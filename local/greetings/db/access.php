@@ -15,25 +15,38 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin strings are defined here.
+ * Main file to view greetings
  *
  * @package     local_greetings
- * @category    string
  * @copyright   2023 The Z <n10324402@qut.edu.au>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
+$capabilities = array(
+ 'local/greetings:postmessages' => array(
+     'riskbitmask' => RISK_SPAM,
+     'captype' => 'write',
+     'contextlevel' => CONTEXT_SYSTEM,
+     'archetypes' => array(
+         'user' => CAP_ALLOW,
+     )
+ ),
+ 'local/greetings:viewmessages' => array(
+     'riskbitmask' => RISK_SPAM,
+     'captype' => 'read',
+     'contextlevel' => CONTEXT_SYSTEM,
+     'archetypes' => array(
+         'user' => CAP_ALLOW,
+     )
+ ),
+ 'local/greetings:deleteanymessage' => array(
+  'riskbitmask' => RISK_SPAM,
+  'captype' => 'read',
+  'contextlevel' => CONTEXT_SYSTEM,
+  'archetypes' => array(
+      'user' => CAP_ALLOW,
+  )
+),
+);
 
-$string['pluginname'] = 'Greetings';
-$string['greetinguser'] = 'Greetings, user.';
-$string['greetingloggedinuser'] = 'Greetings, {$a}.';
-$string['greetinguserau'] = 'Hello, {$a}.';
-$string['greetinguseres'] = 'Hola, {$a}.';
-$string['greetinguserfj'] = 'Bula, {$a}.';
-$string['greetingusernz'] = 'Kia Ora, {$a}.';
-$string['yourmessage'] = 'Your message';
-$string['postedby'] = 'Posted by {$a}.';
-$string['greetings:viewmessages'] = 'View messages on the Greetings wall';
-$string['greetings:postmessages'] = 'Post a new message on the Greetings wall';
-$string['greetings:deleteanymessage'] = "Delete a message on the Greetings wall";
+
