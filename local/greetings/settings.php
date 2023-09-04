@@ -15,27 +15,36 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin strings are defined here.
+ * Library of functions for local_greetings
  *
  * @package     local_greetings
- * @category    string
  * @copyright   2023 The Z <n10324402@qut.edu.au>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+/**
+ * Get a localised greeting message for a user
+ *
+ * @param \stdClass $user
+ * @return string
+ */
 
-$string['pluginname'] = 'Greetings';
-$string['greetinguser'] = 'Greetings, user.';
-$string['greetingloggedinuser'] = 'Greetings, {$a}.';
-$string['greetinguserau'] = 'Hello, {$a}.';
-$string['greetinguseres'] = 'Hola, {$a}.';
-$string['greetinguserfj'] = 'Bula, {$a}.';
-$string['greetingusernz'] = 'Kia Ora, {$a}.';
-$string['yourmessage'] = 'Your message';
-$string['postedby'] = 'Posted by {$a}.';
-$string['greetings:viewmessages'] = 'View messages on the Greetings wall';
-$string['greetings:postmessages'] = 'Post a new message on the Greetings wall';
-$string['greetings:deleteanymessage'] = "Delete a message on the Greetings wall";
-$string['messagecardbgcolor'] = 'Message card color';
-$string['messagecardbgcolordesc'] = 'Background color of the message card';
+ defined('MOODLE_INTERNAL') || die;
+if ($hassiteconfig) {
+    $settings = new admin_settingpage('local_greetings', get_string('pluginname', 'local_greetings'));
+    $ADMIN->add('localplugins', $settings);
+
+    if ($ADMIN->fulltree) {
+        require_once($CFG->dirroot . '/local/greetings/lib.php');
+        $settings->add(new admin_setting_configtext(
+           'local_greetings/messagecardbgcolor',
+            get_string('messagecardbgcolor', 'local_greetings'),
+            get_string('messagecardbgcolordesc', 'local_greetings'),
+            '#FFFFFF',
+        ));
+    }
+}
+
+
+
+
