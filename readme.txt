@@ -3,34 +3,26 @@
   /____/-.---_  .---.  .---.  .-.| || | .---.
   | |  _   _  |/  _  \/  _  \/  _  || |/  __ \
   * | | | | | || |_| || |_| || |_| || || |___/
-    |_| |_| |_|\_____/\_____/\_____||_|\_____
+    |_| |_| |_|\_____/\_____/\_____||_|\_____)
 
-Other site customisation outside of "/local/" directory
-=======================================================
+Moodle - the world's open source learning platform
 
-Local language pack modifications
----------------------------------
-Moodle supports other type of local customisation of standard language
-packs. If you want to create your own language pack based on another
-language create new dataroot directory with "_local" suffix, for example
-following file with content changes string "Login" to "Sign in":
-moodledata/lang/en_local
-<?php
-  $string['login'] = 'Sign in';
+Moodle <https://moodle.org> is a learning platform designed to provide
+educators, administrators and learners with a single robust, secure and
+integrated system to create personalised learning environments.
 
-See also http://docs.moodle.org/en/Language_editing
+You can download Moodle <https://download.moodle.org> and run it on your own
+web server, ask one of our Moodle Partners <https://moodle.com/partners/> to
+assist you, or have a MoodleCloud site <https://moodle.com/cloud/> set up for
+you.
 
+Moodle is widely used around the world by universities, schools, companies and
+all manner of organisations and individuals.
 
-Custom script injection
------------------------
-Very old customisation option that allows you to modify scripts by injecting
-code right after the require 'config.php' call.
+Moodle is provided freely as open source software, under the GNU General Public
+License <https://docs.moodle.org/dev/License>.
 
-This setting is enabled by manually setting $CFG->customscripts variable
-in config.php script. The value is expected to be full path to directory
-with the same structure as dirroot. Please note this hack only affects
-files that actually include the config.php!
+Moodle is written in PHP and JavaScript and uses an SQL database for storing
+the data.
 
-Examples:
-* disable one specific moodle page without code modification
-* alter page parameters on the fly
+See <https://docs.moodle.org> for details of Moodle's many features.
