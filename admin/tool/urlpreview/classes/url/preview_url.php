@@ -29,24 +29,24 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/url/unfurler.php');
 // use unfurl;
 
-class preview_url extends \unfurl
-{
-    /**
-     * Define the form.
-     */
-    public function definition()
-    {
-        $url = 'https://moodle.academy/mod/book/view.php?id=895&chapterid=699';
+// class preview_url extends \unfurl
+// {
+//     /**
+//      * Define the form.
+//      */
+//     public function definition()
+//     {
+//         $url = 'https://moodle.academy/mod/book/view.php?id=895&chapterid=699';
 
-        $customObject = new preview_url($url);
+//         $customObject = new preview_url($url);
 
-        echo $customObject;
-        // $mform = $this->_form; // Don't forget the underscore!
+//         echo $customObject;
+//         // $mform = $this->_form; // Don't forget the underscore!
 
-        // $mform->addElement('textarea', 'message', get_string('yourmessage', 'tool_urlpreview')); // Add elements to your form.
-        // $mform->setType('message', PARAM_TEXT); // Set type of element.
+//         // $mform->addElement('textarea', 'message', get_string('yourmessage', 'tool_urlpreview')); // Add elements to your form.
+//         // $mform->setType('message', PARAM_TEXT); // Set type of element.
 
-        // $submitlabel = get_string('submit');
-        // $mform->addElement('submit', 'submitmessage', $submitlabel);
-    }
-}
+//         // $submitlabel = get_string('submit');
+//         // $mform->addElement('submit', 'submitmessage', $submitlabel);
+//     }
+// }
