@@ -23,7 +23,7 @@
  */
 
 require_once('../../../config.php');
-
+require_once('../../../lib/classes/url/unfurler.php');
 $context = context_system::instance();
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/admin/tool/urlpreview/index.php'));
@@ -52,17 +52,32 @@ if ($action == 'del') {
     $DB->delete_records('tool_urlpreview_messages', array('id' => $id));
 }
 
+
+
 $messageform = new \tool_urlpreview\form\message_form();
 
 if ($data = $messageform->get_data()) {
     require_capability('tool/urlpreview:postmessages', $context);
     $message = required_param('message', PARAM_TEXT);
 
+    // Fetch the URL and get its metadata
+    $url = $data->url;
+    // Assuming the unfurl_store class is available
+    $store = unfurl_store::get_instance();  
+    $metadata = $store->get_unfurl($url);
+
     if (!empty($message)) {
         $record = new stdClass;
         $record->message = $message;
         $record->timecreated = time();
         $record->userid = $USER->id;
+
+        // Add metadata to the record
+        $record->title = $metadata->title;
+        $record->site_name = $metadata->site_name;
+        $record->image = $metadata->image;
+        $record->description = $metadata->description;
+        $record->canonical_url = $metadata->canonical_url;
 
         $DB->insert_record('tool_urlpreview_messages', $record);
     }

@@ -18,7 +18,7 @@
  * Main file to view greetings
  *
  * @package     local_greetings
- * @copyright   2023 The Z <n10324402@qut.edu.au>
+ * @copyright   2023 Hanbin Lee <n10324402@qut.edu.au>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
