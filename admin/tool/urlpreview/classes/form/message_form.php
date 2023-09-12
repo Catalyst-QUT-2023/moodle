@@ -37,7 +37,7 @@ class message_form extends \moodleform {
         $mform->addElement('text', 'url', get_string('url', 'tool_urlpreview')); // Add elements to your form.
         $mform->setType('url', PARAM_TEXT); // Set type of element.
 
-        $submitlabel = get_string('submiturl','tool_urlpreview');
+        $submitlabel = get_string('submiturl', 'tool_urlpreview');
         $mform->addElement('submit', 'submitmessage', $submitlabel);
     }
 }
