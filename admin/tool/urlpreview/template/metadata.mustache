@@ -1,16 +1,16 @@
-{{#no_og_metadata}}
+{{#noogmetadata}}
   <p>No Open Graph metadata available.</p>
-{{/no_og_metadata}}
+{{/noogmetadata}}
 
-{{^no_og_metadata}}
+{{^noogmetadata}}
   <div class="unfurl-metadata">
     {{#title}}
       <h2>Title: {{.}}</h2>
     {{/title}}
     
-    {{#site_name}}
+    {{#sitename}}
       <p>Site Name: {{.}}</p>
-    {{/site_name}}
+    {{/sitename}}
     
     {{#image}}
       <img src="{{.}}" alt="Site image">
@@ -20,8 +20,8 @@
       <p>Description: {{.}}</p>
     {{/description}}
     
-    {{#canonical_url}}
+    {{#canonicalurl}}
       <p>Canonical URL: <a href="{{.}}">{{.}}</a></p>
-    {{/canonical_url}}
+    {{/canonicalurl}}
   </div>
-{{/no_og_metadata}}
+{{/noogmetadata}}
