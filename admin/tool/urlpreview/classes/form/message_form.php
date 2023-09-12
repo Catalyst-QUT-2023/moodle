@@ -34,10 +34,10 @@ class message_form extends \moodleform {
     public function definition() {
         $mform = $this->_form; // Don't forget the underscore!
 
-        $mform->addElement('textarea', 'message', get_string('yourmessage', 'tool_urlpreview')); // Add elements to your form.
-        $mform->setType('message', PARAM_TEXT); // Set type of element.
+        $mform->addElement('text', 'url', get_string('url', 'tool_urlpreview')); // Add elements to your form.
+        $mform->setType('url', PARAM_TEXT); // Set type of element.
 
-        $submitlabel = get_string('submit');
+        $submitlabel = get_string('submiturl','tool_urlpreview');
         $mform->addElement('submit', 'submitmessage', $submitlabel);
     }
 }

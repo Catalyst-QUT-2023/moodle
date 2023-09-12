@@ -26,7 +26,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'urlpreview';
-$string['yourmessage'] = 'Your message';
+$string['url'] = 'URL';
+$string['submiturl'] = 'submit URL';
 $string['postedby'] = 'Posted by {$a}.';
 $string['urlpreview:viewmessages'] = 'View messages on the urlpreview wall';
 $string['urlpreview:postmessages'] = 'Post a new message on the urlpreview wall';
