@@ -28,10 +28,10 @@
  * @param navigation_node $frontpage Node representing the front page in the navigation tree.
  */
 
-function tool_urlpreview_extend_navigation_frontpage(navigation_node $frontpage) {
-    $frontpage->add(
-     get_string('pluginname', 'tool_urlpreview'),
-     new moodle_url('/admin/tool/urlpreview/index.php'),
-     navigation_node::TYPE_CUSTOM,
-    );
-}
+// function tool_urlpreview_extend_navigation_frontpage(navigation_node $frontpage) {
+//     $frontpage->add(
+//      get_string('pluginname', 'tool_urlpreview'),
+//      new moodle_url('/admin/tool/urlpreview/index.php'),
+//      navigation_node::TYPE_CUSTOM,
+//     );
+// }

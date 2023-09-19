@@ -29,7 +29,7 @@ $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/admin/tool/urlpreview/index.php'));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title($SITE->fullname);
-$PAGE->set_heading(get_string('pluginname', 'tool_urlpreview'));
+$PAGE->set_heading(get_string('menuname', 'tool_urlpreview'));
 
 require_login();
 if (isguestuser()) {

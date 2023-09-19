@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'urlpreview';
+$string['menuname'] = 'URL Metadata Preview';
 $string['url'] = 'URL';
 $string['submiturl'] = 'submit URL';
 $string['postedby'] = 'Posted by {$a}.';
