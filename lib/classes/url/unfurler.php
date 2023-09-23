@@ -28,6 +28,7 @@ class unfurl {
     public $image = '';
     public $description = '';
     public $canonicalurl = '';
+    public $type = '';
     public $noogmetadata = true;
 
     public function __construct($url) {
@@ -83,6 +84,8 @@ class unfurl {
                     case 'og:url':
                         $this->canonicalurl = $contentattribute;
                         break;
+                    case 'og:type':
+                        $this->type = $contentattribute;
                     default:
                         break;
                 }

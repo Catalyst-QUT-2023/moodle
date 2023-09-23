@@ -30,6 +30,8 @@ $PAGE->set_url(new moodle_url('/admin/tool/urlpreview/index.php'));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title($SITE->fullname);
 $PAGE->set_heading(get_string('menuname', 'tool_urlpreview'));
+$PAGE->requires->css('/admin/tool/urlpreview/style.css');
+
 
 require_login();
 if (isguestuser()) {
