@@ -98,8 +98,8 @@ class unfurl {
         // Get the properties of this object as an array.
         $unfurldata = get_object_vars($this);
 
-        // Use the render_from_template method to render your Mustache template.
-        return $OUTPUT->render_from_template('../../../admin/tool/urlpreview/template/metadata', $unfurldata);
+        // Use the render_from_template method to render Mustache template.
+        return $OUTPUT->render_from_template('../../../admin/tool/urlpreview/templates/metadata', $unfurldata);
     }
 
 }

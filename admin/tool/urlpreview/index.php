@@ -24,6 +24,8 @@
 
 require_once('../../../config.php');
 require_once('../../../lib/classes/url/unfurler.php');
+
+
 $context = context_system::instance();
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/admin/tool/urlpreview/index.php'));
@@ -38,27 +40,24 @@ if (isguestuser()) {
     throw new moodle_exception('noguest');
 }
 
-$messageform = new \tool_urlpreview\form\message_form();
-
-
 echo $OUTPUT->header();
 if (isloggedin()) {
     echo '<h3>Welcome, ' . fullname($USER) . '</h3>';
 }
+$templatedata = [
+    'action' => 'index.php',
+    'formClass' => 'form-class',
+    'urlLabel' => 'URL',
+    'submitValue' => 'Submit'
+];
+echo $OUTPUT->render_from_template('tool_urlpreview/form', $templatedata);
 
-$messageform->display();
-
-if ($data = $messageform->get_data()) {
-
-    // Fetch the URL and get its metadata.
-    $url = $data->url;
-    // Assuming the unfurl_store class is available.
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['url'])) {
+    $url = optional_param('url', '', PARAM_URL);
     $unfurler = new unfurl($url);
-
-    $renderedoutput = $unfurler->render_unfurl_metadata($url);
+    $renderedoutput = $unfurler->render_unfurl_metadata();
 
     echo $renderedoutput;
-
 }
 
 echo $OUTPUT->box_start('card-columns');
