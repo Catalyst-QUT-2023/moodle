@@ -1,0 +1,77 @@
+{{#noogmetadata}}
+  <p>No Open Graph metadata available.</p>
+{{/noogmetadata}}
+
+{{^noogmetadata}}
+  <table class="unfurl-metadata" border="1">
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>Content</th>
+      </tr>
+      
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>og:url</td>
+        <td>{{#canonicalurl}}<a href="{{.}}" target="_blank">{{.}}</a>{{/canonicalurl}}{{^canonicalurl}}<i>Not available</i>{{/canonicalurl}}</td>
+      </tr>
+
+      <tr>
+        <td>og:type</td>
+        <td>{{#type}}{{.}}{{/type}}{{^type}}<i>Not available</i>{{/type}}</td>
+      </tr>
+
+      <tr>
+        <td>og:title</td>
+        <td>{{#title}}{{.}}{{/title}}{{^title}}<i>Not available</i>{{/title}}</td>
+      </tr>
+
+      <tr>
+        <td>og:image</td>
+        <td>{{#image}}<img src="{{.}}" alt="Site image" width="200">{{/image}}{{^image}}<i>Not available</i>{{/image}}</td>
+      </tr>
+
+      <tr>
+        <td>og:site_name</td>
+        <td>{{#sitename}}{{.}}{{/sitename}}{{^sitename}}<i>Not available</i>{{/sitename}}</td>
+      </tr>
+      
+      
+      <tr>
+        <td>og:description</td>
+        <td>{{#description}}{{.}}{{/description}}{{^description}}<i>Not available</i>{{/description}}</td>
+      </tr>
+      
+      <tr>
+      <td>Link Preview</td>
+      <td class ="link-preview-cell">
+        <div class="link-preview">
+          {{#image}}
+            <div class="preview-image">
+              <img src="{{.}}" alt="Preview Image">
+            </div>
+          {{/image}}
+          <div class="preview-text">
+            {{#sitename}}
+              <div class="preview-site-name">{{.}}</div>
+            {{/sitename}}
+            {{#title}}
+              <div class="preview-title">{{.}}</div>
+            {{/title}}
+            {{#description}}
+              <div class="preview-description">{{.}}</div>
+            {{/description}}
+          </div>
+        </div>
+      </td>
+    </tr>
+      
+    </tbody>
+  </table>
+
+{{/noogmetadata}}
+
+
+

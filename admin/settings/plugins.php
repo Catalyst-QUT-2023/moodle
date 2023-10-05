@@ -813,6 +813,7 @@ if ($hassiteconfig) {
     $ADMIN->add('modules', new admin_category('localplugins', new lang_string('localplugins')));
     $ADMIN->add('localplugins', new admin_externalpage('managelocalplugins', new lang_string('localpluginsmanage'),
                                                         $CFG->wwwroot . '/' . $CFG->admin . '/localplugins.php'));
+    $ADMIN->add('development', new admin_externalpage('urlpreview', get_string('menuname', 'tool_urlpreview'), "$CFG->wwwroot/admin/tool/urlpreview/index.php"));
 }
 
 // Extend settings for each local plugin. Note that their settings may be in any part of the

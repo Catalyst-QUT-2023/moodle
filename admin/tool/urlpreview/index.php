@@ -29,31 +29,14 @@ $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/admin/tool/urlpreview/index.php'));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title($SITE->fullname);
-$PAGE->set_heading(get_string('pluginname', 'tool_urlpreview'));
+$PAGE->set_heading(get_string('menuname', 'tool_urlpreview'));
+$PAGE->requires->css('/admin/tool/urlpreview/style.css');
+
 
 require_login();
 if (isguestuser()) {
     throw new moodle_exception('noguest');
 }
-
-// if ($action == 'del') {
-//     $id = required_param('id', PARAM_TEXT);
-
-//     $DB->delete_records('tool_urlpreview_messages', array('id' => $id));
-// }
-
-
-//$allowpost = has_capability('tool/urlpreview:postmessages', $context);
-//$deleteanypost = has_capability('tool/urlpreview:deleteanymessage', $context);
-//$action = optional_param('action', '', PARAM_TEXT);
-
-// if ($action == 'del') {
-//     require_capability('tool/urlpreview:deleteanymessage', $context);
-//     $id = required_param('id', PARAM_TEXT);
-//     $DB->delete_records('tool_urlpreview_messages', array('id' => $id));
-// }
-
-
 
 $messageform = new \tool_urlpreview\form\message_form();
 
@@ -66,51 +49,20 @@ if (isloggedin()) {
 $messageform->display();
 
 if ($data = $messageform->get_data()) {
-    //require_capability('tool/urlpreview:postmessages', $context);
 
-
-    // Fetch the URL and get its metadata
+    // Fetch the URL and get its metadata.
     $url = $data->url;
-    // Assuming the unfurl_store class is available
-    $unfurler = new unfurl($url);  
-    
-    var_dump($unfurler);
+    // Assuming the unfurl_store class is available.
+    $unfurler = new unfurl($url);
+
+    $renderedoutput = $unfurler->render_unfurl_metadata($url);
+
+    echo $renderedoutput;
 
 }
 
-// $userfields = \core_user\fields::for_name()->with_identity($context);
-// $userfieldssql = $userfields->get_sql('u');
-// $sql = "SELECT m.id, m.message, m.timecreated, m.userid {$userfieldssql->selects}
-//        FROM {tool_urlpreview_messages} m
-//   LEFT JOIN {user} u ON u.id = m.userid
-//    ORDER BY timecreated DESC";
-
-// $messages = $DB->get_records_sql($sql);
-
 echo $OUTPUT->box_start('card-columns');
 
-// foreach ($messages as $m) {
-//     echo html_writer::start_tag('div', array('class' => 'card'));
-//     echo html_writer::start_tag('div', array('class' => 'card-body'));
-//     echo html_writer::tag('p', format_text($m->message, FORMAT_PLAIN), array('class' => 'card-text'));
-//     echo html_writer::tag('p', get_string('postedby', 'tool_urlpreview', $m->firstname), array('class' => 'card-text'));
-//     echo html_writer::start_tag('p', array('class' => 'card-text'));
-//     echo html_writer::tag('small', userdate($m->timecreated), array('class' => 'text-muted'));
-//     echo html_writer::end_tag('p');
-//     echo html_writer::end_tag('div');
-//     echo html_writer::end_tag('div');
-//     if ($deleteanypost) {
-//         echo html_writer::start_tag('p', array('class' => 'card-footer text-center'));
-//         echo html_writer::link(
-//          new moodle_url(
-//              'index.php',
-//              array('action' => 'del', 'id' => $m->id)
-//          ),
-//         $OUTPUT->pix_icon('t/delete', '') . get_string('delete')
-//         );
-//         echo html_writer::end_tag('p');
-//     }
-// }
 echo $OUTPUT->box_end();
 echo $OUTPUT->footer();
 

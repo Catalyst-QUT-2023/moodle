@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Receives Open Graph protocol metadata (a.k.a social media metadata) from link
@@ -25,69 +24,82 @@ defined('MOODLE_INTERNAL') || die();
  */
 class unfurl {
     public $title = '';
-    public $site_name = '';
+    public $sitename = '';
     public $image = '';
     public $description = '';
-    public $canonical_url = '';
-    public $no_og_metadata = true;
+    public $canonicalurl = '';
+    public $type = '';
+    public $noogmetadata = true;
 
-    function __construct($url) {
+    public function __construct($url) {
         $html = file_get_contents($url);
 
         $doc = new DOMDocument();
         @$doc->loadHTML('<?xml encoding="UTF-8">' . $html);
-        $meta_tag_list = $doc->getElementsByTagName('meta');
+        $metataglist = $doc->getElementsByTagName('meta');
 
-        foreach($meta_tag_list as $meta_tag) {
-            $property_attribute = strtolower(s($meta_tag->getAttribute('property')));
+        foreach ($metataglist as $metatag) {
+            $propertyattribute = strtolower(s($metatag->getAttribute('property')));
             if (
-                !empty($property_attribute) &&
-                preg_match ('/^og:\w/i', $property_attribute) === 1
+                !empty($propertyattribute) &&
+                preg_match ('/^og:\w/i', $propertyattribute) === 1
             ) {
-                $this->no_og_metadata = false;
+                $this->noogmetadata = false;
                 break;
             }
         }
 
-        if ($this->no_og_metadata) {
+        if ($this->noogmetadata) {
             return;
         }
 
-        foreach($meta_tag_list as $meta_tag) {
-            $property_attribute = strtolower(s($meta_tag->getAttribute('property')));
-            $content_attribute = s($meta_tag->getAttribute('content'));
+        foreach ($metataglist as $metatag) {
+            $propertyattribute = strtolower(s($metatag->getAttribute('property')));
+            $contentattribute = s($metatag->getAttribute('content'));
             if (
-                !empty($property_attribute) &&
-                !empty($content_attribute) &&
-                preg_match ('/^og:\w/i', $property_attribute) === 1
+                !empty($propertyattribute) &&
+                !empty($contentattribute) &&
+                preg_match ('/^og:\w/i', $propertyattribute) === 1
             ) {
-                switch ($property_attribute) {
+                switch ($propertyattribute) {
                     case 'og:title':
-                        $this->title = $content_attribute;
+                        $this->title = $contentattribute;
                         break;
                     case 'og:site_name':
-                        $this->site_name = $content_attribute;
+                        $this->sitename = $contentattribute;
                         break;
                     case 'og:image':
-                        $imageurl_parts = parse_url($content_attribute);
-                        // Some websites only give the path
-                        if (empty($imageurl_parts['host']) && !empty($imageurl_parts['path'])) {
-                            $url_parts = parse_url($url);
-                            $this->image = $url_parts['scheme'].'://'.$url_parts['host'].$imageurl_parts['path'];
+                        $imageurlparts = parse_url($contentattribute);
+                        // Some websites only give the path.
+                        if (empty($imageurlparts['host']) && !empty($imageurlparts['path'])) {
+                            $urlparts = parse_url($url);
+                            $this->image = $urlparts['scheme'].'://'.$urlparts['host'].$imageurlparts['path'];
                         } else {
-                            $this->image = $content_attribute;
+                            $this->image = $contentattribute;
                         }
                         break;
                     case 'og:description':
-                        $this->description = $content_attribute;
+                        $this->description = $contentattribute;
                         break;
                     case 'og:url':
-                        $this->canonical_url = $content_attribute;
+                        $this->canonicalurl = $contentattribute;
                         break;
+                    case 'og:type':
+                        $this->type = $contentattribute;
                     default:
                         break;
                 }
             }
         }
     }
+    public function render_unfurl_metadata() {
+        global $OUTPUT;  // Use the global $OUTPUT variable, Moodle's core renderer.
+
+        // Get the properties of this object as an array.
+        $unfurldata = get_object_vars($this);
+
+        // Use the render_from_template method to render your Mustache template.
+        return $OUTPUT->render_from_template('../../../admin/tool/urlpreview/template/metadata', $unfurldata);
+    }
+
 }
