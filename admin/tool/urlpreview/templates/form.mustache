@@ -1,5 +1,9 @@
-<form action="{{action}}" method="get" class="{{formClass}}">
-    <label for="url">{{urlLabel}}</label>
-    <input type="text" id="url" name="url" required>
-    <input type="submit" value="{{submitValue}}">
+<form action="{{action}}" method="get" class="m-3">
+    <div class="input-group">
+        <label for="url" class="sr-only">{{#str}}url, tool_urlpreview{{/str}}</label>
+        <input type="text" id="url" name="url" class="form-control" placeholder="{{#str}}url, tool_urlpreview{{/str}}" required value="{{submittedUrl}}">
+        <div class="input-group-append">
+            <input type="submit" class="btn btn-primary" value="{{#str}}submit, tool_urlpreview{{/str}}">
+        </div>
+    </div>
 </form>

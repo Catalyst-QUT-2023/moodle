@@ -99,7 +99,7 @@ class unfurl {
         $unfurldata = get_object_vars($this);
 
         // Use the render_from_template method to render Mustache template.
-        return $OUTPUT->render_from_template('../../../admin/tool/urlpreview/templates/metadata', $unfurldata);
+        return $OUTPUT->render_from_template('tool_urlpreview/metadata', $unfurldata);
     }
 
 }

@@ -44,16 +44,18 @@ echo $OUTPUT->header();
 if (isloggedin()) {
     echo '<h3>Welcome, ' . fullname($USER) . '</h3>';
 }
+
+$url = optional_param('url', '', PARAM_URL);
+
 $templatedata = [
     'action' => 'index.php',
-    'formClass' => 'form-class',
-    'urlLabel' => 'URL',
-    'submitValue' => 'Submit'
+    'submittedUrl' => $url,
 ];
+
 echo $OUTPUT->render_from_template('tool_urlpreview/form', $templatedata);
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['url'])) {
-    $url = optional_param('url', '', PARAM_URL);
+if ($url !== '') {
+
     $unfurler = new unfurl($url);
     $renderedoutput = $unfurler->render_unfurl_metadata();
 
