@@ -3,75 +3,58 @@
 {{/noogmetadata}}
 
 {{^noogmetadata}}
-  <table class="unfurl-metadata" border="1">
-    <thead>
-      <tr>
+<table class="table table-sm table-bordered">
+    <tr>
         <th>Property</th>
         <th>Content</th>
-      </tr>
-      
-    </thead>
-    <tbody>
-
-      <tr>
+    </tr>
+    <tr>
         <td>og:url</td>
         <td>{{#canonicalurl}}<a href="{{.}}" target="_blank">{{.}}</a>{{/canonicalurl}}{{^canonicalurl}}<i>Not available</i>{{/canonicalurl}}</td>
-      </tr>
-
-      <tr>
+    </tr>
+    <tr>
         <td>og:type</td>
         <td>{{#type}}{{.}}{{/type}}{{^type}}<i>Not available</i>{{/type}}</td>
-      </tr>
-
-      <tr>
+    </tr>
+    <tr>
         <td>og:title</td>
         <td>{{#title}}{{.}}{{/title}}{{^title}}<i>Not available</i>{{/title}}</td>
-      </tr>
-
-      <tr>
+    </tr>
+    <tr>
         <td>og:image</td>
-        <td>{{#image}}<img src="{{.}}" alt="Site image" width="200">{{/image}}{{^image}}<i>Not available</i>{{/image}}</td>
-      </tr>
-
-      <tr>
+        <td>{{#image}}<a href="{{.}}">{{.}}{{/image}}{{^image}}<i>Not available</i>{{/image}}</td>
+    </tr>
+    <tr>
         <td>og:site_name</td>
         <td>{{#sitename}}{{.}}{{/sitename}}{{^sitename}}<i>Not available</i>{{/sitename}}</td>
-      </tr>
-      
-      
-      <tr>
+    </tr>
+    <tr>
         <td>og:description</td>
         <td>{{#description}}{{.}}{{/description}}{{^description}}<i>Not available</i>{{/description}}</td>
-      </tr>
-      
-      <tr>
-      <td>Link Preview</td>
-      <td class ="link-preview-cell">
-        <div class="link-preview">
-          {{#image}}
-            <div class="preview-image">
-              <img src="{{.}}" alt="Preview Image">
-            </div>
-          {{/image}}
-          <div class="preview-text">
-            {{#sitename}}
-              <div class="preview-site-name">{{.}}</div>
-            {{/sitename}}
-            {{#title}}
-              <div class="preview-title">{{.}}</div>
-            {{/title}}
-            {{#description}}
-              <div class="preview-description">{{.}}</div>
-            {{/description}}
-          </div>
-        </div>
-      </td>
     </tr>
-      
-    </tbody>
-  </table>
-
+    <tr>
+        <td>Link Preview</td>
+        <td>
+            <div style="max-width: 30em">
+                <div class="card shadow-sm">
+                    {{#image}}
+                        <img class="card-img-top" src="{{{.}}}" alt="Preview Image">
+                    {{/image}}
+                    <div class="card-footer">
+                        {{#title}}
+                            <h5><a href="{{canonicalurl}}" class="card-title stretched-link">{{.}}</a></h5>
+                        {{/title}}
+                        {{#description}}
+                            <div class="card-text">{{.}}</div>
+                        {{/description}}
+                        {{#sitename}}
+                            <small class="card-text text-muted text-uppercase">{{.}}</small>
+                        {{/sitename}}
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
 {{/noogmetadata}}
-
-
 
