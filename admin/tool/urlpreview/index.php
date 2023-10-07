@@ -49,15 +49,10 @@ $templatedata = [
 echo $OUTPUT->render_from_template('tool_urlpreview/form', $templatedata);
 
 if ($url !== '') {
-
     $unfurler = new unfurl($url);
     $renderedoutput = $unfurler->render_unfurl_metadata();
-
     echo $renderedoutput;
 }
 
-echo $OUTPUT->box_start('card-columns');
-
-echo $OUTPUT->box_end();
 echo $OUTPUT->footer();
 
