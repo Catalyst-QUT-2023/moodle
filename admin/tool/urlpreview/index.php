@@ -25,6 +25,7 @@
 require_once('../../../config.php');
 require_once('../../../lib/classes/url/unfurler.php');
 
+$url = optional_param('url', '', PARAM_URL);
 
 $context = context_system::instance();
 $PAGE->set_context($context);
@@ -32,8 +33,6 @@ $PAGE->set_url(new moodle_url('/admin/tool/urlpreview/index.php'));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title($SITE->fullname);
 $PAGE->set_heading(get_string('menuname', 'tool_urlpreview'));
-$PAGE->requires->css('/admin/tool/urlpreview/style.css');
-
 
 require_login();
 if (isguestuser()) {
@@ -41,11 +40,6 @@ if (isguestuser()) {
 }
 
 echo $OUTPUT->header();
-if (isloggedin()) {
-    echo '<h3>Welcome, ' . fullname($USER) . '</h3>';
-}
-
-$url = optional_param('url', '', PARAM_URL);
 
 $templatedata = [
     'action' => 'index.php',
