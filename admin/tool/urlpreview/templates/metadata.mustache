@@ -11,7 +11,7 @@
     <tr>
         <td>Link Preview</td>
         <td>
-            <div style="max-width: 450px">
+            <div style="max-width: 450px" class="p-2">
                 <div class="card shadow-sm">
                     {{#image}}
                         <img class="card-img-top" src="{{{.}}}" alt="Preview Image">
@@ -26,6 +26,32 @@
                         {{#sitename}}
                             <small class="card-text text-muted text-uppercase">{{.}}</small>
                         {{/sitename}}
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td>Slim preview</td>
+        <td>
+            <div style="max-width: 800px" class="p-2">
+                <div class="border shadow-sm rounded">
+                    <div class="row no-gutters">
+                        <div class="col-md-2">
+                            {{#image}}
+                                <img class="rounded-left" style="max-width: 120px" src="{{{.}}}" alt="">
+                            {{/image}}
+                        </div>
+                        <div class="col-md-10">
+                            <div class="py-2 px-0">
+                                {{#title}}
+                                    <h5 class="text-truncate my-0"><a href="{{canonicalurl}}" target="_blank" class="card-title stretched-link">{{.}}</a></h5>
+                                {{/title}}
+                                {{#description}}
+                                    <div class="text-truncate my-0">{{.}}</div>
+                                {{/description}}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
