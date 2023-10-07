@@ -9,6 +9,29 @@
         <th>Content</th>
     </tr>
     <tr>
+        <td>Link Preview</td>
+        <td>
+            <div style="max-width: 450px">
+                <div class="card shadow-sm">
+                    {{#image}}
+                        <img class="card-img-top" src="{{{.}}}" alt="Preview Image">
+                    {{/image}}
+                    <div class="card-footer">
+                        {{#title}}
+                            <h5><a href="{{canonicalurl}}" target="_blank" class="card-title stretched-link">{{.}}</a></h5>
+                        {{/title}}
+                        {{#description}}
+                            <div class="card-text">{{.}}</div>
+                        {{/description}}
+                        {{#sitename}}
+                            <small class="card-text text-muted text-uppercase">{{.}}</small>
+                        {{/sitename}}
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
         <td>og:url</td>
         <td>{{#canonicalurl}}<a href="{{.}}" target="_blank">{{.}}</a>{{/canonicalurl}}{{^canonicalurl}}<i>Not available</i>{{/canonicalurl}}</td>
     </tr>
@@ -31,29 +54,6 @@
     <tr>
         <td>og:description</td>
         <td>{{#description}}{{.}}{{/description}}{{^description}}<i>Not available</i>{{/description}}</td>
-    </tr>
-    <tr>
-        <td>Link Preview</td>
-        <td>
-            <div style="max-width: 450px">
-                <div class="card shadow-sm">
-                    {{#image}}
-                        <img class="card-img-top" src="{{{.}}}" alt="Preview Image">
-                    {{/image}}
-                    <div class="card-footer">
-                        {{#title}}
-                            <h5><a href="{{canonicalurl}}" target="_blank" class="card-title stretched-link">{{.}}</a></h5>
-                        {{/title}}
-                        {{#description}}
-                            <div class="card-text">{{.}}</div>
-                        {{/description}}
-                        {{#sitename}}
-                            <small class="card-text text-muted text-uppercase">{{.}}</small>
-                        {{/sitename}}
-                    </div>
-                </div>
-            </div>
-        </td>
     </tr>
 </table>
 {{/noogmetadata}}
