@@ -38,6 +38,14 @@ class unfurl {
         @$doc->loadHTML('<?xml encoding="UTF-8">' . $html);
         $metataglist = $doc->getElementsByTagName('meta');
 
+        //set default values
+        //default html title
+        $titleElement = $doc->getElementsByTagName('title')->item(0);
+        if ($titleElement) {
+            $this->title = $titleElement->textContent;
+        }
+
+        //iterate through meta tags
         foreach ($metataglist as $metatag) {
             $propertyattribute = strtolower(s($metatag->getAttribute('property')));
             if (
