@@ -29,4 +29,5 @@ $string['pluginname'] = 'urlpreview';
 $string['menuname'] = 'URL Metadata Preview';
 $string['preview'] = 'Preview';
 $string['url'] = 'URL';
+$string['urlpreview:usetool'] = 'Use the urlpreview tool';
 

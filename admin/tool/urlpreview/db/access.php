@@ -15,17 +15,21 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * Plugin strings are defined here.
  *
  * @package     tool_urlpreview
+ * @category    string
  * @copyright   2023 Hanbin Lee <n10324402@qut.edu.au>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+ defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'tool_urlpreview';
-$plugin->release = '0.1.0';
-$plugin->version = 2023100901;
-$plugin->requires = 2022112800;
-$plugin->maturity = MATURITY_ALPHA;
+ $capabilities = array(
+  'tool/urlpreview:usetool' => array(
+      'riskbitmask' => RISK_SPAM,
+      'captype' => 'write',
+      'contextlevel' => CONTEXT_SYSTEM
+  ),
+);
+
