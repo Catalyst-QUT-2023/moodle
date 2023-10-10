@@ -33,11 +33,14 @@ $PAGE->set_url(new moodle_url('/admin/tool/urlpreview/index.php'));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title($SITE->fullname);
 $PAGE->set_heading(get_string('menuname', 'tool_urlpreview'));
+$allowuse = has_capability('tool/urlpreview:usetool', $context);
 
 require_login();
+require_capability('tool/urlpreview:usetool', $context);
 if (isguestuser()) {
     throw new moodle_exception('noguest');
 }
+
 
 echo $OUTPUT->header();
 

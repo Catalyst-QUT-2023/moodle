@@ -26,6 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'tool_urlpreview';
 $plugin->release = '0.1.0';
-$plugin->version = 2023090600;
+$plugin->version = 2023101000;
 $plugin->requires = 2022112800;
 $plugin->maturity = MATURITY_ALPHA;
