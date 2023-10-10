@@ -25,7 +25,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
-    $ADMIN->add('development', new admin_externalpage('urlpreview', get_string('menuname', 'tool_urlpreview'), "$CFG->wwwroot/admin/tool/urlpreview/index.php"));
+    $ADMIN->add('development',
+    new admin_externalpage('urlpreview',
+    get_string('menuname', 'tool_urlpreview'),
+    "$CFG->wwwroot/admin/tool/urlpreview/index.php"));
 }
 
 

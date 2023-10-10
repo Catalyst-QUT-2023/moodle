@@ -15,21 +15,20 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin strings are defined here.
  *
  * @package     tool_urlpreview
- * @category    string
  * @copyright   2023 Hanbin Lee <n10324402@qut.edu.au>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
  defined('MOODLE_INTERNAL') || die();
 
- $capabilities = array(
-  'tool/urlpreview:usetool' => array(
+ $capabilities = [
+  'tool/urlpreview:usetool' => [
       'riskbitmask' => RISK_SPAM,
       'captype' => 'write',
       'contextlevel' => CONTEXT_SYSTEM
-  ),
-);
+  ],
+
+ ];
 
