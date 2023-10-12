@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
+ * defines capabilities for access to urlpreview tool
  *
  * @package     tool_urlpreview
  * @copyright   2023 Hanbin Lee <n10324402@qut.edu.au>

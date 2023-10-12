@@ -17,7 +17,7 @@
 /**
  * Link to CSV course upload.
  *
- * @package    tool_uploadcourse
+ * @package    tool_urlpreview
  * @copyright  2023 Emily Lim <n10882243@qut.edu.au>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

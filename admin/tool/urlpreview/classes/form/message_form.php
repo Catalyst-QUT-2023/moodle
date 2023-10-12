@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Main file to view greetings
+ * Main file for defining message form
  *
  * @package     tool_urlpreview
  * @copyright   2023 Hanbin Lee <n10324402@qut.edu.au>
@@ -27,6 +27,9 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/formslib.php');
 
+/**
+ * Form for entering urls in urlpreview tool
+ */
 class message_form extends \moodleform {
     /**
      * Define the form.
