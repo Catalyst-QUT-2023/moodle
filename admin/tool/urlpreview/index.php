@@ -51,26 +51,26 @@ $templatedata = [
 echo $OUTPUT->render_from_template('tool_urlpreview/form', $templatedata);
 
 if ($url !== '') {
-    // Check if the linted data for this URL is already in the database
-    $lintedData = $DB->get_record('urlpreview', ['url' => $url]);
+    // Check if the linted data for this URL is already in the database.
+    $linteddata = $DB->get_record('urlpreview', ['url' => $url]);
 
-    if (!$lintedData) {
-        // If not in the database, lint the URL
+    if (!$linteddata) {
+        // If not in the database, lint the URL.
         $unfurler = new unfurl($url);
         $renderedoutput = $unfurler->render_unfurl_metadata();
 
-        // Save the linted data to the database
-        $dataToInsert = new stdClass();
-        $dataToInsert->url = $url;
-        $dataToInsert->title = $unfurler->title;
-        $dataToInsert->type = $unfurler->type;
-        $dataToInsert->imageurl = $unfurler->image;
-        $dataToInsert->sitename = $unfurler->sitename;
-        $dataToInsert->description = $unfurler->description;
-        $DB->insert_record('urlpreview', $dataToInsert);
+        // Save the linted data to the database.
+        $datatoinsert = new stdClass();
+        $datatoinsert->url = $url;
+        $datatoinsert->title = $unfurler->title;
+        $datatoinsert->type = $unfurler->type;
+        $datatoinsert->imageurl = $unfurler->image;
+        $datatoinsert->sitename = $unfurler->sitename;
+        $datatoinsert->description = $unfurler->description;
+        $DB->insert_record('urlpreview', $datatoinsert);
     } else {
-        // If data is in the database, prepare it for rendering
-        $renderedoutput = rend($lintedData);
+        // If data is in the database, prepare it for rendering.
+        $renderedoutput = rend($linteddata);
     }
 
     echo $renderedoutput;
@@ -80,7 +80,7 @@ echo $OUTPUT->footer();
 
 /**
  * Renders linted data from the database for display.
- * 
+ *
  * @param stdClass $data The linted data retrieved from the database.
  * @return string The formatted output for display.
  */
@@ -88,14 +88,15 @@ function rend($data) {
     global $OUTPUT;
 
     $templatedata = [
-        'noogmetadata' => empty($data->title) && empty($data->imageurl) && empty($data->sitename) && empty($data->description) && empty($data->type), // true if no data
+        'noogmetadata' => empty($data->title) && empty($data->imageurl) && empty($data->sitename)
+        && empty($data->description) && empty($data->type),
         'canonicalurl' => $data->url,
         'title'        => $data->title,
-        'image'        => $data->imageurl, 
+        'image'        => $data->imageurl,
         'sitename'     => $data->sitename,
         'description'  => $data->description,
-        'type'         => $data->type
+        'type'         => $data->type,
     ];
 
-    return $OUTPUT->render_from_template('tool_urlpreview/metadata', $templatedata); 
+    return $OUTPUT->render_from_template('tool_urlpreview/metadata', $templatedata);
 }
