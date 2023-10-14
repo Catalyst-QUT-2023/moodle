@@ -41,7 +41,6 @@ if (isguestuser()) {
     throw new moodle_exception('noguest');
 }
 
-
 echo $OUTPUT->header();
 
 $templatedata = [
@@ -52,10 +51,51 @@ $templatedata = [
 echo $OUTPUT->render_from_template('tool_urlpreview/form', $templatedata);
 
 if ($url !== '') {
-    $unfurler = new unfurl($url);
-    $renderedoutput = $unfurler->render_unfurl_metadata();
+    // Check if the linted data for this URL is already in the database
+    $lintedData = $DB->get_record('urlpreview', ['url' => $url]);
+
+    if (!$lintedData) {
+        // If not in the database, lint the URL
+        $unfurler = new unfurl($url);
+        $renderedoutput = $unfurler->render_unfurl_metadata();
+
+        // Save the linted data to the database
+        $dataToInsert = new stdClass();
+        $dataToInsert->url = $url;
+        $dataToInsert->title = $unfurler->title;
+        $dataToInsert->type = $unfurler->type;
+        $dataToInsert->imageurl = $unfurler->image;
+        $dataToInsert->sitename = $unfurler->sitename;
+        $dataToInsert->description = $unfurler->description;
+        $DB->insert_record('urlpreview', $dataToInsert);
+    } else {
+        // If data is in the database, prepare it for rendering
+        $renderedoutput = rend($lintedData);
+    }
+
     echo $renderedoutput;
 }
 
 echo $OUTPUT->footer();
 
+/**
+ * Renders linted data from the database for display.
+ * 
+ * @param stdClass $data The linted data retrieved from the database.
+ * @return string The formatted output for display.
+ */
+function rend($data) {
+    global $OUTPUT;
+
+    $templatedata = [
+        'noogmetadata' => empty($data->title) && empty($data->imageurl) && empty($data->sitename) && empty($data->description) && empty($data->type), // true if no data
+        'canonicalurl' => $data->url,
+        'title'        => $data->title,
+        'image'        => $data->imageurl, 
+        'sitename'     => $data->sitename,
+        'description'  => $data->description,
+        'type'         => $data->type
+    ];
+
+    return $OUTPUT->render_from_template('tool_urlpreview/metadata', $templatedata); 
+}
