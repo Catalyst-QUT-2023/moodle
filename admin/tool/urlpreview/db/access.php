@@ -27,7 +27,7 @@
   'tool/urlpreview:usetool' => [
       'riskbitmask' => RISK_SPAM,
       'captype' => 'write',
-      'contextlevel' => CONTEXT_SYSTEM
+      'contextlevel' => CONTEXT_SYSTEM,
   ],
 
  ];
