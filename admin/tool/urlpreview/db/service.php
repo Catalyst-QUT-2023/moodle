@@ -15,29 +15,21 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Main file to view greetings
  *
  * @package     tool_urlpreview
  * @copyright   2023 Hanbin Lee <n10324402@qut.edu.au>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace tool_urlpreview\form;
-
 defined('MOODLE_INTERNAL') || die();
+// Delcare the new web service functions.
+$functions = [
+ 'tool_urlpreview_get_data' => [
+     'classname' => 'tool_urlpreview_external',
+     'methodname' => 'get_url_data',
+     'classpath' => 'admin/tool/urlpreview/classes/external/externallib.php',
+     'description' => 'Get scraped data',
+     'type' => 'read',
+     'ajax' => true,
+ ],
+];
 
-require_once($CFG->libdir . '/formslib.php');
-
-class message_form extends \moodleform {
-    /**
-     * Define the form.
-     */
-    public function definition() {
-        $mform = $this->_form; // Don't forget the underscore!
-
-        $mform->addElement('text', 'url', get_string('url', 'tool_urlpreview')); // Add elements to your form.
-        $mform->setType('url', PARAM_TEXT); // Set type of element.
-
-        $submitlabel = get_string('submiturl', 'tool_urlpreview');
-        $mform->addElement('submit', 'submitmessage', $submitlabel);
-    }
-}
