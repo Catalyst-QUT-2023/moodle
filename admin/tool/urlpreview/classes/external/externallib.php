@@ -22,6 +22,8 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace urlpreview\external;
+
 use core_external\external_function_parameters;
 use core_external\external_single_structure;
 use core_external\external_multiple_structure;
@@ -30,7 +32,7 @@ use core_external\external_value;
 class tool_urlpreview_external extends core_external\external_api {
 
     /**
-     * @return external_fucntion_parameters
+     * @return external_function_parameters
      */
     public static function get_url_data_parameters(): external_function_parameters {
         return new external_function_parameters(
