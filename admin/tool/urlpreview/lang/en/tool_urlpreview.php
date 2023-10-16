@@ -32,5 +32,6 @@ $string['url'] = 'URL';
 $string['urlpreview:usetool'] = 'Use the urlpreview tool';
 $string['deleteunusedpreviews'] = 'Delete unused previews';
 $string['refresholdpreviews'] = 'Refresh old, frequently used previews';
+$string['privacy:metadata'] = 'The urlpreview tool only displays previews for input urls and does not store user data.';
 
 

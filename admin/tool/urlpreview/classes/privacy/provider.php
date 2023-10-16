@@ -15,25 +15,32 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Link to CSV course upload.
+ * Privacy Subsystem implementation for block_calendar_month.
  *
  * @package    tool_urlpreview
- * @copyright  2023 Emily Lim <n10882243@qut.edu.au>
+ * @copyright  2023 Zave Bradshaw <n11024801@qut.edu.au>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace tool_urlpreview\privacy;
+
 defined('MOODLE_INTERNAL') || die();
 
-if ($hassiteconfig) {
-    $ADMIN->add('development',
-    new admin_externalpage('urlpreview',
-    get_string('menuname', 'tool_urlpreview'),
-    "$CFG->wwwroot/admin/tool/urlpreview/index.php"));
+/**
+ * Privacy Subsystem for urlpreview implementing null_provider.
+ *
+ * @copyright  2023 Zave Bradshaw <n11024801@qut.edu.au>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class provider implements \core_privacy\local\metadata\null_provider {
+
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return  string
+     */
+    public static function get_reason() : string {
+        return 'privacy:metadata';
+    }
 }
-
-
-
-
-
-
-
