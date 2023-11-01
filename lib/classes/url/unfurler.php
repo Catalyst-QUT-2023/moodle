@@ -41,8 +41,15 @@ class unfurl {
         //set default values
         //default html title
         $titleElement = $doc->getElementsByTagName('title')->item(0);
+        $h1Element = $doc->getElementsByTagName('h1')->item(0);
+        $h2Element = $doc->getElementsByTagName('h2')->item(0);
+
         if ($titleElement) {
             $this->title = $titleElement->textContent;
+        } elseif ($h1Element) {
+            $this->title = $h1Element->textContent;
+        } elseif ($h2Element) {
+            $this->title = $h2Element->textContent;
         }
 
         //iterate through meta tags
