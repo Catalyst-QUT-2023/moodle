@@ -24,6 +24,7 @@
 
 require_once('../../../config.php');
 require_once('../../../lib/classes/url/unfurler.php');
+use tool_urlpreview\form\urlpreview;
 
 $url = optional_param('url', '', PARAM_URL);
 
@@ -41,7 +42,6 @@ if (isguestuser()) {
     throw new moodle_exception('noguest');
 }
 
-
 echo $OUTPUT->header();
 
 $templatedata = [
@@ -52,10 +52,59 @@ $templatedata = [
 echo $OUTPUT->render_from_template('tool_urlpreview/form', $templatedata);
 
 if ($url !== '') {
-    $unfurler = new unfurl($url);
-    $renderedoutput = $unfurler->render_unfurl_metadata();
+    // Check if the linted data for this URL is already in the database.
+    $linteddata = urlpreview::get_record(['url' => $url]);
+
+    if (!$linteddata) {
+        // If not in the database, lint the URL.
+        $unfurler = new unfurl($url);
+        $renderedoutput = $unfurler->render_unfurl_metadata();
+
+        // Save the linted data to the database using the persistent class.
+        $record = new urlpreview();
+        $record->set('url', $url);
+        $record->set('title', $unfurler->title);
+        $record->set('type', $unfurler->type);
+        $record->set('imageurl', $unfurler->image);
+        $record->set('sitename', $unfurler->sitename);
+        $record->set('description', $unfurler->description);
+        $record->set('timecreated', time());
+        $record->set('timemodified', time());
+        $record->set('lastpreviewed', time());
+        $record->create();
+    } else {
+        // Update the 'lastpreviewed' timestamp only if it's been more than an hour.
+        $currenttime = time();
+        if (($currenttime - $linteddata->get('lastpreviewed')) > 3600) { // 3600 seconds = 1 hour
+            $linteddata->set('lastpreviewed', $currenttime);
+            $linteddata->update();
+        }
+        $renderedoutput = rend($linteddata->to_record());
+    }
+
     echo $renderedoutput;
 }
 
 echo $OUTPUT->footer();
 
+/**
+ * Renders linted data from the database for display.
+ *
+ * @param stdClass $data The linted data retrieved from the database.
+ * @return string The formatted output for display.
+ */
+function rend($data) {
+    global $OUTPUT;
+
+    $templatedata = [
+        'noogmetadata' => empty($data->title) && empty($data->imageurl) && empty($data->sitename)
+        && empty($data->description) && empty($data->type),
+        'canonicalurl' => $data->url,
+        'title'        => $data->title,
+        'image'        => $data->imageurl,
+        'sitename'     => $data->sitename,
+        'description'  => $data->description,
+        'type'         => $data->type,
+    ];
+    return $OUTPUT->render_from_template('tool_urlpreview/metadata', $templatedata);
+}
