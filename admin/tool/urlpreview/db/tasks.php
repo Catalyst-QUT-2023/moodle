@@ -15,25 +15,35 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Link to CSV course upload.
+ * Scheduled task definitions for Urlpreview
+ *
+ * Documentation: {@link https://moodledev.io/docs/apis/subsystems/task}
  *
  * @package    tool_urlpreview
- * @copyright  2023 Emily Lim <n10882243@qut.edu.au>
+ * @category   task
+ * @copyright  2023 Thomas Daly <n11134551@qut.edu,au>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-if ($hassiteconfig) {
-    $ADMIN->add('development',
-    new admin_externalpage('urlpreview',
-    get_string('menuname', 'tool_urlpreview'),
-    "$CFG->wwwroot/admin/tool/urlpreview/index.php"));
-}
-
-
-
-
-
-
-
+$tasks = [
+    [
+        'classname' => 'tool_urlpreview\task\refresh_old_previews',
+        'blocking' => 0,
+        'minute' => 'R',
+        'hour' => '2',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*',
+    ],
+    [
+        'classname' => 'tool_urlpreview\task\delete_unused_previews',
+        'blocking' => 0,
+        'minute' => 'R',
+        'hour' => '3',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*',
+    ],
+];
