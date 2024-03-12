@@ -22,6 +22,11 @@
  * @copyright  2021 Jon Green <jgreen01@stanford.edu>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+
+require_once('../../../config.php');
+require_once($CFG->libdir.'/filelib.php');
+
 class unfurl {
     public $title = '';
     public $sitename = '';
@@ -30,10 +35,28 @@ class unfurl {
     public $canonicalurl = '';
     public $type = '';
     public $noogmetadata = true;
+    private $response;
 
     public function __construct($url) {
+
         $html = file_get_contents($url);
 
+
+        // Initialize cURL session
+        $curl = new curl();
+        $curl->setopt(array(
+            'CURLOPT_URL' => $url,
+            'CURLOPT_RETURNTRANSFER' => true,
+            'CURLOPT_TIMEOUT' => 5
+        ));
+        $this->response = $curl->getResponse();
+
+        $error_no = $curl->get_errno();
+        if ($error_no === CURLE_OPERATION_TIMEOUTED) {
+            echo "Timeout occurred while fetching URL: $url"; 
+            return;
+        }
+        
         $doc = new DOMDocument();
         @$doc->loadHTML('<?xml encoding="UTF-8">' . $html);
         $metataglist = $doc->getElementsByTagName('meta');
