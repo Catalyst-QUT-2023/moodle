@@ -49,6 +49,7 @@ $templatedata = [
     'submittedUrl' => $url,
 ];
 
+//replace the following with web service that is called via ajax call
 echo $OUTPUT->render_from_template('tool_urlpreview/form', $templatedata);
 
 if ($url !== '') {
