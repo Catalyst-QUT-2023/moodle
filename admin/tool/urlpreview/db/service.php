@@ -21,7 +21,7 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
-// Delcare the new web service functions.
+// Declare the new web service functions.
 $functions = [
  'tool_urlpreview_get_data' => [
      'classname' => 'tool_urlpreview_external',
@@ -32,4 +32,3 @@ $functions = [
      'ajax' => true,
  ],
 ];
-
