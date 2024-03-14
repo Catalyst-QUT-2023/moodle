@@ -39,24 +39,22 @@ class unfurl {
 
     public function __construct($url) {
 
-        $html = file_get_contents($url);
-
-
         // Initialize cURL session
         $curl = new curl();
-        $curl->setopt(array(
-            'CURLOPT_URL' => $url,
+        $options = array(
             'CURLOPT_RETURNTRANSFER' => true,
             'CURLOPT_TIMEOUT' => 5
-        ));
-        $this->response = $curl->getResponse();
+        );
+        $this->response = $curl->get($url, null, $options);
 
         $error_no = $curl->get_errno();
         if ($error_no === CURLE_OPERATION_TIMEOUTED) {
             echo "Timeout occurred while fetching URL: $url"; 
             return;
         }
-        
+
+        $html = $this->response;
+
         $doc = new DOMDocument();
         @$doc->loadHTML('<?xml encoding="UTF-8">' . $html);
         $metataglist = $doc->getElementsByTagName('meta');
