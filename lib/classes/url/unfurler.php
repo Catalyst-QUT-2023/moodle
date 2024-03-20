@@ -47,13 +47,18 @@ class unfurl {
         );
         $this->response = $curl->get($url, null, $options);
 
+        $html = $this->response;
+
         $error_no = $curl->get_errno();
         if ($error_no === CURLE_OPERATION_TIMEOUTED) {
             echo "Timeout occurred while fetching URL: $url"; 
+            $metadata = $this->extract_basic_metadata($url);
+            $this->title = $metadata['title'];
+            $this->sitename = $metadata['sitename'];
             return;
         }
 
-        $html = $this->response;
+        
 
         $doc = new DOMDocument();
         @$doc->loadHTML('<?xml encoding="UTF-8">' . $html);
@@ -121,6 +126,13 @@ class unfurl {
             }
         }
     }
+# 1. binary file - pdf
+# 2. filename,sitename 
+    public function extract_basic_metadata($url) {
+
+    }
+    
+    
     public function render_unfurl_metadata() {
         global $OUTPUT;  // Use the global $OUTPUT variable, Moodle's core renderer.
 
