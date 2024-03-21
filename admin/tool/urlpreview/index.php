@@ -49,63 +49,24 @@ $templatedata = [
     'submittedUrl' => $url,
 ];
 
-//replace the following with web service that is called via ajax call
 echo $OUTPUT->render_from_template('tool_urlpreview/form', $templatedata);
 
+//Display output from AJAX Call
 if ($url !== '') {
-    // Check if the linted data for this URL is already in the database.
-    $linteddata = urlpreview::get_record(['url' => $url]);
-
-    if (!$linteddata) {
-        // If not in the database, lint the URL.
-        $unfurler = new unfurl($url);
-        $renderedoutput = $unfurler->render_unfurl_metadata();
-
-        // Save the linted data to the database using the persistent class.
-        $record = new urlpreview();
-        $record->set('url', $url);
-        $record->set('title', $unfurler->title);
-        $record->set('type', $unfurler->type);
-        $record->set('imageurl', $unfurler->image);
-        $record->set('sitename', $unfurler->sitename);
-        $record->set('description', $unfurler->description);
-        $record->set('timecreated', time());
-        $record->set('timemodified', time());
-        $record->set('lastpreviewed', time());
-        $record->create();
-    } else {
-        // Update the 'lastpreviewed' timestamp only if it's been more than an hour.
-        $currenttime = time();
-        if (($currenttime - $linteddata->get('lastpreviewed')) > 3600) { // 3600 seconds = 1 hour
-            $linteddata->set('lastpreviewed', $currenttime);
-            $linteddata->update();
-        }
-        $renderedoutput = rend($linteddata->to_record());
-    }
-
-    echo $renderedoutput;
+    $PAGE->requires->js_call_amd('tool_urlpreview/get_url_data', 'getPreviewTemplate', [
+        $url
+    ]);
 }
+
+// // Code adapted from Matthew Hilton:
+// // Render a generic loading icon while waiting for ajax.
+// $loadingstr = get_string('loading', '', $this->check->get_name());
+// $loadingicon = $OUTPUT->pix_icon('i/loading', $loadingstr);
+
+// // Wrap it in a notification so we reduce style changes when loading is finished.
+// $output = $OUTPUT->notification($loadingicon . $loadingstr, \core\output\notification::NOTIFY_INFO, false);
+
+// // Wrap in a div with a reference. The JS getAndRender will replace this with the response from the webservice.
+// $statusdiv = \html_writer::div($output, '', ['data-check-reference' => $domref]);
 
 echo $OUTPUT->footer();
-
-/**
- * Renders linted data from the database for display.
- *
- * @param stdClass $data The linted data retrieved from the database.
- * @return string The formatted output for display.
- */
-function rend($data) {
-    global $OUTPUT;
-
-    $templatedata = [
-        'noogmetadata' => empty($data->title) && empty($data->imageurl) && empty($data->sitename)
-        && empty($data->description) && empty($data->type),
-        'canonicalurl' => $data->url,
-        'title'        => $data->title,
-        'image'        => $data->imageurl,
-        'sitename'     => $data->sitename,
-        'description'  => $data->description,
-        'type'         => $data->type,
-    ];
-    return $OUTPUT->render_from_template('tool_urlpreview/metadata', $templatedata);
-}

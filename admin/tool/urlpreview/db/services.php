@@ -22,13 +22,14 @@
  */
 defined('MOODLE_INTERNAL') || die();
 // Declare the new web service functions.
+
 $functions = [
- 'tool_urlpreview_get_data' => [
-     'classname' => 'tool_urlpreview_external',
-     'methodname' => 'get_url_data',
-     'classpath' => 'admin/tool/urlpreview/classes/external/externallib.php',
-     'description' => 'Get scraped data',
-     'type' => 'read',
-     'ajax' => true,
- ],
+
+    'tool_urlpreview_get_preview' => [
+        'classname' => tool_urlpreview\external\get_preview::class,
+        'description' => 'Gets the preview for a given url',
+        'type' => 'write',
+        'ajax' => true,
+    ],
 ];
+

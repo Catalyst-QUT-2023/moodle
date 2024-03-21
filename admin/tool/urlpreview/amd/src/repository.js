@@ -12,17 +12,22 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-{{!
-    @template tool_urlpreview/form
 
-    This is the form that is rendered for the url Metadata Preview form
-}}
-<form action="{{action}}" method="get" class="simplesearchform mb-3">
-    <div class="input-group">
-        <label for="url" class="sr-only">{{#str}}url, tool_urlpreview{{/str}}</label>
-        <input type="text" name="url" class="form-control form-control-sm" placeholder="{{#str}}url, tool_urlpreview{{/str}}" required value="{{submittedUrl}}">
-        <div class="input-group-append">
-            <input type="submit" class="btn btn-sm btn-primary" value="{{#str}}preview, tool_urlpreview{{/str}}">
-        </div>
-    </div>
-</form>
+/**
+ * This script fetches the data required from the external service
+ *
+ * @module     tool_urlpreview/repository
+ * @copyright  2024 Team the Z <your@email.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+import {call as fetchMany} from 'core/ajax';
+
+export const getPreview = (
+    url
+) => fetchMany([{
+    methodname: 'tool_urlpreview_get_preview',
+    args: {
+        url
+    },
+}])[0];
