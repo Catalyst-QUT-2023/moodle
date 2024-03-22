@@ -36,7 +36,7 @@ class delete_unused_previews extends scheduled_task {
 
     public function execute() {
         global $DB;
-        $threemonthsago = time() - (90 * DAYSECS); 
-        $DB->delete_records_select('urlpreview', 'lastpreviewed < ?', [$threemonthsago]); 
+        $threemonthsago = time() - (90 * DAYSECS);
+        $DB->delete_records_select('urlpreview', 'lastpreviewed < ?', [$threemonthsago]);
     }
 }

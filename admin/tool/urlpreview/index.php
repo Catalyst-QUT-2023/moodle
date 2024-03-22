@@ -75,7 +75,7 @@ if ($url !== '') {
     } else {
         // Update the 'lastpreviewed' timestamp only if it's been more than an hour.
         $currenttime = time();
-        if (($currenttime - $linteddata->lastpreviewed) > (1 * HOURSECS)) { 
+        if (($currenttime - $linteddata->lastpreviewed) > (1 * HOURSECS)) {
             $linteddata->lastpreviewed = $currenttime;
             $DB->update_record('urlpreview', $linteddata);
         }
