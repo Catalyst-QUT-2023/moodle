@@ -93,12 +93,13 @@ echo $OUTPUT->footer();
  * @param stdClass $data The linted data retrieved from the database.
  * @return string The formatted output for display.
  */
-function rend($data) {
+function rend($data)
+{
     global $OUTPUT;
 
     $templatedata = [
         'noogmetadata' => empty($data->title) && empty($data->imageurl) && empty($data->sitename)
-        && empty($data->description) && empty($data->type),
+            && empty($data->description) && empty($data->type),
         'canonicalurl' => $data->url,
         'title'        => $data->title,
         'image'        => $data->imageurl,
