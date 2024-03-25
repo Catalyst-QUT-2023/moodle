@@ -53,10 +53,10 @@ class get_preview extends external_api {
             'title' => $unfurler->title,
             'sitename' => $unfurler->sitename,
             'image' => $unfurler->image,
-            'description' => $unfurler->type
+            'description' => $unfurler->type,
         ];
         return $scrapeddata;
-    } 
+    }
 
 
     /**
@@ -76,7 +76,7 @@ class get_preview extends external_api {
         self::validate_context($context);
 
         // TODO check permissions and implement WS.
-        
+
         global $DB;
         // Validate the URL.
         self::validate_context($url);
@@ -127,12 +127,12 @@ class get_preview extends external_api {
                 'sitename' => new external_value(PARAM_TEXT, 'Site Name'),
                 'image' => new external_value(PARAM_TEXT, 'Image URL'),
                 'description' => new external_value(PARAM_TEXT, 'Description'),
-                'type' => new external_value(PARAM_TEXT, 'Type')
+                'type' => new external_value(PARAM_TEXT, 'Type'),
             ])
          );
     }
 
-       /**
+    /**
      * Renders linted data from the database for display.
      *
      * @param stdClass $data The linted data retrieved from the database.
