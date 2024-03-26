@@ -47,21 +47,26 @@ class unfurl {
         );
         $this->response = $curl->get($url, null, $options);
 
-        $html = $this->response;
+        $curlresponse = $this->response;
 
         $error_no = $curl->get_errno();
         if ($error_no === CURLE_OPERATION_TIMEOUTED) {
             echo "Timeout occurred while fetching URL: $url"; 
-            $metadata = $this->extract_basic_metadata($url);
-            $this->title = $metadata['title'];
-            $this->sitename = $metadata['sitename'];
             return;
         }
-
         
+        if (stripos($this->response, '%PDF-') === 0) {
+            $this->extract_pdf_metadata($url);
+        } else {
+            $this->extract_html_metadata($url,$curlresponse);
+        }
+    
+        
+    }
 
+    public function extract_html_metadata($url, $responseurl){
         $doc = new DOMDocument();
-        @$doc->loadHTML('<?xml encoding="UTF-8">' . $html);
+        @$doc->loadHTML('<?xml encoding="UTF-8">' . $responseurl);
         $metataglist = $doc->getElementsByTagName('meta');
 
         //set default values
@@ -126,9 +131,9 @@ class unfurl {
             }
         }
     }
-# 1. binary file - pdf
-# 2. filename,sitename 
-    public function extract_basic_metadata($url) {
+
+    public function extract_pdf_metadata($pdfurl) {
+        // Work on later
 
     }
     
