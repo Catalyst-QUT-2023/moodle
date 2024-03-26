@@ -1,82 +1,44 @@
-<table class="table table-sm table-bordered">
-    <tr>
-        <th>Property</th>
-        <th>Content</th>
-    </tr>
-    <tr>
-        <td>Link Preview</td>
-        <td>
-            <div style="max-width: 450px" class="p-2">
-                <div class="card shadow-sm">
-                    {{#image}}
-                        <img class="card-img-top" src="{{{.}}}" alt="Preview Image">
-                    {{/image}}
-                    <div class="card-footer">
-                        {{#title}}
-                            <h5><a href="{{canonicalurl}}" target="_blank" class="card-title stretched-link">{{.}}</a></h5>
-                        {{/title}}
-                        {{#description}}
-                            <div class="card-text">{{.}}</div>
-                        {{/description}}
-                        {{#sitename}}
-                            <small class="card-text text-muted text-uppercase">{{.}}</small>
-                        {{/sitename}}
-                    </div>
-                </div>
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <td>Slim preview</td>
-        <td>
-            <div style="max-width: 800px" class="p-2">
-                <div class="border shadow-sm rounded">
-                    <div class="row no-gutters">
-                        <div class="col-md-2">
-                            {{#image}}
-                                <img class="rounded-left" style="max-width: 120px" src="{{{.}}}" alt="">
-                            {{/image}}
-                        </div>
-                        <div class="col-md-10">
-                            <div class="py-2 px-0">
-                                {{#title}}
-                                    <b class="text-truncate my-0"><a href="{{canonicalurl}}" target="_blank" class="card-title stretched-link">{{.}}</a></b>
-                                {{/title}}
-                                {{#description}}
-                                    <div class="text-truncate my-0 pr-2">
-                                        {{#sitename}}<small class="card-text text-muted text-uppercase">{{.}}｜</small>{{/sitename}}{{.}}
-                                    </div>
-                                {{/description}}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <td>og:url</td>
-        <td>{{#canonicalurl}}<a href="{{.}}" target="_blank">{{.}}</a>{{/canonicalurl}}{{^canonicalurl}}<i>Not available</i>{{/canonicalurl}}</td>
-    </tr>
-    <tr>
-        <td>og:type</td>
-        <td>{{#type}}{{.}}{{/type}}{{^type}}<i>Not available</i>{{/type}}</td>
-    </tr>
-    <tr>
-        <td>og:title</td>
-        <td>{{#title}}{{.}}{{/title}}{{^title}}<i>Not available</i>{{/title}}</td>
-    </tr>
-    <tr>
-        <td>og:image</td>
-        <td>{{#image}}<a target="_blank" href="{{.}}">{{.}}{{/image}}{{^image}}<i>Not available</i>{{/image}}</td>
-    </tr>
-    <tr>
-        <td>og:site_name</td>
-        <td>{{#sitename}}{{.}}{{/sitename}}{{^sitename}}<i>Not available</i>{{/sitename}}</td>
-    </tr>
-    <tr>
-        <td>og:description</td>
-        <td>{{#description}}{{.}}{{/description}}{{^description}}<i>Not available</i>{{/description}}</td>
-    </tr>
-</table>
-
+<div style="overflow-x: auto;">
+    <table class="table table-sm table-bordered">
+        <tr>
+            <th>Property</th>
+            <th>Content</th>
+        </tr>
+        <tr>
+            <td>Link Preview</td>
+            <td>
+                {{> core/url_preview_card}}
+            </td>
+        </tr>
+        <tr>
+            <td>Slim preview</td>
+            <td>
+                {{> core/url_preview_slim}}
+            </td>
+        </tr>
+        <tr>
+            <td>og:url</td>
+            <td>{{#canonicalurl}}<a href="{{.}}" target="_blank">{{.}}</a>{{/canonicalurl}}{{^canonicalurl}}<i>Not available</i>{{/canonicalurl}}</td>
+        </tr>
+        <tr>
+            <td>og:type</td>
+            <td>{{#type}}{{.}}{{/type}}{{^type}}<i>Not available</i>{{/type}}</td>
+        </tr>
+        <tr>
+            <td>og:title</td>
+            <td>{{#title}}{{.}}{{/title}}{{^title}}<i>Not available</i>{{/title}}</td>
+        </tr>
+        <tr>
+            <td>og:image</td>
+            <td>{{#image}}<a target="_blank" href="{{.}}">{{.}}{{/image}}{{^image}}<i>Not available</i>{{/image}}</td>
+        </tr>
+        <tr>
+            <td>og:site_name</td>
+            <td>{{#sitename}}{{.}}{{/sitename}}{{^sitename}}<i>Not available</i>{{/sitename}}</td>
+        </tr>
+        <tr>
+            <td>og:description</td>
+            <td>{{#description}}{{.}}{{/description}}{{^description}}<i>Not available</i>{{/description}}</td>
+        </tr>
+    </table>
+</div>
