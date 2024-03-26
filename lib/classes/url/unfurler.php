@@ -55,11 +55,8 @@ class unfurl {
             return;
         }
         
-        if (stripos($this->response, '%PDF-') === 0) {
-            $this->extract_pdf_metadata($url);
-        } else {
-            $this->extract_html_metadata($url,$curlresponse);
-        }
+        $this->extract_html_metadata($url,$curlresponse);
+
     
         
     }
@@ -131,12 +128,6 @@ class unfurl {
             }
         }
     }
-
-    public function extract_pdf_metadata($pdfurl) {
-        // Work on later
-
-    }
-    
     
     public function render_unfurl_metadata() {
         global $OUTPUT;  // Use the global $OUTPUT variable, Moodle's core renderer.
