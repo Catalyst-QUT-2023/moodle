@@ -21,9 +21,6 @@ use core_external\external_single_structure;
 use core_external\external_api;
 use core_external\external_value;
 
-require_once('../../../../../config.php');
-require_once('../../../../../lib/classes/url/unfurler.php');
-
 /**
  * Implementation of web service tool_urlpreview_get_preview
  *
@@ -45,7 +42,6 @@ class get_preview extends external_api {
     }
 
     private static function scrape_url($url) {
-        require_once('../../../../../lib/classes/url/unfurler.php');
 
         $unfurler = new unfurl($url);
         $scrapeddata = [
@@ -117,11 +113,11 @@ class get_preview extends external_api {
     /**
      * Describe the return structure for tool_urlpreview_get_preview
      *
-     * @return external_multiple_structure
+     * @return external_single_structure
      */
-    public static function execute_returns(): external_multiple_structure {
-        return new external_multiple_structure(
-            new external_single_structure([
+    public static function execute_returns(): external_single_structure {
+        return new external_single_structure([
+            'data' => new external_multiple_structure([
                 'url' => new external_value(PARAM_URL, 'The URL'),
                 'title' => new external_value(PARAM_TEXT, 'The title'),
                 'sitename' => new external_value(PARAM_TEXT, 'Site Name'),
@@ -129,7 +125,7 @@ class get_preview extends external_api {
                 'description' => new external_value(PARAM_TEXT, 'Description'),
                 'type' => new external_value(PARAM_TEXT, 'Type'),
             ])
-         );
+        ]);
     }
 
     /**
@@ -154,5 +150,3 @@ class get_preview extends external_api {
         return $OUTPUT->render_from_template('tool_urlpreview/metadata', $templatedata);
     }
 }
-
-
