@@ -22,6 +22,11 @@
  * @copyright  2021 Jon Green <jgreen01@stanford.edu>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+
+require_once('../../../config.php');
+require_once($CFG->libdir.'/filelib.php');
+
 class unfurl {
     public $title = '';
     public $sitename = '';
@@ -30,12 +35,35 @@ class unfurl {
     public $canonicalurl = '';
     public $type = '';
     public $noogmetadata = true;
+    private $response;
 
     public function __construct($url) {
-        $html = file_get_contents($url);
 
+        // Initialize cURL session
+        $curl = new curl();
+        $options = array(
+            'CURLOPT_RETURNTRANSFER' => true,
+            'CURLOPT_TIMEOUT' => 5
+        );
+        $this->response = $curl->get($url, null, $options);
+
+        $curlresponse = $this->response;
+
+        $error_no = $curl->get_errno();
+        if ($error_no === CURLE_OPERATION_TIMEOUTED) {
+            echo "Timeout occurred while fetching URL: $url"; 
+            return;
+        }
+        
+        $this->extract_html_metadata($url,$curlresponse);
+
+    
+        
+    }
+
+    public function extract_html_metadata($url, $responseurl){
         $doc = new DOMDocument();
-        @$doc->loadHTML('<?xml encoding="UTF-8">' . $html);
+        @$doc->loadHTML('<?xml encoding="UTF-8">' . $responseurl);
         $metataglist = $doc->getElementsByTagName('meta');
 
         //set default values
@@ -107,6 +135,7 @@ class unfurl {
             }
         }
     }
+    
     public function render_unfurl_metadata() {
         global $OUTPUT;  // Use the global $OUTPUT variable, Moodle's core renderer.
 
