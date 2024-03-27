@@ -75,7 +75,6 @@ class get_preview extends external_api {
 
         global $DB;
         // Validate the URL.
-        self::validate_context($url);
 
         // Check if the linted data for this URL is already in the database.
         $sql = "SELECT * FROM {urlpreview} WHERE " . $DB->sql_compare_text('url') . " = ?";
@@ -119,15 +118,13 @@ class get_preview extends external_api {
      */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
-            'data' => new external_multiple_structure([
                 'url' => new external_value(PARAM_URL, 'The URL'),
                 'title' => new external_value(PARAM_TEXT, 'The title'),
                 'sitename' => new external_value(PARAM_TEXT, 'Site Name'),
                 'image' => new external_value(PARAM_TEXT, 'Image URL'),
                 'description' => new external_value(PARAM_TEXT, 'Description'),
                 'type' => new external_value(PARAM_TEXT, 'Type'),
-            ])
-        ]);
+            ]);
     }
 
     /**
