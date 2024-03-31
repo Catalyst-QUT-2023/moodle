@@ -193,6 +193,7 @@ $string['connected'] = 'Connected';
 $string['connecting'] = 'Connecting...';
 $string['contact'] = 'Contact';
 $string['contact_help'] = 'An email address associated with the badge issuer.';
+$string['copy'] = 'Copy';
 $string['copyof'] = 'Copy of {$a}';
 $string['course'] = 'Course: {$a}';
 $string['coursebadgesdisabled'] = 'Course badges are not enabled on this site.';
@@ -416,6 +417,7 @@ $string['month'] = 'Month(s)';
 $string['moredetails'] = 'More details';
 $string['mybadges'] = 'My badges';
 $string['mybackpack'] = 'My backpack settings';
+$string['namewithlink'] = 'Name with link';
 $string['never'] = 'Never';
 $string['newbackpack'] = 'Add a new backpack';
 $string['newbadge'] = 'Add a new badge';
@@ -589,11 +591,6 @@ $string['version_help'] = 'The version field may be used to keep track of the ba
 $string['warnexpired'] = ' (This badge has expired!)';
 $string['year'] = 'Year(s)';
 $string['includeauthdetails'] = "Include authentication details with the backpack";
-
-// Deprecated since Moodle 4.0.
-$string['evidence'] = 'Evidence';
-$string['recipientdetails'] = 'Recipient details';
-$string['recipientidentificationproblem'] = 'Cannot find a recipient of this badge among the existing users.';
 
 // Deprecated since Moodle 4.3.
 $string['backpackemail'] = 'Email address';

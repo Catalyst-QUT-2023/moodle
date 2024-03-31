@@ -232,8 +232,6 @@ class mod_forum_mod_form extends moodleform_mod {
         $gradefieldname = component_gradeitems::get_field_name_for_itemnumber($component, $itemnumber, 'grade');
         $gradecatfieldname = component_gradeitems::get_field_name_for_itemnumber($component, $itemnumber, 'gradecat');
         $gradepassfieldname = component_gradeitems::get_field_name_for_itemnumber($component, $itemnumber, 'gradepass');
-        $sendstudentnotificationsfieldname = component_gradeitems::get_field_name_for_itemnumber($component, $itemnumber,
-                'sendstudentnotifications');
 
         // The advancedgradingmethod is different in that it is suffixed with an area name... which is not the
         // itemnumber.
@@ -304,13 +302,9 @@ class mod_forum_mod_form extends moodleform_mod {
         $mform->setType($gradepassfieldname, PARAM_RAW);
         $mform->hideIf($gradepassfieldname, "{$gradefieldname}[modgrade_type]", 'eq', 'none');
 
-        $mform->addElement(
-                'selectyesno',
-                $sendstudentnotificationsfieldname,
-                get_string('sendstudentnotificationsdefault', 'forum')
-        );
-        $mform->addHelpButton($sendstudentnotificationsfieldname, 'sendstudentnotificationsdefault', 'forum');
-        $mform->hideIf($sendstudentnotificationsfieldname, "{$gradefieldname}[modgrade_type]", 'eq', 'none');
+        $mform->addElement('selectyesno', 'grade_forum_notify', get_string('sendstudentnotificationsdefault', 'forum'));
+        $mform->addHelpButton('grade_forum_notify', 'sendstudentnotificationsdefault', 'forum');
+        $mform->hideIf('grade_forum_notify', "{$gradefieldname}[modgrade_type]", 'eq', 'none');
     }
 
     function definition_after_data() {
@@ -455,8 +449,8 @@ class mod_forum_mod_form extends moodleform_mod {
         $group[] =& $mform->createElement('text', $completionpostsel, '', ['size' => 3]);
         $mform->setType($completionpostsel, PARAM_INT);
         $completionpostsgroupel = 'completionpostsgroup' . $suffix;
-        $mform->addGroup($group, $completionpostsgroupel, get_string('completionpostsgroup', 'forum'), ' ', false);
-        $mform->disabledIf($completionpostsel, $completionpostsenabledel, 'notchecked');
+        $mform->addGroup($group, $completionpostsgroupel, '', ' ', false);
+        $mform->hideIf($completionpostsel, $completionpostsenabledel, 'notchecked');
 
         $group = [];
         $completiondiscussionsenabledel = 'completiondiscussionsenabled' . $suffix;
@@ -464,15 +458,14 @@ class mod_forum_mod_form extends moodleform_mod {
             'checkbox',
             $completiondiscussionsenabledel,
             '',
-            get_string('completiondiscussions',
-            'forum')
+            get_string('completiondiscussions', 'forum')
         );
         $completiondiscussionsel = 'completiondiscussions' . $suffix;
         $group[] =& $mform->createElement('text', $completiondiscussionsel, '', ['size' => 3]);
         $mform->setType($completiondiscussionsel, PARAM_INT);
         $completiondiscussionsgroupel = 'completiondiscussionsgroup' . $suffix;
-        $mform->addGroup($group, $completiondiscussionsgroupel, get_string('completiondiscussionsgroup', 'forum'), ' ', false);
-        $mform->disabledIf($completiondiscussionsel, $completiondiscussionsenabledel, 'notchecked');
+        $mform->addGroup($group, $completiondiscussionsgroupel, '', ' ', false);
+        $mform->hideIf($completiondiscussionsel, $completiondiscussionsenabledel, 'notchecked');
 
         $group = [];
         $completionrepliesenabledel = 'completionrepliesenabled' . $suffix;
@@ -481,8 +474,8 @@ class mod_forum_mod_form extends moodleform_mod {
         $group[] =& $mform->createElement('text', $completionrepliesel, '', ['size' => 3]);
         $mform->setType($completionrepliesel, PARAM_INT);
         $completionrepliesgroupel = 'completionrepliesgroup' . $suffix;
-        $mform->addGroup($group, $completionrepliesgroupel, get_string('completionrepliesgroup', 'forum'), ' ', false);
-        $mform->disabledIf($completionrepliesel, $completionrepliesenabledel, 'notchecked');
+        $mform->addGroup($group, $completionrepliesgroupel, '', ' ', false);
+        $mform->hideIf($completionrepliesel, $completionrepliesenabledel, 'notchecked');
 
         return [$completiondiscussionsgroupel, $completionrepliesgroupel, $completionpostsgroupel];
     }

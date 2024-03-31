@@ -25,6 +25,7 @@
 namespace core_courseformat\output\local\content;
 
 use cm_info;
+use context_course;
 use core\output\named_templatable;
 use core_availability\info_module;
 use core_courseformat\base as course_format;
@@ -107,6 +108,8 @@ class cm implements named_templatable, renderable {
      * @return stdClass data context for a mustache template
      */
     public function export_for_template(renderer_base $output): stdClass {
+        global $PAGE;
+
         $mod = $this->mod;
         $displayoptions = $this->displayoptions;
 
@@ -118,6 +121,7 @@ class cm implements named_templatable, renderable {
             'textclasses' => $displayoptions['textclasses'],
             'classlist' => [],
             'cmid' => $mod->id,
+            'editing' => $PAGE->user_is_editing(),
         ];
 
         // Add partial data segments.
@@ -126,6 +130,7 @@ class cm implements named_templatable, renderable {
         $haspartials['availability'] = $this->add_availability_data($data, $output);
         $haspartials['alternative'] = $this->add_alternative_content_data($data, $output);
         $haspartials['completion'] = $this->add_completion_data($data, $output);
+        $haspartials['dates'] = $this->add_dates_data($data, $output);
         $haspartials['editor'] = $this->add_editor_data($data, $output);
         $haspartials['groupmode'] = $this->add_groupmode_data($data, $output);
         $haspartials['visibility'] = $this->add_visibility_data($data, $output);
@@ -206,6 +211,26 @@ class cm implements named_templatable, renderable {
     }
 
     /**
+     * Add activity dates information to the data structure.
+     *
+     * @param stdClass $data the current cm data reference
+     * @param renderer_base $output typically, the renderer that's calling this function
+     * @return bool the module has completion information
+     */
+    protected function add_dates_data(stdClass &$data, renderer_base $output): bool {
+        global $USER;
+        $course = $this->mod->get_course();
+        if (!$course->showactivitydates) {
+            return false;
+        }
+        $activitydates = \core\activity_dates::get_dates_for_module($this->mod, $USER->id);
+        $templatedata = new \core_course\output\activity_dates($activitydates);
+        $data->dates = $templatedata->export_for_template($output);
+
+        return $data->dates->hasdates;
+    }
+
+    /**
      * Add activity completion information to the data structure.
      *
      * @param stdClass $data the current cm data reference
@@ -216,7 +241,7 @@ class cm implements named_templatable, renderable {
         $completion = new $this->completionclass($this->format, $this->section, $this->mod);
         $templatedata = $completion->export_for_template($output);
         if ($templatedata) {
-            $data->activityinfo = $templatedata;
+            $data->completion = $templatedata;
             return true;
         }
         return false;
@@ -256,6 +281,7 @@ class cm implements named_templatable, renderable {
             $this->mod->has_custom_cmlist_item() &&
             !$haspartials['availability'] &&
             !$haspartials['completion'] &&
+            !$haspartials['dates'] &&
             !$haspartials['groupmode'] &&
             !isset($data->modhiddenfromstudents) &&
             !isset($data->modstealth) &&
@@ -275,10 +301,16 @@ class cm implements named_templatable, renderable {
      * @return bool if the cm has editor data
      */
     protected function add_editor_data(stdClass &$data, renderer_base $output): bool {
-        if (!$this->format->show_editor()) {
+        $course = $this->format->get_course();
+        $coursecontext = context_course::instance($course->id);
+        $editcaps = [];
+        if (has_capability('moodle/course:activityvisibility', $coursecontext)) {
+            $editcaps = ['moodle/course:activityvisibility'];
+        }
+        if (!$this->format->show_editor($editcaps)) {
             return false;
         }
-        $returnsection = $this->format->get_section_number();
+        $returnsection = $this->format->get_sectionnum();
         // Edit actions.
         $controlmenu = new $this->controlmenuclass(
             $this->format,

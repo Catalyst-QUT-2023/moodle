@@ -731,6 +731,15 @@ class behat_navigation extends behat_base {
             case 'System logs report':
                 return new moodle_url('/report/log/index.php');
 
+            case 'Profile':
+                return new moodle_url('/user/view.php');
+
+            case 'Profile advanced editing':
+                return new moodle_url('/user/editadvanced.php', ['returnto' => 'profile']);
+
+            case 'Profile editing':
+                return new moodle_url('/user/edit.php', ['returnto' => 'profile']);
+
             default:
                 throw new Exception('Unrecognised core page type "' . $name . '."');
         }
@@ -740,26 +749,29 @@ class behat_navigation extends behat_base {
      * Convert page names to URLs for steps like 'When I am on the "[identifier]" "[page type]" page'.
      *
      * Recognised page names are:
-     * | Page type                  | Identifier meaning        | description                          |
-     * | Category                   | category idnumber         | List of courses in that category.    |
-     * | Course                     | course shortname          | Main course home pag                 |
-     * | Course editing             | course shortname          | Edit settings page for the course    |
-     * | Activity                   | activity idnumber         | Start page for that activity         |
-     * | Activity editing           | activity idnumber         | Edit settings page for that activity |
-     * | [modname] Activity         | activity name or idnumber | Start page for that activity         |
-     * | [modname] Activity editing | activity name or idnumber | Edit settings page for that activity |
-     * | Backup                     | course shortname          | Course to backup                     |
-     * | Import                     | course shortname          | Course import from                   |
-     * | Restore                    | course shortname          | Course to restore from               |
-     * | Reset                      | course shortname          | Course to reset                      |
-     * | Course copy                | course shortname          | Course to copy                       |
-     * | Groups                     | course shortname          | Groups page for the course           |
-     * | Groups overview            | course shortname          | Groups overview page for the course  |
-     * | Groupings                  | course shortname          | Groupings page for the course        |
-     * | Permissions                | course shortname          | Permissions page for the course      |
-     * | Enrolment methods          | course shortname          | Enrolment methods for the course     |
-     * | Enrolled users             | course shortname          | The main participants page           |
-     * | Other users                | course shortname          | The course other users page          |
+     * | Page type                       | Identifier meaning        | description                                                      |
+     * | Category                        | category idnumber         | List of courses in that category.                                |
+     * | Course                          | course shortname          | Main course home pag                                             |
+     * | Course editing                  | course shortname          | Edit settings page for the course                                |
+     * | Activity                        | activity idnumber         | Start page for that activity                                     |
+     * | Activity editing                | activity idnumber         | Edit settings page for that activity                             |
+     * | [modname] Activity              | activity name or idnumber | Start page for that activity                                     |
+     * | [modname] Activity editing      | activity name or idnumber | Edit settings page for that activity                             |
+     * | Backup                          | course shortname          | Course to backup                                                 |
+     * | Import                          | course shortname          | Course import from                                               |
+     * | Restore                         | course shortname          | Course to restore from                                           |
+     * | Reset                           | course shortname          | Course to reset                                                  |
+     * | Course copy                     | course shortname          | Course to copy                                                   |
+     * | Groups                          | course shortname          | Groups page for the course                                       |
+     * | Groups overview                 | course shortname          | Groups overview page for the course                              |
+     * | Groupings                       | course shortname          | Groupings page for the course                                    |
+     * | Permissions                     | course shortname          | Permissions page for the course                                  |
+     * | Enrolment methods               | course shortname          | Enrolment methods for the course                                 |
+     * | Enrolled users                  | course shortname          | The main participants page                                       |
+     * | Other users                     | course shortname          | The course other users page                                      |
+     * | Course profile                  | course shortname          | The current user's profile for this course                       |
+     * | Course profile editing          | course shortname          | The current user's profile editing page for this course          |
+     * | Course profile advanced editing | course shortname          | The current user's advanced profile editing page for this course |
      *
      * Examples:
      *
@@ -772,6 +784,9 @@ class behat_navigation extends behat_base {
      */
     protected function resolve_core_page_instance_url(string $type, string $identifier): moodle_url {
         $type = strtolower($type);
+        $coursenotfoundexception = new Exception(
+            "The specified course with shortname, fullname, or idnumber '{$identifier}' does not exist",
+        );
 
         switch ($type) {
             case 'category':
@@ -784,16 +799,14 @@ class behat_navigation extends behat_base {
             case 'course editing':
                 $courseid = $this->get_course_id($identifier);
                 if (!$courseid) {
-                    throw new Exception('The specified course with shortname, fullname, or idnumber "' .
-                        $identifier . '" does not exist');
+                    throw $coursenotfoundexception;
                 }
                 return new moodle_url('/course/edit.php', ['id' => $courseid]);
 
             case 'course':
                 $courseid = $this->get_course_id($identifier);
                 if (!$courseid) {
-                    throw new Exception('The specified course with shortname, fullname, or idnumber "' .
-                        $identifier . '" does not exist');
+                    throw $coursenotfoundexception;
                 }
                 return new moodle_url('/course/view.php', ['id' => $courseid]);
 
@@ -815,96 +828,110 @@ class behat_navigation extends behat_base {
             case 'backup':
                 $courseid = $this->get_course_id($identifier);
                 if (!$courseid) {
-                    throw new Exception('The specified course with shortname, fullname, or idnumber "' .
-                            $identifier . '" does not exist');
+                    throw $coursenotfoundexception;
                 }
                 return new moodle_url('/backup/backup.php', ['id' => $courseid]);
             case 'import':
                 $courseid = $this->get_course_id($identifier);
                 if (!$courseid) {
-                    throw new Exception('The specified course with shortname, fullname, or idnumber "' .
-                            $identifier . '" does not exist');
+                    throw $coursenotfoundexception;
                 }
                 return new moodle_url('/backup/import.php', ['id' => $courseid]);
             case 'restore':
                 $courseid = $this->get_course_id($identifier);
                 if (!$courseid) {
-                    throw new Exception('The specified course with shortname, fullname, or idnumber "' .
-                            $identifier . '" does not exist');
+                    throw $coursenotfoundexception;
                 }
                 $context = context_course::instance($courseid);
                 return new moodle_url('/backup/restorefile.php', ['contextid' => $context->id]);
             case 'reset':
                 $courseid = $this->get_course_id($identifier);
                 if (!$courseid) {
-                    throw new Exception('The specified course with shortname, fullname, or idnumber "' .
-                            $identifier . '" does not exist');
+                    throw $coursenotfoundexception;
                 }
                 return new moodle_url('/course/reset.php', ['id' => $courseid]);
             case 'course copy':
                 $courseid = $this->get_course_id($identifier);
                 if (!$courseid) {
-                    throw new Exception('The specified course with shortname, fullname, or idnumber "' .
-                            $identifier . '" does not exist');
+                    throw $coursenotfoundexception;
                 }
                 return new moodle_url('/backup/copy.php', ['id' => $courseid]);
             case 'groups':
                 $courseid = $this->get_course_id($identifier);
                 if (!$courseid) {
-                    throw new Exception('The specified course with shortname, fullname, or idnumber "' .
-                            $identifier . '" does not exist');
+                    throw $coursenotfoundexception;
                 }
                 return new moodle_url('/group/index.php', ['id' => $courseid]);
             case 'groups overview':
                 $courseid = $this->get_course_id($identifier);
                 if (!$courseid) {
-                    throw new Exception('The specified course with shortname, fullname, or idnumber "' .
-                        $identifier . '" does not exist');
+                    throw $coursenotfoundexception;
                 }
                 return new moodle_url('/group/overview.php', ['id' => $courseid]);
             case 'groupings':
                 $courseid = $this->get_course_id($identifier);
                 if (!$courseid) {
-                    throw new Exception('The specified course with shortname, fullname, or idnumber "' .
-                        $identifier . '" does not exist');
+                    throw $coursenotfoundexception;
                 }
                 return new moodle_url('/group/groupings.php', ['id' => $courseid]);
             case 'permissions':
                 $courseid = $this->get_course_id($identifier);
                 if (!$courseid) {
-                    throw new Exception('The specified course with shortname, fullname, or idnumber "' .
-                            $identifier . '" does not exist');
+                    throw $coursenotfoundexception;
                 }
                 $context = context_course::instance($courseid);
                 return new moodle_url('/admin/roles/permissions.php', ['contextid' => $context->id]);
             case 'enrolment methods':
                 $courseid = $this->get_course_id($identifier);
                 if (!$courseid) {
-                    throw new Exception('The specified course with shortname, fullname, or idnumber "' .
-                            $identifier . '" does not exist');
+                    throw $coursenotfoundexception;
                 }
                 return new moodle_url('/enrol/instances.php', ['id' => $courseid]);
             case 'enrolled users':
                 $courseid = $this->get_course_id($identifier);
                 if (!$courseid) {
-                    throw new Exception('The specified course with shortname, fullname, or idnumber "' .
-                            $identifier . '" does not exist');
+                    throw $coursenotfoundexception;
                 }
                 return new moodle_url('/user/index.php', ['id' => $courseid]);
             case 'other users':
                 $courseid = $this->get_course_id($identifier);
                 if (!$courseid) {
-                    throw new Exception('The specified course with shortname, fullname, or idnumber "' .
-                        $identifier . '" does not exist');
+                    throw $coursenotfoundexception;
                 }
                 return new moodle_url('/enrol/otherusers.php', ['id' => $courseid]);
             case 'renameroles':
                 $courseid = $this->get_course_id($identifier);
                 if (!$courseid) {
-                    throw new Exception('The specified course with shortname, fullname, or idnumber "' .
-                            $identifier . '" does not exist');
+                    throw $coursenotfoundexception;
                 }
                 return new moodle_url('/enrol/renameroles.php', ['id' => $courseid]);
+
+            case 'course profile':
+                $courseid = $this->get_course_id($identifier);
+                if (!$courseid) {
+                    throw $coursenotfoundexception;
+                }
+                return new moodle_url('/user/user.php', ['course' => $courseid]);
+
+            case 'course profile editing':
+                $courseid = $this->get_course_id($identifier);
+                if (!$courseid) {
+                    throw $coursenotfoundexception;
+                }
+                return new moodle_url('/user/edit.php', [
+                    'course' => $courseid,
+                    'returnto' => 'profile',
+                ]);
+
+            case 'course profile advanced editing':
+                $courseid = $this->get_course_id($identifier);
+                if (!$courseid) {
+                    throw $coursenotfoundexception;
+                }
+                return new moodle_url('/user/editadvanced.php', [
+                    'course' => $courseid,
+                    'returnto' => 'profile',
+                ]);
         }
 
         $parts = explode(' ', $type);
@@ -936,6 +963,63 @@ class behat_navigation extends behat_base {
         }
 
         throw new Exception('Unrecognised core page type "' . $type . '."');
+    }
+
+    /**
+     * Opens a new tab with given name on the same URL as current page and switches to it.
+     *
+     * @param string $name Tab name that can be used for switching later (no whitespace)
+     * @When /^I open a tab named "(?<name>[^"]*)" on the current page$/
+     */
+    public function i_open_a_tab_on_the_current_page(string $name): void {
+        $this->open_tab($name, 'location.href');
+    }
+
+    /**
+     * Opens a new tab with given name on specified page, and switches to it.
+     *
+     * @param string $name Tab name that can be used for switching later (no whitespace)
+     * @param string $page Page name
+     * @When /^I open a tab named "(?<name>[^"]*)" on the "(?<page>[^"]*)" page$/
+     */
+    public function i_open_a_tab_on_the_page(string $name, string $page): void {
+        if ($page === 'current') {
+            $jstarget = 'location.href';
+        } else {
+            $jstarget = '"' . addslashes_js($this->resolve_page_helper($page)->out(false)) . '"';
+        }
+        $this->open_tab($name, $jstarget);
+    }
+
+    /**
+     * Opens a new tab with given name (on specified page), and switches to it.
+     *
+     * @param string $name Tab name that can be used for switching later (no whitespace)
+     * @param string $identifier Page identifier
+     * @param string $page Page type
+     * @When /^I open a tab named "(?<name>[^"]*)" on the "(?<identifier>[^"]*)" "(?<page>[^"]*)" page$/
+     */
+    public function i_open_a_tab_on_the_page_instance(string $name, string $identifier, string $page): void {
+        $this->open_tab($name, '"' . addslashes_js(
+            $this->resolve_page_instance_helper($identifier, $page)->out(false)) . '"');
+    }
+
+    /**
+     * Opens a new tab at the given target URL.
+     *
+     * @param string $name Name for tab
+     * @param string $jstarget Target in JavaScript syntax, i.e. if a string, must be quoted
+     */
+    protected function open_tab(string $name, string $jstarget): void {
+        // Tab names aren't allowed spaces, and our JavaScript below doesn't do any escaping.
+        if (clean_param($name, PARAM_ALPHANUMEXT) !== $name) {
+            throw new Exception('Tab name may not contain whitespace or special characters: "' . $name . '"');
+        }
+
+        // Normally you can't open a tab unless in response to a user action, but presumably Behat
+        // is exempt from this restriction, because it works to just open it directly.
+        $this->execute_script('window.open(' . $jstarget . ', "' . $name . '");');
+        $this->execute('behat_general::switch_to_window', [$name]);
     }
 
     /**

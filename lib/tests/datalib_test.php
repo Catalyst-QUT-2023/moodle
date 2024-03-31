@@ -77,42 +77,48 @@ class datalib_test extends \advanced_testcase {
         $user2 = self::getDataGenerator()->create_user($user2);
 
         // Search by name (anywhere in text).
-        list($sql, $params) = users_search_sql('User Test 2', '');
+        list($sql, $params) = users_search_sql('User Test 2', '', USER_SEARCH_CONTAINS);
         $results = $DB->get_records_sql("SELECT id FROM {user} WHERE $sql ORDER BY username", $params);
         $this->assertFalse(array_key_exists($user1->id, $results));
         $this->assertTrue(array_key_exists($user2->id, $results));
 
         // Search by (most of) full name.
-        list($sql, $params) = users_search_sql('First Name User Test 2 Last Name User', '');
+        list($sql, $params) = users_search_sql('First Name User Test 2 Last Name User', '', USER_SEARCH_CONTAINS);
         $results = $DB->get_records_sql("SELECT id FROM {user} WHERE $sql ORDER BY username", $params);
         $this->assertFalse(array_key_exists($user1->id, $results));
         $this->assertTrue(array_key_exists($user2->id, $results));
 
         // Search by name (start of text) valid or not.
-        list($sql, $params) = users_search_sql('User Test 2', '', false);
+        list($sql, $params) = users_search_sql('User Test 2', '');
         $results = $DB->get_records_sql("SELECT id FROM {user} WHERE $sql ORDER BY username", $params);
         $this->assertEquals(0, count($results));
-        list($sql, $params) = users_search_sql('First Name User Test 2', '', false);
+        list($sql, $params) = users_search_sql('First Name User Test 2', '');
         $results = $DB->get_records_sql("SELECT id FROM {user} WHERE $sql ORDER BY username", $params);
         $this->assertFalse(array_key_exists($user1->id, $results));
         $this->assertTrue(array_key_exists($user2->id, $results));
 
         // Search by extra fields included or not (address).
-        list($sql, $params) = users_search_sql('Test Street', '', true);
+        list($sql, $params) = users_search_sql('Test Street', '', USER_SEARCH_CONTAINS);
         $results = $DB->get_records_sql("SELECT id FROM {user} WHERE $sql ORDER BY username", $params);
         $this->assertCount(0, $results);
-        list($sql, $params) = users_search_sql('Test Street', '', true, array('address'));
+        list($sql, $params) = users_search_sql('Test Street', '', USER_SEARCH_CONTAINS, array('address'));
         $results = $DB->get_records_sql("SELECT id FROM {user} WHERE $sql ORDER BY username", $params);
         $this->assertCount(2, $results);
 
         // Exclude user.
-        list($sql, $params) = users_search_sql('User Test', '', true, array(), array($user1->id));
+        list($sql, $params) = users_search_sql('User Test', '', USER_SEARCH_CONTAINS, array(), array($user1->id));
         $results = $DB->get_records_sql("SELECT id FROM {user} WHERE $sql ORDER BY username", $params);
         $this->assertFalse(array_key_exists($user1->id, $results));
         $this->assertTrue(array_key_exists($user2->id, $results));
 
         // Include only user.
-        list($sql, $params) = users_search_sql('User Test', '', true, array(), array(), array($user1->id));
+        list($sql, $params) = users_search_sql('User Test', '', USER_SEARCH_CONTAINS, array(), array(), array($user1->id));
+        $results = $DB->get_records_sql("SELECT id FROM {user} WHERE $sql ORDER BY username", $params);
+        $this->assertTrue(array_key_exists($user1->id, $results));
+        $this->assertFalse(array_key_exists($user2->id, $results));
+
+        // Exact match only.
+        [$sql, $params] = users_search_sql('Last Name User Test 1', '', USER_SEARCH_EXACT_MATCH, [], null, null, true);
         $results = $DB->get_records_sql("SELECT id FROM {user} WHERE $sql ORDER BY username", $params);
         $this->assertTrue(array_key_exists($user1->id, $results));
         $this->assertFalse(array_key_exists($user2->id, $results));
@@ -120,7 +126,7 @@ class datalib_test extends \advanced_testcase {
         // Join with another table and use different prefix.
         set_user_preference('amphibian', 'frog', $user1);
         set_user_preference('amphibian', 'salamander', $user2);
-        list($sql, $params) = users_search_sql('User Test 1', 'qq');
+        list($sql, $params) = users_search_sql('User Test 1', 'qq', USER_SEARCH_CONTAINS);
         $results = $DB->get_records_sql("
                 SELECT up.id, up.value
                   FROM {user} qq
@@ -135,7 +141,7 @@ class datalib_test extends \advanced_testcase {
         // Join with another table and include other table fields in search.
         set_user_preference('reptile', 'snake', $user1);
         set_user_preference('reptile', 'lizard', $user2);
-        list($sql, $params) = users_search_sql('snake', 'qq', true, ['up.value']);
+        list($sql, $params) = users_search_sql('snake', 'qq', USER_SEARCH_CONTAINS, ['up.value']);
         $results = $DB->get_records_sql("
                 SELECT up.id, up.value
                   FROM {user} qq
@@ -412,7 +418,7 @@ class datalib_test extends \advanced_testcase {
         $this->assertSame('folder', $cm->modname);
         $this->assertSame($folder1a->id, $cm->instance);
         $this->assertSame($folder1a->course, $cm->course);
-        $this->assertObjectNotHasAttribute('sectionnum', $cm);
+        $this->assertObjectNotHasProperty('sectionnum', $cm);
 
         $this->assertEquals($cm, get_coursemodule_from_id('', $folder1a->cmid));
         $this->assertEquals($cm, get_coursemodule_from_id('folder', $folder1a->cmid, $course1->id));
@@ -477,7 +483,7 @@ class datalib_test extends \advanced_testcase {
         $this->assertSame('folder', $cm->modname);
         $this->assertSame($folder1a->id, $cm->instance);
         $this->assertSame($folder1a->course, $cm->course);
-        $this->assertObjectNotHasAttribute('sectionnum', $cm);
+        $this->assertObjectNotHasProperty('sectionnum', $cm);
 
         $this->assertEquals($cm, get_coursemodule_from_instance('folder', $folder1a->id, $course1->id));
         $this->assertEquals($cm, get_coursemodule_from_instance('folder', $folder1a->id, 0));
@@ -547,17 +553,17 @@ class datalib_test extends \advanced_testcase {
         $this->assertSame('folder', $cm->modname);
         $this->assertSame($folder1a->id, $cm->instance);
         $this->assertSame($folder1a->course, $cm->course);
-        $this->assertObjectNotHasAttribute('sectionnum', $cm);
-        $this->assertObjectNotHasAttribute('revision', $cm);
-        $this->assertObjectNotHasAttribute('display', $cm);
+        $this->assertObjectNotHasProperty('sectionnum', $cm);
+        $this->assertObjectNotHasProperty('revision', $cm);
+        $this->assertObjectNotHasProperty('display', $cm);
 
         $cm = $modules[$folder1b->cmid];
         $this->assertSame('folder', $cm->modname);
         $this->assertSame($folder1b->id, $cm->instance);
         $this->assertSame($folder1b->course, $cm->course);
-        $this->assertObjectNotHasAttribute('sectionnum', $cm);
-        $this->assertObjectNotHasAttribute('revision', $cm);
-        $this->assertObjectNotHasAttribute('display', $cm);
+        $this->assertObjectNotHasProperty('sectionnum', $cm);
+        $this->assertObjectNotHasProperty('revision', $cm);
+        $this->assertObjectNotHasProperty('display', $cm);
 
         $modules = get_coursemodules_in_course('folder', $course1->id, 'revision, display');
         $this->assertCount(2, $modules);
@@ -566,9 +572,9 @@ class datalib_test extends \advanced_testcase {
         $this->assertSame('folder', $cm->modname);
         $this->assertSame($folder1a->id, $cm->instance);
         $this->assertSame($folder1a->course, $cm->course);
-        $this->assertObjectNotHasAttribute('sectionnum', $cm);
-        $this->assertObjectHasAttribute('revision', $cm);
-        $this->assertObjectHasAttribute('display', $cm);
+        $this->assertObjectNotHasProperty('sectionnum', $cm);
+        $this->assertObjectHasProperty('revision', $cm);
+        $this->assertObjectHasProperty('display', $cm);
 
         $modules = get_coursemodules_in_course('label', $course1->id);
         $this->assertCount(0, $modules);
@@ -836,11 +842,11 @@ class datalib_test extends \advanced_testcase {
         $this->assertEquals('user_a@example.com', $results[$userids[0]]->email);
         $this->assertEquals(1, $results[$userids[0]]->confirmed);
         $this->assertEquals('a_first', $results[$userids[0]]->firstname);
-        $this->assertObjectHasAttribute('firstnamephonetic', $results[$userids[0]]);
+        $this->assertObjectHasProperty('firstnamephonetic', $results[$userids[0]]);
 
         // Should not have the custom field or department because no context specified.
-        $this->assertObjectNotHasAttribute('department', $results[$userids[0]]);
-        $this->assertObjectNotHasAttribute('profile_field_specialid', $results[$userids[0]]);
+        $this->assertObjectNotHasProperty('department', $results[$userids[0]]);
+        $this->assertObjectNotHasProperty('profile_field_specialid', $results[$userids[0]]);
 
         // Check sorting.
         $results = get_users_listing('username', 'DESC');
@@ -861,8 +867,8 @@ class datalib_test extends \advanced_testcase {
         // specify a context AND have permissions.
         $results = get_users_listing('lastaccess', 'asc', 0, 0, '', '', '', '', null,
                 \context_system::instance());
-        $this->assertObjectNotHasAttribute('department', $results[$userids[0]]);
-        $this->assertObjectNotHasAttribute('profile_field_specialid', $results[$userids[0]]);
+        $this->assertObjectNotHasProperty('department', $results[$userids[0]]);
+        $this->assertObjectNotHasProperty('profile_field_specialid', $results[$userids[0]]);
         $this->setAdminUser();
         $results = get_users_listing('lastaccess', 'asc', 0, 0, '', '', '', '', null,
                 \context_system::instance());

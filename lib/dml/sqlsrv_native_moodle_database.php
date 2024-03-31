@@ -680,9 +680,11 @@ class sqlsrv_native_moodle_database extends moodle_database {
      * @return bool
      */
     private function free_result($resource) {
-        if (!is_bool($resource)) { // true/false resources cannot be freed
+        if (!is_bool($resource) && is_resource($resource)) {
+            // We need to make sure that the statement resource is in the correct type before freeing it.
             return sqlsrv_free_stmt($resource);
         }
+        return false;
     }
 
     /**
@@ -1318,6 +1320,16 @@ class sqlsrv_native_moodle_database extends moodle_database {
         return true;
     }
 
+    /**
+     * Return SQL for casting to char of given field/expression
+     *
+     * @param string $field Table field or SQL expression to be cast
+     * @return string
+     */
+    public function sql_cast_to_char(string $field): string {
+        return "CAST({$field} AS NVARCHAR(MAX))";
+    }
+
 
     public function sql_cast_char2int($fieldname, $text = false) {
         if (!$text) {
@@ -1437,11 +1449,9 @@ class sqlsrv_native_moodle_database extends moodle_database {
         return $text;
     }
 
-    public function sql_concat() {
-        $arr = func_get_args();
-
+    public function sql_concat(...$arr) {
         foreach ($arr as $key => $ele) {
-            $arr[$key] = ' CAST('.$ele.' AS NVARCHAR(255)) ';
+            $arr[$key] = $this->sql_cast_to_char($ele);
         }
         $s = implode(' + ', $arr);
 

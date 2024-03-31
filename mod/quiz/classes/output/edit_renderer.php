@@ -111,11 +111,11 @@ class edit_renderer extends \plugin_renderer_base {
         // Include the contents of any other popups required.
         if ($structure->can_be_edited()) {
             $thiscontext = $contexts->lowest();
-            $this->page->requires->js_call_amd('mod_quiz/quizquestionbank', 'init', [
+            $this->page->requires->js_call_amd('mod_quiz/modal_quiz_question_bank', 'init', [
                 $thiscontext->id
             ]);
 
-            $this->page->requires->js_call_amd('mod_quiz/add_random_question', 'init', [
+            $this->page->requires->js_call_amd('mod_quiz/modal_add_random_question', 'init', [
                 $thiscontext->id,
                 $pagevars['cat'],
                 $pageurl->out_as_local_url(true),
@@ -181,7 +181,7 @@ class edit_renderer extends \plugin_renderer_base {
         $output = '';
         $output .= html_writer::start_div('maxgrade');
         $output .= html_writer::start_tag('form', ['method' => 'post', 'action' => 'edit.php',
-                'class' => 'quizsavegradesform form-inline']);
+                'class' => 'quizsavegradesform d-flex flex-wrap align-items-center']);
         $output .= html_writer::start_tag('fieldset', ['class' => 'invisiblefieldset']);
         $output .= html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]);
         $output .= html_writer::input_hidden_params($pageurl);
@@ -680,7 +680,7 @@ class edit_renderer extends \plugin_renderer_base {
         if ($structure->can_add_random_questions()) {
             $returnurl = new \moodle_url('/mod/quiz/edit.php', ['cmid' => $structure->get_cmid(), 'data-addonpage' => $page]);
             $params = ['returnurl' => $returnurl, 'cmid' => $structure->get_cmid(), 'appendqnumstring' => 'addarandomquestion'];
-            $url = new \moodle_url('/mod/quiz/addrandom.php', $params);
+            $url = new \moodle_url('/mod/quiz/edit.php', $params);
             $icon = new \pix_icon('t/add', $str->addarandomquestion, 'moodle', ['class' => 'iconsmall', 'title' => '']);
             $attributes = ['class' => 'cm-edit-action addarandomquestion', 'data-action' => 'addarandomquestion'];
             if ($page) {
@@ -794,7 +794,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @param int $slot the slot on the page we are outputting.
      * @return string HTML to output.
      */
-    public function get_checkbox_render(structure $structure, int $slot) : string {
+    public function get_checkbox_render(structure $structure, int $slot): string {
         $questionslot = $structure->get_displayed_number_for_slot($slot);
         $checkbox = new \core\output\checkbox_toggleall($this->togglegroup, false,
             [
@@ -816,7 +816,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @param \moodle_url $pageurl the canonical URL of this page.
      * @return string HTML to output.
      */
-    public function get_question_name_for_slot(structure $structure, int $slot, \moodle_url $pageurl) : string {
+    public function get_question_name_for_slot(structure $structure, int $slot, \moodle_url $pageurl): string {
         // Display the link to the question (or do nothing if question has no url).
         if ($structure->get_question_type_for_slot($slot) === 'random') {
             $questionname = $this->random_question($structure, $slot, $pageurl);
@@ -835,7 +835,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @param \moodle_url $pageurl the canonical URL of this page.
      * @return string HTML to output.
      */
-    public function get_action_icon(structure $structure, int $slot, \moodle_url $pageurl) : string {
+    public function get_action_icon(structure $structure, int $slot, \moodle_url $pageurl): string {
         // Action icons.
         $qtype = $structure->get_question_type_for_slot($slot);
         $slotinfo = $structure->get_slot_by_number($slot);
@@ -1079,7 +1079,6 @@ class edit_renderer extends \plugin_renderer_base {
         $qbankurlparams = [
             'cmid' => $structure->get_cmid(),
             'cat' => $slot->category . ',' . $slot->contextid,
-            'recurse' => $slot->randomrecurse,
         ];
 
         $slottags = [];
@@ -1235,8 +1234,6 @@ class edit_renderer extends \plugin_renderer_base {
                 'edittitleinstructions',
                 'emptydragdropregion',
                 'hide',
-                'markedthistopic',
-                'markthistopic',
                 'move',
                 'movecontent',
                 'moveleft',

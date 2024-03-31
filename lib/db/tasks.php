@@ -132,15 +132,6 @@ $tasks = array(
         'month' => '*'
     ),
     array(
-        'classname' => 'core\task\legacy_plugin_cron_task',
-        'blocking' => 0,
-        'minute' => '*',
-        'hour' => '*',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-    ),
-    array(
         'classname' => 'core\task\grade_cron_task',
         'blocking' => 0,
         'minute' => '*',
@@ -456,5 +447,23 @@ $tasks = array(
         'dayofweek' => '*',
         'month' => '*',
         'disabled' => true,
+    ],
+    [
+        'classname' => 'core_communication\task\synchronise_providers_task',
+        'blocking' => 0,
+        'minute' => 'R',
+        'hour' => 'R',
+        'day' => '*',
+        'dayofweek' => 'R',
+        'month' => '*',
+    ],
+    [
+        'classname' => 'core\task\automated_backup_report_task',
+        'blocking' => 0,
+        'minute' => '*',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
     ],
 );

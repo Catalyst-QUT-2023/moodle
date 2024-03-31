@@ -144,10 +144,6 @@ $card-gutter : $card-deck-margin * 2;
         width: 36px;
         padding: 0;
         border-radius: 50%;
-
-        @include hover-focus {
-            background-color: $gray-200;
-        }
     }
 }
 
@@ -219,6 +215,9 @@ $card-gutter : $card-deck-margin * 2;
         margin-right: 0;
         .dashboard-card {
             width: calc(100% - #{$card-gutter}) !important;
+            @include media-breakpoint-down(xs) {
+                width: 100% !important;
+            }
         }
     }
 }
@@ -265,7 +264,8 @@ $card-gutter : $card-deck-margin * 2;
     }
 
     a.dashboard-card {
-        @include hover-focus {
+        &:hover,
+        &:focus {
             text-decoration: none;
             h6 {
                 text-decoration: underline;
@@ -345,13 +345,6 @@ $card-gutter : $card-deck-margin * 2;
     color: $text-muted;
 }
 
-@include media-breakpoint-down(sm) {
-    .block.card {
-        border-left: 0;
-        border-right: 0;
-    }
-}
-
 .block_social_activities li a.movehere,
 .block_site_main_menu li a.movehere {
     display: block;
@@ -387,6 +380,29 @@ $card-gutter : $card-deck-margin * 2;
         }
         .embedded-blocks {
             width: 100%;
+        }
+    }
+}
+
+//
+// Block add button
+//
+.block-add {
+    @include alert-variant($primary-light-background, $primary-light-border, $primary);
+    @include border-radius();
+    width: 100%;
+    border-width: $border-width;
+    .pluscontainer {
+        border: $border-width solid $primary-light-border;
+        border-radius: 50%;
+        width: map-get($iconsizes, 5);
+        height: map-get($iconsizes, 5);
+    }
+    &:hover {
+        cursor: pointer;
+        background-color: $primary-light-background;
+        .activity-add-text {
+            text-decoration: underline;
         }
     }
 }

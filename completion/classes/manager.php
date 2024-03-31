@@ -25,6 +25,7 @@
 
 namespace core_completion;
 
+use core\context;
 use stdClass;
 use context_course;
 use cm_info;
@@ -54,6 +55,20 @@ class manager {
      */
     public function __construct($courseid) {
         $this->courseid = $courseid;
+    }
+
+    /**
+     * Returns current course context or system level for $SITE courseid.
+     *
+     * @return context The course based on current courseid or system context.
+     */
+    protected function get_context(): context {
+        global $SITE;
+
+        if ($this->courseid && $this->courseid != $SITE->id) {
+            return context_course::instance($this->courseid);
+        }
+        return \context_system::instance();
     }
 
     /**
@@ -220,13 +235,13 @@ class manager {
         $data->helpicon = $OUTPUT->help_icon('bulkcompletiontracking', 'core_completion');
         // Add icon information.
         $data->modules = array_values($modules);
-        $coursecontext = context_course::instance($this->courseid);
-        $canmanage = has_capability('moodle/course:manageactivities', $coursecontext);
+        $context = $this->get_context();
+        $canmanage = has_capability('moodle/course:manageactivities', $context);
         $course = get_course($this->courseid);
         foreach ($data->modules as $module) {
             $module->icon = $OUTPUT->image_url('monologo', $module->name)->out();
             $module->formattedname = format_string(get_string('modulename', 'mod_' . $module->name),
-                true, ['context' => $coursecontext]);
+                true, ['context' => $context]);
             $module->canmanage = $canmanage && course_allowed_module($course, $module->name);
             if ($includedefaults) {
                 $defaults = self::get_default_completion($course, $module, false);
@@ -234,6 +249,12 @@ class manager {
                 $module->completionstatus = $this->get_completion_detail($defaults);
             }
         }
+        // Order modules by displayed name.
+        $modules = (array) $data->modules;
+        usort($modules, function($a, $b) {
+            return strcmp($a->formattedname, $b->formattedname);
+        });
+        $data->modules = $modules;
 
         return $data;
     }
@@ -263,46 +284,10 @@ class manager {
     }
 
     /**
-     * Gets the available completion tabs for the current course and user.
-     *
      * @deprecated since Moodle 4.0
-     * @param stdClass|int $courseorid the course object or id.
-     * @return tabobject[]
      */
-    public static function get_available_completion_tabs($courseorid) {
-        debugging('get_available_completion_tabs() has been deprecated. Please use ' .
-            'core_completion\manager::get_available_completion_options() instead.', DEBUG_DEVELOPER);
-
-        $tabs = [];
-
-        $courseid = is_object($courseorid) ? $courseorid->id : $courseorid;
-        $coursecontext = context_course::instance($courseid);
-
-        if (has_capability('moodle/course:update', $coursecontext)) {
-            $tabs[] = new tabobject(
-                'completion',
-                new moodle_url('/course/completion.php', ['id' => $courseid]),
-                new lang_string('coursecompletion', 'completion')
-            );
-        }
-
-        if (has_capability('moodle/course:manageactivities', $coursecontext)) {
-            $tabs[] = new tabobject(
-                'defaultcompletion',
-                new moodle_url('/course/defaultcompletion.php', ['id' => $courseid]),
-                new lang_string('defaultcompletion', 'completion')
-            );
-        }
-
-        if (self::can_edit_bulk_completion($courseorid)) {
-            $tabs[] = new tabobject(
-                'bulkcompletion',
-                new moodle_url('/course/bulkcompletion.php', ['id' => $courseid]),
-                new lang_string('bulkactivitycompletion', 'completion')
-            );
-        }
-
-        return $tabs;
+    public static function get_available_completion_tabs() {
+        throw new \coding_exception(__FUNCTION__ . '() has been removed.');
     }
 
     /**
@@ -492,13 +477,22 @@ class manager {
         ];
 
         $data = (array)$data;
+        if (!array_key_exists('completionusegrade', $data)) {
+            $data['completionusegrade'] = 0;
+        }
+        if (!array_key_exists('completionpassgrade', $data)) {
+            $data['completionpassgrade'] = 0;
+        }
+        if ($data['completionusegrade'] == 0) {
+            $data['completionpassgrade'] = 0;
+        }
 
         if ($updatecustomrules) {
             $customdata = array_diff_key($data, $defaults);
             $data['customrules'] = $customdata ? json_encode($customdata) : null;
             $defaults['customrules'] = null;
         }
-        $data = array_intersect_key($data, $defaults);
+        $data = array_merge($defaults, $data);
 
         // Get names of the affected modules.
         list($modidssql, $params) = $DB->get_in_or_equal($modids);
@@ -544,9 +538,18 @@ class manager {
      * @return stdClass
      */
     public static function get_default_completion($course, $module, $flatten = true, string $suffix = '') {
-        global $DB, $CFG;
-        if ($data = $DB->get_record('course_completion_defaults', ['course' => $course->id, 'module' => $module->id],
-            'completion, completionview, completionexpected, completionusegrade, completionpassgrade, customrules')) {
+        global $DB, $CFG, $SITE;
+
+        $fields = 'completion, completionview, completionexpected, completionusegrade, completionpassgrade, customrules';
+        // Check course default completion values.
+        $params = ['course' => $course->id, 'module' => $module->id];
+        $data = $DB->get_record('course_completion_defaults', $params, $fields);
+        if (!$data && $course->id != $SITE->id) {
+            // If there is no course default completion, check site level default completion values ($SITE->id).
+            $params['course'] = $SITE->id;
+            $data = $DB->get_record('course_completion_defaults', $params, $fields);
+        }
+        if ($data) {
             if ($data->customrules && ($customrules = @json_decode($data->customrules, true))) {
                 // MDL-72375 This will override activity id for new mods. Skip this field, it is already exposed as courseid.
                 unset($customrules['id']);
@@ -563,13 +566,6 @@ class manager {
         } else {
             $data = new stdClass();
             $data->completion = COMPLETION_TRACKING_NONE;
-            if ($CFG->completiondefault) {
-                $completion = new \completion_info(get_fast_modinfo($course->id)->get_course());
-                if ($completion->is_enabled() && plugin_supports('mod', $module->name, FEATURE_MODEDIT_DEFAULT_COMPLETION, true)) {
-                    $data->completion = COMPLETION_TRACKING_MANUAL;
-                    $data->completionview = 1;
-                }
-            }
         }
 
         // If the suffix is not empty, the completion rules need to be renamed to avoid conflicts.

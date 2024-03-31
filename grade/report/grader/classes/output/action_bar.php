@@ -32,6 +32,9 @@ class action_bar extends \core_grades\output\action_bar {
     /** @var string $usersearch The content that the current user is looking for. */
     protected string $usersearch = '';
 
+    /** @var int $userid The ID of the user that the current user is looking for. */
+    protected int $userid = 0;
+
     /**
      * The class constructor.
      *
@@ -40,7 +43,13 @@ class action_bar extends \core_grades\output\action_bar {
     public function __construct(\context_course $context) {
         parent::__construct($context);
 
-        $this->usersearch = optional_param('searchvalue', '', PARAM_NOTAGS);
+        $this->userid = optional_param('gpr_userid', 0, PARAM_INT);
+        $this->usersearch = optional_param('gpr_search', '', PARAM_NOTAGS);
+
+        if ($this->userid) {
+            $user = \core_user::get_user($this->userid);
+            $this->usersearch = fullname($user);
+        }
     }
 
     /**
@@ -60,7 +69,7 @@ class action_bar extends \core_grades\output\action_bar {
      * @throws \moodle_exception
      */
     public function export_for_template(\renderer_base $output): array {
-        global $PAGE, $OUTPUT;
+        global $PAGE, $OUTPUT, $SESSION, $USER;
         // If in the course context, we should display the general navigation selector in gradebook.
         $courseid = $this->context->instanceid;
         // Get the data used to output the general navigation selector.
@@ -80,6 +89,10 @@ class action_bar extends \core_grades\output\action_bar {
                 $this->context,
                 '/grade/report/grader/index.php'
             );
+
+            $firstnameinitial = $SESSION->gradereport["filterfirstname-{$this->context->id}"] ?? '';
+            $lastnameinitial  = $SESSION->gradereport["filtersurname-{$this->context->id}"] ?? '';
+
             $initialselector = new comboboxsearch(
                 false,
                 $initialscontent->buttoncontent,
@@ -88,6 +101,13 @@ class action_bar extends \core_grades\output\action_bar {
                 'initialswidget',
                 'initialsdropdown',
                 $initialscontent->buttonheader,
+                true,
+                get_string('filterbyname', 'core_grades'),
+                'nameinitials',
+                json_encode([
+                    'first' => $firstnameinitial,
+                    'last' => $lastnameinitial,
+                ])
             );
             $data['initialselector'] = $initialselector->export_for_template($output);
             $data['groupselector'] = $gradesrenderer->group_selector($course);
@@ -96,14 +116,20 @@ class action_bar extends \core_grades\output\action_bar {
             $searchinput = $OUTPUT->render_from_template('core_user/comboboxsearch/user_selector', [
                 'currentvalue' => $this->usersearch,
                 'courseid' => $courseid,
+                'instance' => rand(),
                 'resetlink' => $resetlink->out(false),
                 'group' => 0,
+                'name' => 'usersearch',
+                'value' => json_encode([
+                    'userid' => $this->userid,
+                    'search' => $this->usersearch,
+                ]),
             ]);
             $searchdropdown = new comboboxsearch(
                 true,
                 $searchinput,
                 null,
-                'user-search dropdown d-flex',
+                'user-search d-flex',
                 null,
                 'usersearchdropdown overflow-auto',
                 null,
@@ -111,20 +137,46 @@ class action_bar extends \core_grades\output\action_bar {
             );
             $data['searchdropdown'] = $searchdropdown->export_for_template($output);
 
+            // The collapsed column dialog is aligned to the edge of the screen, we need to place it such that it also aligns.
+            $collapsemenudirection = right_to_left() ? 'dropdown-menu-left' : 'dropdown-menu-right';
+
             $collapse = new comboboxsearch(
                 true,
                 get_string('collapsedcolumns', 'gradereport_grader', 0),
                 null,
                 'collapse-columns',
                 'collapsecolumn',
-                'collapsecolumndropdown p-3 flex-column',
+                'collapsecolumndropdown p-3 flex-column ' . $collapsemenudirection,
                 null,
                 true,
+                get_string('aria:dropdowncolumns', 'gradereport_grader'),
+                'collapsedcolumns'
             );
             $data['collapsedcolumns'] = [
                 'classes' => 'd-none',
                 'content' => $collapse->export_for_template($output)
             ];
+
+            if ($course->groupmode == VISIBLEGROUPS || has_capability('moodle/site:accessallgroups', $this->context)) {
+                $allowedgroups = groups_get_all_groups($course->id, 0, $course->defaultgroupingid);
+            } else {
+                $allowedgroups = groups_get_all_groups($course->id, $USER->id, $course->defaultgroupingid);
+            }
+
+            if (
+                $firstnameinitial ||
+                $lastnameinitial ||
+                groups_get_course_group($course, true, $allowedgroups) ||
+                $this->usersearch
+            ) {
+                $reset = new moodle_url('/grade/report/grader/index.php', [
+                    'id' => $courseid,
+                    'group' => 0,
+                    'sifirst' => '',
+                    'silast' => ''
+                ]);
+                $data['pagereset'] = $reset->out(false);
+            }
         }
 
         return $data;

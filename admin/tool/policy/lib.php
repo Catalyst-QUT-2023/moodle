@@ -76,7 +76,7 @@ function tool_policy_myprofile_navigation(tree $tree, $user, $iscurrentuser, $co
  *
  * @return string The HTML code to insert before the head.
  */
-function tool_policy_before_standard_html_head() {
+function tool_policy_before_standard_top_of_body_html() {
     global $CFG, $PAGE, $USER;
 
     $message = null;

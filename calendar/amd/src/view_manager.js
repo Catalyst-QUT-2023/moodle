@@ -27,13 +27,14 @@ import Notification from 'core/notification';
 import * as CalendarRepository from 'core_calendar/repository';
 import CalendarEvents from 'core_calendar/events';
 import * as CalendarSelectors from 'core_calendar/selectors';
-import ModalFactory from 'core/modal_factory';
 import ModalEvents from 'core/modal_events';
 import SummaryModal from 'core_calendar/summary_modal';
 import CustomEvents from 'core/custom_interaction_events';
-import {get_string as getString} from 'core/str';
+import {getString} from 'core/str';
 import Pending from 'core/pending';
 import {prefetchStrings} from 'core/prefetch';
+import Url from 'core/url';
+import Config from 'core/config';
 
 /**
  * Limit number of events per day
@@ -94,7 +95,7 @@ export const foldDayEvents = () => {
                 moreEventsLink.attr('data-event-folded', 'false');
                 link.text(str);
                 return str;
-            }).fail();
+            }).catch(Notification.exception);
         } else {
             moreEventsLink.hide();
         }
@@ -221,17 +222,20 @@ const registerEventListeners = (root) => {
             if (view == 'month') {
                 refreshMonthContent(root, year, month, courseId, categoryId, root, 'core_calendar/calendar_month', day)
                     .then(() => {
-                        updateUrl('?view=month');
+                        updateUrl('?view=month&course=' + courseId);
+                        return;
                     }).fail(Notification.exception);
             } else if (view == 'day') {
                 refreshDayContent(root, year, month, day, courseId, categoryId, root, 'core_calendar/calendar_day')
                     .then(() => {
-                        updateUrl('?view=day');
+                        updateUrl('?view=day&course=' + courseId);
+                        return;
                     }).fail(Notification.exception);
             } else if (view == 'upcoming') {
                 reloadCurrentUpcoming(root, courseId, categoryId, root, 'core_calendar/calendar_upcoming')
                     .then(() => {
-                        updateUrl('?view=upcoming');
+                        updateUrl('?view=upcoming&course=' + courseId);
+                        return;
                     }).fail(Notification.exception);
             }
         }
@@ -524,7 +528,6 @@ const renderEventSummaryModal = (eventId) => {
         // Build the modal parameters from the event data.
         const modalParams = {
             title: eventData.name,
-            type: SummaryModal.TYPE,
             body: Templates.render('core_calendar/event_summary_body', eventData),
             templateContext: {
                 canedit: eventData.canedit,
@@ -537,7 +540,7 @@ const renderEventSummaryModal = (eventId) => {
         };
 
         // Create the modal.
-        return ModalFactory.create(modalParams);
+        return SummaryModal.create(modalParams);
     })
     .then(modal => {
         // Handle hidden event.
@@ -567,5 +570,33 @@ export const init = (root, view) => {
     if (calendarTable.length) {
         const pendingId = `month-detailed-${calendarTable.id}-filterChanged`;
         registerEventListenersForMonthDetailed(calendarTable, pendingId);
+    }
+};
+
+/**
+ * Handles the change of course and updates the relevant elements on the page.
+ *
+ * @param {integer} courseId - The ID of the new course.
+ * @param {string} courseName - The name of the new course.
+ * @returns {Promise<void>} - A promise that resolves after the updates are applied.
+ */
+export const handleCourseChange = async(courseId, courseName) => {
+    // Select the <ul> element inside the data-region="view-selector".
+    const ulElement = document.querySelector(CalendarSelectors.viewSelector + ' ul');
+    // Select all <li><a> elements within the <ul>.
+    const liElements = ulElement.querySelectorAll('li a');
+    // Loop through the selected elements and update the courseid.
+    liElements.forEach(element => {
+        element.setAttribute('data-courseid', courseId);
+    });
+
+    const calendar = await getString('calendar', 'calendar');
+    const pageHeaderHeadingsElement = document.querySelector(CalendarSelectors.pageHeaderHeadings);
+    const courseUrl = Url.relativeUrl('/course/view.php', {id: courseId});
+    // Apply the page header text.
+    if (courseId !== Config.siteId) {
+        pageHeaderHeadingsElement.innerHTML = calendar + ': <a href="' + courseUrl + '">' + courseName + '</a>';
+    } else {
+        pageHeaderHeadingsElement.innerHTML = calendar;
     }
 };

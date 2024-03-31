@@ -104,7 +104,8 @@ class core_completion_defaultedit_form extends core_completion_edit_base_form {
      * Form definition,
      */
     public function definition() {
-        $this->course = $this->_customdata['course'];
+        $course = $this->_customdata['course'];
+        $this->course = is_numeric($course) ? get_course($course) : $course;
         $this->modules = $this->_customdata['modules'];
 
         $mform = $this->_form;
@@ -128,23 +129,21 @@ class core_completion_defaultedit_form extends core_completion_edit_base_form {
                 $this->get_suffix()
             );
             $data = (array)$data;
-            $modform->data_preprocessing($data);
+            try {
+                $modform->data_preprocessing($data);
+            } catch (moodle_exception $e) {
+                debugging(
+                    'data_preprocessing function of module ' . $modnames[0] .
+                    ' should be fixed so it can be shown together with other Default activity completion forms',
+                    DEBUG_DEVELOPER
+                );
+            }
             // Unset fields that will conflict with this form and set data to this form.
             unset($data['cmid']);
             unset($data['modids']);
             unset($data['id']);
             $this->set_data($data);
         }
-    }
-
-    /**
-     * There is no course module for this form, because it is used to update default completion settings. So it will
-     * always return null.
-     *
-     * @return \stdClass|null
-     */
-    protected function get_cm(): ?\stdClass {
-        return null;
     }
 
     /**
