@@ -98,18 +98,23 @@ class unfurl {
 
         foreach ($metataglist as $metatag) {
             $propertyattribute = strtolower(s($metatag->getAttribute('property')));
-            $contentattribute = s($metatag->getAttribute('content'));
+            $contentattribute = $metatag->getAttribute('content');
             if (
                 !empty($propertyattribute) &&
                 !empty($contentattribute) &&
                 preg_match ('/^og:\w/i', $propertyattribute) === 1
             ) {
+                if (preg_match('/&[#a-zA-Z0-9]+;/', $contentattribute)) {
+                    $sanitizedcontent = $contentattribute;
+                } else {
+                    $sanitizedcontent = htmlspecialchars($contentattribute, ENT_QUOTES, 'UTF-8');
+                }
                 switch ($propertyattribute) {
                     case 'og:title':
-                        $this->title = $contentattribute;
+                        $this->title = $sanitizedcontent;
                         break;
                     case 'og:site_name':
-                        $this->sitename = $contentattribute;
+                        $this->sitename = $sanitizedcontent;
                         break;
                     case 'og:image':
                         $imageurlparts = parse_url($contentattribute);
@@ -122,13 +127,13 @@ class unfurl {
                         }
                         break;
                     case 'og:description':
-                        $this->description = $contentattribute;
+                        $this->description = $sanitizedcontent;
                         break;
                     case 'og:url':
-                        $this->canonicalurl = $contentattribute;
+                        $this->canonicalurl = $sanitizedcontent;
                         break;
                     case 'og:type':
-                        $this->type = $contentattribute;
+                        $this->type = $sanitizedcontent;
                     default:
                         break;
                 }
