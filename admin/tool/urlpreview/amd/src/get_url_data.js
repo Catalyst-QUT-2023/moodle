@@ -26,5 +26,5 @@ import {getPreview} from './repository';
 
 export const getPreviewTemplate = async(url) => {
     const response = await getPreview(url);
-    document.write(response);
+    document.getElementById("previewField").innerHTML = response;
 };
