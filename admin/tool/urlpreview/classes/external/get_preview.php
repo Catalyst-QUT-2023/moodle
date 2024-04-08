@@ -14,13 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace tool_urlpreview;
+namespace tool_urlpreview\external;
+
 use core_external\external_function_parameters;
 use core_external\external_single_structure;
 use core_external\external_api;
 use core_external\external_value;
 require_once($CFG->dirroot . '/admin/tool/urlpreview/db/urlpreview.php');
 require_once($CFG->libdir . '/classes/url/unfurler.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 
 
 /**
@@ -73,10 +75,9 @@ class get_preview extends external_api {
         $context = \context_system::instance(); // TODO change if required.
         self::validate_context($context);
 
-        // TODO check permissions and implement WS.
+        // TODO check permissions
 
         global $DB;
-        // Validate the URL.
 
         // Check if the linted data for this URL is already in the database.
         $sql = "SELECT * FROM {urlpreview} WHERE " . $DB->sql_compare_text('url') . " = ?";
