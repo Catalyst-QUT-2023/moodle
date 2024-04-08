@@ -117,38 +117,9 @@ class get_preview extends external_api {
     /**
      * Describe the return structure for tool_urlpreview_get_preview
      *
-     * @return external_single_structure
+     * @return external_value
      */
-    public static function execute_returns(): external_single_structure {
-        return new external_single_structure([
-                'url' => new external_value(PARAM_URL, 'The URL'),
-                'title' => new external_value(PARAM_TEXT, 'The title'),
-                'sitename' => new external_value(PARAM_TEXT, 'Site Name'),
-                'image' => new external_value(PARAM_TEXT, 'Image URL'),
-                'description' => new external_value(PARAM_TEXT, 'Description'),
-                'type' => new external_value(PARAM_TEXT, 'Type'),
-            ]);
-    }
-
-    /**
-     * Renders linted data from the database for display.
-     *
-     * @param stdClass $data The linted data retrieved from the database.
-     * @return string The formatted output for display.
-     */
-    private static function rend($data) {
-        global $OUTPUT;
-
-        $templatedata = [
-            'noogmetadata' => empty($data->title) && empty($data->imageurl) && empty($data->sitename)
-            && empty($data->description) && empty($data->type),
-            'canonicalurl' => $data->url,
-            'title'        => $data->title,
-            'image'        => $data->imageurl,
-            'sitename'     => $data->sitename,
-            'description'  => $data->description,
-            'type'         => $data->type,
-        ];
-        return $OUTPUT->render_from_template('tool_urlpreview/metadata', $templatedata);
+    public static function execute_returns(): external_value {
+        return new external_value(PARAM_RAW, 'HTML Output');
     }
 }
