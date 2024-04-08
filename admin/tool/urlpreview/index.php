@@ -87,3 +87,28 @@ if ($url !== '') {
 
 echo $OUTPUT->footer();
 
+
+
+/**
+ * Renders linted data from the database for display.
+ *
+ * @param stdClass $data The linted data retrieved from the database.
+ * @return string The formatted output for display.
+ */
+function rend($data)
+{
+    global $OUTPUT;
+
+    $templatedata = [
+        'noogmetadata' => empty($data->title) && empty($data->imageurl) && empty($data->sitename)
+            && empty($data->description) && empty($data->type),
+        'canonicalurl' => $data->url,
+        'title'        => $data->title,
+        'image'        => $data->imageurl,
+        'sitename'     => $data->sitename,
+        'description'  => $data->description,
+        'type'         => $data->type,
+    ];
+    return $OUTPUT->render_from_template('tool_urlpreview/metadata', $templatedata);
+}
+

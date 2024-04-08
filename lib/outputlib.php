@@ -301,6 +301,33 @@ function theme_set_designer_mod($state) {
 }
 
 /**
+ * Purge theme used in context caches.
+ */
+function theme_purge_used_in_context_caches() {
+    \cache::make('core', 'theme_usedincontext')->purge();
+}
+
+/**
+ * Delete theme used in context cache for a particular theme.
+ *
+ * When switching themes, both old and new theme caches are deleted.
+ * This gives the query the opportunity to recache accurate results for both themes.
+ *
+ * @param string $newtheme The incoming new theme.
+ * @param string $oldtheme The theme that was already set.
+ */
+function theme_delete_used_in_context_cache(string $newtheme, string $oldtheme): void {
+    if ((strlen($newtheme) > 0) && (strlen($oldtheme) > 0)) {
+        // Theme -> theme.
+        \cache::make('core', 'theme_usedincontext')->delete($oldtheme);
+        \cache::make('core', 'theme_usedincontext')->delete($newtheme);
+    } else {
+        // No theme -> theme, or theme -> no theme.
+        \cache::make('core', 'theme_usedincontext')->delete($newtheme . $oldtheme);
+    }
+}
+
+/**
  * This class represents the configuration variables of a Moodle theme.
  *
  * All the variables with access: public below (with a few exceptions that are marked)
@@ -1598,7 +1625,7 @@ class theme_config {
 
         // Getting all the candidate functions.
         $candidates = array();
-        foreach ($this->parent_configs as $parent_config) {
+        foreach (array_reverse($this->parent_configs) as $parent_config) {
             if (!isset($parent_config->extrascsscallback)) {
                 continue;
             }
@@ -1631,7 +1658,7 @@ class theme_config {
 
         // Getting all the candidate functions.
         $candidates = array();
-        foreach ($this->parent_configs as $parent_config) {
+        foreach (array_reverse($this->parent_configs) as $parent_config) {
             if (!isset($parent_config->prescsscallback)) {
                 continue;
             }
@@ -2093,8 +2120,7 @@ class theme_config {
      *
      * @param string $image name of image, may contain relative path
      * @param string $component
-     * @param bool $svg|null Should SVG images also be looked for? If null, resorts to $CFG->svgicons if that is set; falls back to
-     * auto-detection of browser support otherwise
+     * @param bool $svg|null Should SVG images also be looked for? If null, falls back to auto-detection of browser support
      * @return string full file path
      */
     public function resolve_image_location($image, $component, $svg = false) {
@@ -2251,16 +2277,10 @@ class theme_config {
      * @return bool
      */
     public function use_svg_icons() {
-        global $CFG;
         if ($this->usesvg === null) {
-
-            if (!isset($CFG->svgicons)) {
-                $this->usesvg = core_useragent::supports_svg();
-            } else {
-                // Force them on/off depending upon the setting.
-                $this->usesvg = (bool)$CFG->svgicons;
-            }
+            $this->usesvg = core_useragent::supports_svg();
         }
+
         return $this->usesvg;
     }
 

@@ -215,4 +215,44 @@ $functions = [
         'capabilities' => 'mod/quiz:reopenattempts',
         'ajax' => true,
     ],
+
+    'mod_quiz_add_random_questions' => [
+        'classname'     => 'mod_quiz\external\add_random_questions',
+        'description'   => 'Add a number of random questions to a quiz.',
+        'type'          => 'write',
+        'capabilities'  => 'mod/quiz:manage',
+        'ajax'          => true,
+    ],
+
+    'mod_quiz_update_filter_condition' => [
+        'classname'     => 'mod_quiz\external\update_filter_condition',
+        'description'   => 'Update filter condition for a random question slot.',
+        'type'          => 'write',
+        'capabilities'  => 'mod/quiz:manage',
+        'ajax'          => true,
+    ],
+
+    'mod_quiz_save_overrides' => [
+        'classname'     => 'mod_quiz\external\save_overrides',
+        'description'   => 'Update or insert quiz overrides',
+        'type'          => 'write',
+        'capabilities'  => 'mod/quiz:manageoverrides',
+        'ajax'          => true,
+    ],
+
+    'mod_quiz_delete_overrides' => [
+        'classname'     => 'mod_quiz\external\delete_overrides',
+        'description'   => 'Delete quiz overrides',
+        'type'          => 'write',
+        'capabilities'  => 'mod/quiz:manageoverrides',
+        'ajax'          => true,
+    ],
+
+    'mod_quiz_get_overrides' => [
+        'classname'     => 'mod_quiz\external\get_overrides',
+        'description'   => 'Get quiz overrides',
+        'type'          => 'read',
+        'capabilities'  => 'mod/quiz:manageoverrides',
+        'ajax'          => true,
+    ],
 ];

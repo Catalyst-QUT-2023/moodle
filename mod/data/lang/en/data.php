@@ -71,8 +71,7 @@ $string['commentsaved'] = 'Comment saved';
 $string['commentsn'] = '{$a} comment(s)';
 $string['commentsoff'] = 'Comments feature is not enabled';
 $string['completiondetail:entries'] = 'Make entries: {$a}';
-$string['completionentries'] = 'Require entries';
-$string['completionentriescount'] = 'Count of entries';
+$string['completionentriescount'] = 'Add entries';
 $string['completionentriesdesc'] = 'Minimum number of entries required: {$a}';
 $string['configenablerssfeeds'] = 'This switch will enable the possibility of RSS feeds for all databases. You will still need to turn feeds on manually in the settings for each database.';
 $string['confirmdeletefield'] = 'You are about to delete this field, are you sure?';
@@ -171,7 +170,6 @@ $string['exportownentries'] = 'Export your own entries only? ({$a->mine}/{$a->al
 $string['exportpreset'] = 'Export preset';
 $string['failedpresetdelete'] = 'An error was encountered while trying to delete the preset.';
 $string['fieldadded'] = 'Field added';
-$string['fieldallowautolink'] = 'Allow autolink';
 $string['fielddeleted'] = 'Field deleted';
 $string['fielddelimiter'] = 'Field separator';
 $string['fielddescription'] = 'Field description';
@@ -423,6 +421,7 @@ $string['savesuccess'] = 'Preset saved. <a href="{$a->url}">Preview preset</a>';
 $string['search'] = 'Search';
 $string['search:activity'] = 'Database - activity information';
 $string['search:entry'] = 'Database - entries';
+$string['searchresults'] = 'Entries containing "{$a}"';
 $string['selectedrequired'] = 'All selected required';
 $string['selectfields'] = 'Select fields';
 $string['selectexportoptions'] = 'Select export options';
@@ -486,3 +485,9 @@ $string['todatabase'] = 'to this database.';
 
 // Deprecated since Moodle 4.2.
 $string['fieldids'] = 'Field ids';
+
+// Deprecated since Moodle 4.3.
+$string['completionentries'] = 'Require entries';
+
+// Deprecated since Moodle 4.4.
+$string['fieldallowautolink'] = 'Allow autolink';

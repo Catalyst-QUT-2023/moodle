@@ -273,7 +273,8 @@ class mod_scorm_mod_form extends moodleform_mod {
         // A SCORM module should define this within itself and is not needed here.
         $suffix = $this->get_suffix();
         $completionpassgradeel = 'completionpassgrade' . $suffix;
-        if ($mform->elementExists($completionpassgradeel)) {
+        // The 'completionpassgrade' is a radio element with multiple options, so we should remove all of them.
+        while ($mform->elementExists($completionpassgradeel)) {
             $mform->removeElement($completionpassgradeel);
         }
 
@@ -344,7 +345,7 @@ class mod_scorm_mod_form extends moodleform_mod {
                     $cvalues[$key] = 1;
                 }
             }
-        } else if (empty($this->_instance)) {
+        } else if (empty($this->_instance) && !array_key_exists($completionstatusrequiredel, $defaultvalues)) {
             // When in add mode, set a default completion rule that requires the SCORM's status be set to "Completed".
             $cvalues[4] = 1;
         }
@@ -354,9 +355,9 @@ class mod_scorm_mod_form extends moodleform_mod {
         }
 
         $completionscorerequiredel = 'completionscorerequired' . $suffix;
-        if (!isset($defaultvalues[$completionscorerequiredel]) || !strlen($defaultvalues[$completionscorerequiredel])) {
-            $completionscoredisabledel = 'completionscoredisabled' . $suffix;
-            $defaultvalues[$completionscoredisabledel] = 1;
+        if (isset($defaultvalues[$completionscorerequiredel])) {
+            $completionscoreenabledel = 'completionscoreenabled' . $suffix;
+            $defaultvalues[$completionscoreenabledel] = 1;
         }
     }
 
@@ -469,6 +470,18 @@ class mod_scorm_mod_form extends moodleform_mod {
             }
         }
 
+        // Validate 'Require minimum score' value.
+        $completionscorerequiredel = 'completionscorerequired' . $this->get_suffix();
+        $completionscoreenabledel = 'completionscoreenabled' . $this->get_suffix();
+        if (array_key_exists($completionscoreenabledel, $data) &&
+                $data[$completionscoreenabledel] &&
+                array_key_exists($completionscorerequiredel, $data) &&
+                strlen($data[$completionscorerequiredel]) &&
+                $data[$completionscorerequiredel] <= 0
+        ) {
+            $errors['completionscoregroup' . $this->get_suffix()] = get_string('minimumscoregreater', 'scorm');
+        }
+
         return $errors;
     }
 
@@ -502,39 +515,36 @@ class mod_scorm_mod_form extends moodleform_mod {
     public function add_completion_rules() {
         $suffix = $this->get_suffix();
         $mform =& $this->_form;
-        $items = array();
+        $items = [];
 
         // Require score.
         $group = [];
         $completionscorerequiredel = 'completionscorerequired' . $suffix;
+        $completionscoreenabledel = 'completionscoreenabled' . $suffix;
+        $group[] =& $mform->createElement(
+            'checkbox',
+            $completionscoreenabledel,
+            null,
+            get_string('completionscorerequired', 'scorm')
+        );
         $group[] =& $mform->createElement('text', $completionscorerequiredel, '', ['size' => 5]);
-        $group[] =& $mform->createElement('checkbox', 'completionscoredisabled', null, get_string('disable'));
         $mform->setType($completionscorerequiredel, PARAM_INT);
         $completionscoregroupel = 'completionscoregroup' . $suffix;
-        $mform->addGroup($group, $completionscoregroupel, get_string('completionscorerequired', 'scorm'), '', false);
-        $mform->addHelpButton($completionscoregroupel, 'completionscorerequired', 'scorm');
-        $mform->disabledIf($completionscorerequiredel, 'completionscoredisabled', 'checked');
+        $mform->addGroup($group, $completionscoregroupel, '', '', false);
+        $mform->hideIf($completionscorerequiredel, $completionscoreenabledel, 'notchecked');
         $mform->setDefault($completionscorerequiredel, 0);
 
         $items[] = $completionscoregroupel;
 
         // Require status.
-        $first = true;
-        $firstkey = null;
         $completionstatusrequiredel = 'completionstatusrequired' . $suffix;
         foreach (scorm_status_options(true) as $key => $value) {
-            $name = null;
             $key = $completionstatusrequiredel . '['.$key.']';
-            if ($first) {
-                $name = get_string('completionstatusrequired', 'scorm');
-                $first = false;
-                $firstkey = $key;
-            }
-            $mform->addElement('checkbox', $key, $name, $value);
+            $mform->addElement('checkbox', $key, '', $value);
             $mform->setType($key, PARAM_BOOL);
+            $mform->hideIf($key, $completionstatusrequiredel, 'notchecked');
             $items[] = $key;
         }
-        $mform->addHelpButton($firstkey, 'completionstatusrequired', 'scorm');
 
         $completionstatusallscosel = 'completionstatusallscos' . $suffix;
         $mform->addElement('checkbox', $completionstatusallscosel, get_string('completionstatusallscos', 'scorm'));
@@ -549,7 +559,8 @@ class mod_scorm_mod_form extends moodleform_mod {
     public function completion_rule_enabled($data) {
         $suffix = $this->get_suffix();
         $status = !empty($data['completionstatusrequired' . $suffix]);
-        $score = empty($data['completionscoredisabled' . $suffix]) && strlen($data['completionscorerequired' . $suffix]);
+        $score = !empty($data['completionscoreenabled' . $suffix]) &&
+                strlen($data['completionscorerequired' . $suffix] && $data['completionscorerequired' . $suffix] > 0);
 
         return $status || $score;
     }
@@ -589,7 +600,7 @@ class mod_scorm_mod_form extends moodleform_mod {
             }
             // Else do nothing: completionstatusrequired has been already converted into a correct integer representation.
 
-            if (!empty($data->{'completionscoredisabled' . $suffix}) || !$autocompletion) {
+            if (!(isset($data->{'completionscoreenabled' . $suffix}) && $autocompletion)) {
                 $data->{'completionscorerequired' . $suffix} = null;
             }
         }

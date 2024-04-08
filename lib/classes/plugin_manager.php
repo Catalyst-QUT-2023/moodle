@@ -591,19 +591,12 @@ class core_plugin_manager {
      * @return string
      */
     public function plugintype_name($type) {
-
         if (get_string_manager()->string_exists('type_' . $type, 'core_plugin')) {
             // For most plugin types, their names are defined in core_plugin lang file.
             return get_string('type_' . $type, 'core_plugin');
-
         } else if ($parent = $this->get_parent_of_subplugin($type)) {
             // If this is a subplugin, try to ask the parent plugin for the name.
-            if (get_string_manager()->string_exists('subplugintype_' . $type, $parent)) {
-                return $this->plugin_name($parent) . ' / ' . get_string('subplugintype_' . $type, $parent);
-            } else {
-                return $this->plugin_name($parent) . ' / ' . $type;
-            }
-
+            return $this->plugin_name($parent) . ' / ' . get_string('subplugintype_' . $type, $parent);
         } else {
             return $type;
         }
@@ -620,19 +613,12 @@ class core_plugin_manager {
      * @return string
      */
     public function plugintype_name_plural($type) {
-
         if (get_string_manager()->string_exists('type_' . $type . '_plural', 'core_plugin')) {
             // For most plugin types, their names are defined in core_plugin lang file.
             return get_string('type_' . $type . '_plural', 'core_plugin');
-
         } else if ($parent = $this->get_parent_of_subplugin($type)) {
             // If this is a subplugin, try to ask the parent plugin for the name.
-            if (get_string_manager()->string_exists('subplugintype_' . $type . '_plural', $parent)) {
-                return $this->plugin_name($parent) . ' / ' . get_string('subplugintype_' . $type . '_plural', $parent);
-            } else {
-                return $this->plugin_name($parent) . ' / ' . $type;
-            }
-
+            return $this->plugin_name($parent) . ' / ' . get_string('subplugintype_' . $type . '_plural', $parent);
         } else {
             return $type;
         }
@@ -923,7 +909,7 @@ class core_plugin_manager {
      * @param int $branch the moodle branch to check support for
      * @return string
      */
-    public function check_explicitly_supported($plugin, $branch) : string {
+    public function check_explicitly_supported($plugin, $branch): string {
         // Check for correctly formed supported.
         if (isset($plugin->pluginsupported)) {
             // Broken apart for readability.
@@ -1550,7 +1536,7 @@ class core_plugin_manager {
 
         $provider = \core\update\checker::instance();
 
-        if (!$provider->enabled() or during_initial_install()) {
+        if (!$provider->enabled() || $component === '' || during_initial_install()) {
             return null;
         }
 
@@ -1720,7 +1706,6 @@ class core_plugin_manager {
         // branch, listed should be no plugins that were removed at 1.9.x - 2.1.x versions as
         // Moodle 2.3 supports upgrades from 2.2.x only.
         $plugins = array(
-            'qformat' => array('blackboard', 'learnwise', 'examview'),
             'assignment' => array('offline', 'online', 'upload', 'uploadsingle'),
             'auth' => array('radius', 'fc', 'nntp', 'pam', 'pop3', 'imap'),
             'block' => array('course_overview', 'messages', 'community', 'participants', 'quiz_results'),
@@ -1728,9 +1713,10 @@ class core_plugin_manager {
             'editor' => array('tinymce'),
             'enrol' => array('authorize'),
             'filter' => array('censor'),
+            'h5plib' => array('v124'),
             'media' => array('swf'),
             'portfolio' => array('picasa', 'boxnet'),
-            'qformat' => array('webct'),
+            'qformat' => array('blackboard', 'learnwise', 'examview', 'webct'),
             'message' => array('jabber'),
             'mod' => array('assignment'),
             'quizaccess' => array('safebrowser'),
@@ -1826,6 +1812,7 @@ class core_plugin_manager {
             ),
 
             'communication' => [
+                'customlink',
                 'matrix',
             ],
 
@@ -1871,6 +1858,11 @@ class core_plugin_manager {
                 'paypal', 'self', 'fee',
             ),
 
+            'factor' => [
+                'admin', 'auth', 'capability', 'cohort',  'email', 'grace', 'iprange', 'nosetup', 'role',
+                'token', 'totp', 'webauthn', 'sms',
+            ],
+
             'filter' => array(
                 'activitynames', 'algebra', 'emailprotect',
                 'emoticon', 'displayh5p', 'mathjaxloader', 'mediaplugin', 'multilang', 'tex', 'tidy',
@@ -1902,7 +1894,7 @@ class core_plugin_manager {
             ),
 
             'h5plib' => array(
-                'v124'
+                'v126',
             ),
 
             'local' => array(
@@ -2008,7 +2000,8 @@ class core_plugin_manager {
             'report' => array(
                 'backups', 'competency', 'completion', 'configlog', 'courseoverview', 'eventlist',
                 'infectedfiles', 'insights', 'log', 'loglive', 'outline', 'participation', 'progress',
-                'questioninstances', 'security', 'stats', 'status', 'performance', 'usersessions'
+                'questioninstances', 'security', 'stats', 'status', 'performance', 'usersessions',
+                'themeusage',
             ),
 
             'repository' => array(
@@ -2038,6 +2031,8 @@ class core_plugin_manager {
                 'recordrtc',
                 'link',
                 'html',
+                'noautolink',
+                'premium',
             ],
 
             'theme' => array(
@@ -2050,7 +2045,7 @@ class core_plugin_manager {
                 'installaddon', 'langimport', 'licensemanager', 'log', 'lp', 'lpimportcsv', 'lpmigrate', 'messageinbound',
                 'mobile', 'moodlenet', 'multilangupgrade', 'monitor', 'oauth2', 'phpunit', 'policy', 'profiling', 'recyclebin',
                 'replace', 'spamcleaner', 'task', 'templatelibrary', 'uploadcourse', 'uploaduser', 'unsuproles',
-                'usertours', 'xmldb'
+                'usertours', 'xmldb', 'mfa'
             ),
 
             'webservice' => array(

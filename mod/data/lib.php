@@ -1027,7 +1027,7 @@ function data_get_field_new($type, $data) {
  * @param stdClass|null $cm optional course module data
  * @return data_field_base the field object instance or data_field_base if unkown type
  */
-function data_get_field($field, $data, $cm=null) {
+function data_get_field(stdClass $field, stdClass $data, ?stdClass $cm=null): data_field_base {
     global $CFG;
     if (!isset($field->type)) {
         return new data_field_base($field);
@@ -1749,7 +1749,7 @@ function data_print_preference_form($data, $perpage, $search, $sort='', $order='
         $regsearchclass = 'search_inline';
         $advancedsearchclass = 'search_none';
     }
-    echo '<div id="reg_search" class="' . $regsearchclass . ' form-inline" >&nbsp;&nbsp;&nbsp;';
+    echo '<div id="reg_search" class="' . $regsearchclass . ' d-flex flex-wrap align-items-center" >&nbsp;&nbsp;&nbsp;';
     echo '<label for="pref_search">' . get_string('search') . '</label> <input type="text" ' .
          'class="form-control" size="16" name="search" id= "pref_search" value="' . s($search) . '" /></div>';
     echo '&nbsp;&nbsp;&nbsp;<label for="pref_sortby">'.get_string('sortby').'</label> ';
@@ -2259,7 +2259,6 @@ function data_print_header($course, $cm, $data, $currenttab='', string $actionba
 
     global $CFG, $displaynoticegood, $displaynoticebad, $OUTPUT, $PAGE, $USER;
 
-    $PAGE->set_title($data->name);
     echo $OUTPUT->header();
 
     echo $actionbar;
@@ -3348,7 +3347,6 @@ function data_presets_generate_xml($course, $cm, $data) {
     $preset = preset::create_from_instance($manager, $data->name);
     $reflection = new \ReflectionClass(preset::class);
     $method = $reflection->getMethod('generate_preset_xml');
-    $method->setAccessible(true);
     return $method->invokeArgs($preset, []);
 }
 

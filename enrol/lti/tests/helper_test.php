@@ -477,7 +477,6 @@ class helper_test extends \advanced_testcase {
     public function test_set_xpath($parameters, $expected) {
         $helper = new \ReflectionClass('enrol_lti\\helper');
         $function = $helper->getMethod('set_xpath');
-        $function->setAccessible(true);
 
         $document = new \DOMDocument();
         $document->load(realpath(__DIR__ . '/fixtures/input.xml'));
@@ -502,7 +501,6 @@ class helper_test extends \advanced_testcase {
         ];
         $helper = new \ReflectionClass('enrol_lti\\helper');
         $function = $helper->getMethod('set_xpath');
-        $function->setAccessible(true);
 
         $document = new \DOMDocument();
         $document->load(realpath(__DIR__ . '/fixtures/input.xml'));
@@ -525,7 +523,7 @@ class helper_test extends \advanced_testcase {
 
         $cartridge = \enrol_lti\helper::create_cartridge($tool1->id);
         $this->assertStringContainsString('<blti:title>Test LTI</blti:title>', $cartridge);
-        $this->assertStringContainsString("<blti:icon>$CFG->wwwroot/theme/image.php/_s/boost/theme/1/favicon</blti:icon>", $cartridge);
+        $this->assertStringContainsString("<blti:icon>$CFG->wwwroot/theme/image.php/boost/theme/1/favicon</blti:icon>", $cartridge);
         $this->assertStringContainsString("<blti:launch_url>$CFG->wwwroot/enrol/lti/tool.php?id=$tool1->id</blti:launch_url>", $cartridge);
     }
 }

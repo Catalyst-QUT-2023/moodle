@@ -952,26 +952,26 @@ class enrollib_test extends advanced_testcase {
         $this->assertEquals([$course1->id, $course2->id, $course3->id], array_keys($courses));
 
         // Check fields parameter still works. Fields default (certain base fields).
-        $this->assertObjectHasAttribute('id', $courses[$course3->id]);
-        $this->assertObjectHasAttribute('shortname', $courses[$course3->id]);
-        $this->assertObjectNotHasAttribute('summary', $courses[$course3->id]);
+        $this->assertObjectHasProperty('id', $courses[$course3->id]);
+        $this->assertObjectHasProperty('shortname', $courses[$course3->id]);
+        $this->assertObjectNotHasProperty('summary', $courses[$course3->id]);
 
         // Specified fields (one, string).
         $courses = enrol_get_my_courses('summary', 'id', 0, [], true);
-        $this->assertObjectHasAttribute('id', $courses[$course3->id]);
-        $this->assertObjectHasAttribute('shortname', $courses[$course3->id]);
-        $this->assertObjectHasAttribute('summary', $courses[$course3->id]);
-        $this->assertObjectNotHasAttribute('summaryformat', $courses[$course3->id]);
+        $this->assertObjectHasProperty('id', $courses[$course3->id]);
+        $this->assertObjectHasProperty('shortname', $courses[$course3->id]);
+        $this->assertObjectHasProperty('summary', $courses[$course3->id]);
+        $this->assertObjectNotHasProperty('summaryformat', $courses[$course3->id]);
 
         // Specified fields (two, string).
         $courses = enrol_get_my_courses('summary, summaryformat', 'id', 0, [], true);
-        $this->assertObjectHasAttribute('summary', $courses[$course3->id]);
-        $this->assertObjectHasAttribute('summaryformat', $courses[$course3->id]);
+        $this->assertObjectHasProperty('summary', $courses[$course3->id]);
+        $this->assertObjectHasProperty('summaryformat', $courses[$course3->id]);
 
         // Specified fields (two, array).
         $courses = enrol_get_my_courses(['summary', 'summaryformat'], 'id', 0, [], true);
-        $this->assertObjectHasAttribute('summary', $courses[$course3->id]);
-        $this->assertObjectHasAttribute('summaryformat', $courses[$course3->id]);
+        $this->assertObjectHasProperty('summary', $courses[$course3->id]);
+        $this->assertObjectHasProperty('summaryformat', $courses[$course3->id]);
 
         // By default, courses are ordered by sortorder - which by default is most recent first.
         $courses = enrol_get_my_courses(null, null, 0, [], true);
@@ -1105,6 +1105,43 @@ class enrollib_test extends advanced_testcase {
         $manualplugin->update_user_enrol($manualinstance, $user1->id, ENROL_USER_SUSPENDED);
         $this->assertCount(2, enrol_get_course_users($course1->id, false));
         $this->assertCount(1, enrol_get_course_users($course1->id, true));
+    }
+
+    /**
+     * test_course_users in groups
+     *
+     * @covers \enrol_get_course_users()
+     * @return void
+     */
+    public function test_course_users_in_groups() {
+        $this->resetAfterTest();
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+        $group1 = $this->getDataGenerator()->create_group(['courseid' => $course->id]);
+        $group2 = $this->getDataGenerator()->create_group(['courseid' => $course->id]);
+
+        $this->getDataGenerator()->enrol_user($user1->id, $course->id);
+        $this->getDataGenerator()->enrol_user($user2->id, $course->id);
+        $this->getDataGenerator()->enrol_user($user3->id, $course->id);
+
+        $this->getDataGenerator()->create_group_member(['groupid' => $group1->id, 'userid' => $user1->id]);
+        $this->getDataGenerator()->create_group_member(['groupid' => $group2->id, 'userid' => $user1->id]);
+        $this->getDataGenerator()->create_group_member(['groupid' => $group2->id, 'userid' => $user2->id]);
+
+        $this->assertCount(3, enrol_get_course_users($course->id));
+        $this->assertCount(1, enrol_get_course_users($course->id, false, [], [], [$group1->id]));
+        $this->assertCount(2, enrol_get_course_users($course->id, false, [], [], [$group2->id]));
+
+        $instances = enrol_get_instances($course->id, true);
+        $manualinstance = reset($instances);
+
+        $manualplugin = enrol_get_plugin('manual');
+        $manualplugin->update_user_enrol($manualinstance, $user1->id, ENROL_USER_SUSPENDED);
+        $this->assertCount(2, enrol_get_course_users($course->id, false, [], [], [$group2->id]));
+        $this->assertCount(1, enrol_get_course_users($course->id, true, [], [], [$group2->id]));
     }
 
     /**

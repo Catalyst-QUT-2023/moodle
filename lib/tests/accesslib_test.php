@@ -1685,23 +1685,23 @@ class accesslib_test extends advanced_testcase {
         $this->assertDebuggingCalled('get_role_users() adding u.lastname, u.firstname to the query result because they were required by $sort but missing in $fields');
         $this->assertCount(2, $users);
         $this->assertArrayHasKey($user1->id, $users);
-        $this->assertObjectHasAttribute('lastname', $users[$user1->id]);
-        $this->assertObjectHasAttribute('firstname', $users[$user1->id]);
+        $this->assertObjectHasProperty('lastname', $users[$user1->id]);
+        $this->assertObjectHasProperty('firstname', $users[$user1->id]);
         $this->assertArrayHasKey($user3->id, $users);
-        $this->assertObjectHasAttribute('lastname', $users[$user3->id]);
-        $this->assertObjectHasAttribute('firstname', $users[$user3->id]);
+        $this->assertObjectHasProperty('lastname', $users[$user3->id]);
+        $this->assertObjectHasProperty('firstname', $users[$user3->id]);
 
         $users = get_role_users($teacherrole->id, $coursecontext, false, 'u.id AS id_alias');
         $this->assertDebuggingCalled('get_role_users() adding u.lastname, u.firstname to the query result because they were required by $sort but missing in $fields');
         $this->assertCount(2, $users);
         $this->assertArrayHasKey($user1->id, $users);
-        $this->assertObjectHasAttribute('id_alias', $users[$user1->id]);
-        $this->assertObjectHasAttribute('lastname', $users[$user1->id]);
-        $this->assertObjectHasAttribute('firstname', $users[$user1->id]);
+        $this->assertObjectHasProperty('id_alias', $users[$user1->id]);
+        $this->assertObjectHasProperty('lastname', $users[$user1->id]);
+        $this->assertObjectHasProperty('firstname', $users[$user1->id]);
         $this->assertArrayHasKey($user3->id, $users);
-        $this->assertObjectHasAttribute('id_alias', $users[$user3->id]);
-        $this->assertObjectHasAttribute('lastname', $users[$user3->id]);
-        $this->assertObjectHasAttribute('firstname', $users[$user3->id]);
+        $this->assertObjectHasProperty('id_alias', $users[$user3->id]);
+        $this->assertObjectHasProperty('lastname', $users[$user3->id]);
+        $this->assertObjectHasProperty('firstname', $users[$user3->id]);
 
         $users = get_role_users($teacherrole->id, $coursecontext, false, 'u.id, u.email, u.idnumber', 'u.idnumber', null, $group->id);
         $this->assertCount(1, $users);
@@ -1965,10 +1965,9 @@ class accesslib_test extends advanced_testcase {
         // the access.php works.
         $mockedcomponent = new ReflectionClass(core_component::class);
         $mockedplugins = $mockedcomponent->getProperty('plugins');
-        $mockedplugins->setAccessible(true);
         $plugins = $mockedplugins->getValue();
         $plugins['fake'] = [$pluginname => "{$CFG->dirroot}/lib/tests/fixtures/fakeplugins/$pluginname"];
-        $mockedplugins->setValue($plugins);
+        $mockedplugins->setValue(null, $plugins);
         update_capabilities('fake_access');
         $this->resetDebugging(); // We have debugging messages here that we need to get rid of.
         // End of the component loader mock.
@@ -2948,6 +2947,90 @@ class accesslib_test extends advanced_testcase {
         // Get users without any group on the system context (it should throw an exception).
         $this->expectException('coding_exception');
         get_enrolled_users($systemcontext, '', USERSWITHOUTGROUP);
+    }
+
+    /**
+     * Test that enrolled users returns only users in those groups that are
+     * specified, and they are allowed to see members of.
+     *
+     * @covers ::get_enrolled_users
+     * @covers ::get_enrolled_sql
+     * @covers ::get_enrolled_with_capabilities_join
+     * @covers ::get_enrolled_join
+     * @covers ::get_with_capability_join
+     * @covers ::groups_get_members_join
+     * @covers ::get_suspended_userids
+     */
+    public function test_get_enrolled_sql_userswithhiddengroups() {
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $coursecontext = context_course::instance($course->id);
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+        $user4 = $this->getDataGenerator()->create_user();
+        $user5 = $this->getDataGenerator()->create_user();
+        $user6 = $this->getDataGenerator()->create_user();
+
+        $this->getDataGenerator()->enrol_user($user1->id, $course->id);
+        $this->getDataGenerator()->enrol_user($user2->id, $course->id);
+        $this->getDataGenerator()->enrol_user($user3->id, $course->id);
+        $this->getDataGenerator()->enrol_user($user4->id, $course->id);
+        $this->getDataGenerator()->enrol_user($user5->id, $course->id);
+        $this->getDataGenerator()->enrol_user($user6->id, $course->id);
+
+        $group1 = $this->getDataGenerator()->create_group([
+                'courseid' => $course->id,
+                'visibility' => GROUPS_VISIBILITY_ALL,
+        ]);
+        groups_add_member($group1, $user1);
+        $group2 = $this->getDataGenerator()->create_group([
+                'courseid' => $course->id,
+                'visibility' => GROUPS_VISIBILITY_MEMBERS,
+        ]);
+        groups_add_member($group2, $user2);
+        groups_add_member($group2, $user5);
+        $group3 = $this->getDataGenerator()->create_group([
+                'courseid' => $course->id,
+                'visibility' => GROUPS_VISIBILITY_OWN,
+        ]);
+        groups_add_member($group3, $user3);
+        groups_add_member($group3, $user6);
+        $group4 = $this->getDataGenerator()->create_group([
+                'courseid' => $course->id,
+                'visibility' => GROUPS_VISIBILITY_NONE,
+        ]);
+        groups_add_member($group4, $user4);
+
+        $groupids = [$group1->id, $group2->id, $group3->id, $group4->id];
+        // User 1 can only see members of Group 1.
+        $this->setUser($user1);
+        $user1groupusers = get_enrolled_users($coursecontext, '', $groupids);
+        $this->assertCount(1, $user1groupusers);
+        $this->assertArrayHasKey($user1->id, $user1groupusers);
+        $this->assertEquals(1, count_enrolled_users($coursecontext, '', $groupids));
+        // User 2 can see all members of Group 1 and Group 2.
+        $this->setUser($user2);
+        $user2groupusers = get_enrolled_users($coursecontext, '', $groupids);
+        $this->assertCount(3, $user2groupusers);
+        $this->assertArrayHasKey($user1->id, $user2groupusers);
+        $this->assertArrayHasKey($user2->id, $user2groupusers);
+        $this->assertArrayHasKey($user5->id, $user2groupusers);
+        $this->assertEquals(3, count_enrolled_users($coursecontext, '', $groupids));
+        // User 3 can see members of Group 1, and themselves in Group 3 but not other members.
+        $this->setUser($user3);
+        $user3groupusers = get_enrolled_users($coursecontext, '', $groupids);
+        $this->assertCount(2, $user3groupusers);
+        $this->assertArrayHasKey($user1->id, $user3groupusers);
+        $this->assertArrayHasKey($user3->id, $user3groupusers);
+        $this->assertEquals(2, count_enrolled_users($coursecontext, '', $groupids));
+        // User 4 can only see members of Group 1.
+        $this->setUser($user4);
+        $user4groupusers = get_enrolled_users($coursecontext, '', $groupids);
+        $this->assertCount(1, $user4groupusers);
+        $this->assertArrayHasKey($user1->id, $user4groupusers);
+        $this->assertEquals(1, count_enrolled_users($coursecontext, '', $groupids));
     }
 
     public function get_enrolled_sql_provider() {
@@ -4793,7 +4876,6 @@ class accesslib_test extends advanced_testcase {
             ->getMock();
 
         $rcp = new ReflectionProperty($context, '_path');
-        $rcp->setAccessible(true);
         $rcp->setValue($context, $contextpath);
 
         $comparisoncontext = $this->getMockBuilder(\context::class)
@@ -4805,7 +4887,6 @@ class accesslib_test extends advanced_testcase {
             ->getMock();
 
         $rcp = new ReflectionProperty($comparisoncontext, '_path');
-        $rcp->setAccessible(true);
         $rcp->setValue($comparisoncontext, $testpath);
 
         $this->assertEquals($expected, $context->is_parent_of($comparisoncontext, $testself));
@@ -4902,7 +4983,6 @@ class accesslib_test extends advanced_testcase {
             ->getMock();
 
         $rcp = new ReflectionProperty($context, '_path');
-        $rcp->setAccessible(true);
         $rcp->setValue($context, $contextpath);
 
         $comparisoncontext = $this->getMockBuilder(\context::class)
@@ -4914,7 +4994,6 @@ class accesslib_test extends advanced_testcase {
             ->getMock();
 
         $rcp = new ReflectionProperty($comparisoncontext, '_path');
-        $rcp->setAccessible(true);
         $rcp->setValue($comparisoncontext, $testpath);
 
         $this->assertEquals($expected, $context->is_child_of($comparisoncontext, $testself));

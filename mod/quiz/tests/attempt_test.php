@@ -17,6 +17,7 @@
 namespace mod_quiz;
 
 use core_question\local\bank\question_version_status;
+use mod_quiz\output\view_page;
 use question_engine;
 
 defined('MOODLE_INTERNAL') || die();

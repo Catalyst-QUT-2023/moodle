@@ -41,6 +41,12 @@ class behat_courseformat extends behat_base {
             new behat_component_named_selector('Activity groupmode', [
                 ".//*[@data-activityname=%locator%]//*[@data-region='groupmode']",
             ]),
+            new behat_component_named_selector('Activity visibility', [
+                ".//*[@data-activityname=%locator%]//*[@data-region='visibility']",
+            ]),
+            new behat_component_named_selector('Activity icon', [
+                ".//*[@data-activityname=%locator%]//*[@data-region='activity-icon']",
+            ]),
         ];
     }
 }

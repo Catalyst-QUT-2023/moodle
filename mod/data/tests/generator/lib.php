@@ -134,7 +134,7 @@ class mod_data_generator extends testing_module_generator {
                 $record['param1'] = implode("\n", array('menu1', 'menu2', 'menu3', 'menu4'));
             } else if ($record['type'] == 'multimenu') {
                 $record['param1'] = implode("\n", array('multimenu1', 'multimenu2', 'multimenu3', 'multimenu4'));
-            } else if (($record['type'] === 'text') || ($record['type'] === 'url')) {
+            } else if ($record['type'] === 'url') {
                 $record['param1'] = 1;
             } else if ($record['type'] == 'latlong') {
                 $record['param1'] = 'Google Maps';
@@ -325,7 +325,7 @@ class mod_data_generator extends testing_module_generator {
                     get_file_storage()->create_file_from_string(['component' => 'user', 'filearea' => 'draft',
                         'contextid' => $usercontext->id, 'itemid' => $itemid, 'filepath' => '/',
                         'filename' => $filename],
-                        file_get_contents($CFG->dirroot.'/mod/data/pix/monologo.png'));
+                        file_get_contents($CFG->dirroot.'/mod/data/field/picture/pix/sample.png'));
                 }
 
                 $fieldname = 'field_' . $fieldid . '_file';

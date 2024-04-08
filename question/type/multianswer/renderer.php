@@ -208,19 +208,22 @@ abstract class qtype_multianswer_subq_renderer_base extends qtype_renderer {
      * @return string
      */
     protected function get_feedback_image(string $icon, string $feedbackcontents): string {
+        global $PAGE;
         if ($icon === '') {
             return '';
         }
 
+        $PAGE->requires->js_call_amd('qtype_multianswer/feedback', 'initPopovers');
+
         return html_writer::link('#', $icon, [
             'role' => 'button',
             'tabindex' => 0,
-            'class' => 'btn btn-link p-0',
+            'class' => 'feedbacktrigger btn btn-link p-0',
             'data-toggle' => 'popover',
             'data-container' => 'body',
             'data-content' => $feedbackcontents,
             'data-placement' => 'right',
-            'data-trigger' => 'focus',
+            'data-trigger' => 'hover focus',
             'data-html' => 'true',
         ]);
     }
@@ -329,7 +332,7 @@ class qtype_multianswer_textfield_renderer extends qtype_multianswer_subq_render
                         $qa, 'question', 'answerfeedback', $matchinganswer->id),
                 s($correctanswer->answer), $options);
 
-        $output = html_writer::start_tag('span', array('class' => 'subquestion form-inline d-inline'));
+        $output = html_writer::start_tag('span', ['class' => 'subquestion d-flex flex-wrap align-items-center']);
 
         $output .= html_writer::tag('label', $this->get_answer_label(),
                 array('class' => 'subq accesshide', 'for' => $inputattributes['id']));

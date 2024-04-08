@@ -370,7 +370,8 @@ function drop_plugin_tables($name, $file, $feedback=true) {
     global $CFG, $DB;
 
     // first try normal delete
-    if (file_exists($file) and $DB->get_manager()->delete_tables_from_xmldb_file($file)) {
+    if (file_exists($file)) {
+        $DB->get_manager()->delete_tables_from_xmldb_file($file);
         return true;
     }
 
@@ -2022,7 +2023,7 @@ abstract class admin_setting {
      * Returns current value of this setting
      * @return mixed array or string depending on instance, NULL means not set yet
      */
-    public abstract function get_setting();
+    abstract public function get_setting();
 
     /**
      * Returns default setting if exists
@@ -2047,7 +2048,7 @@ abstract class admin_setting {
      * @param mixed $data string or array, must not be NULL
      * @return string empty string if ok, string error message otherwise
      */
-    public abstract function write_setting($data);
+    abstract public function write_setting($data);
 
     /**
      * Return part of form with setting
@@ -2446,6 +2447,8 @@ class admin_setting_configtext extends admin_setting {
 
     /** @var int default field size */
     public $size;
+    /** @var array List of arbitrary data attributes */
+    protected $datavalues = [];
 
     /**
      * Config text constructor
@@ -2530,10 +2533,23 @@ class admin_setting_configtext extends admin_setting {
     }
 
     /**
+     * Set arbitrary data attributes for template.
+     *
+     * @param string $key Attribute key for template.
+     * @param string $value Attribute value for template.
+     */
+    public function set_data_attribute(string $key, string $value): void {
+        $this->datavalues[] = [
+            'key' => $key,
+            'value' => $value,
+        ];
+    }
+
+    /**
      * Return an XHTML string for the setting
      * @return string Returns an XHTML string
      */
-    public function output_html($data, $query='') {
+    public function output_html($data, $query = '') {
         global $OUTPUT;
 
         $default = $this->get_defaultsetting();
@@ -2544,6 +2560,8 @@ class admin_setting_configtext extends admin_setting {
             'value' => $data,
             'forceltr' => $this->get_force_ltr(),
             'readonly' => $this->is_readonly(),
+            'data' => $this->datavalues,
+            'maxcharacter' => array_key_exists('validation-max-length', $this->datavalues),
         ];
         $element = $OUTPUT->render_from_template('core_admin/setting_configtext', $context);
 
@@ -2577,6 +2595,7 @@ class admin_setting_configtext_with_maxlength extends admin_setting_configtext {
     public function __construct($name, $visiblename, $description, $defaultsetting, $paramtype=PARAM_RAW,
                                 $size=null, $maxlength = 0) {
         $this->maxlength = $maxlength;
+        $this->set_data_attribute('validation-max-length', $maxlength);
         parent::__construct($name, $visiblename, $description, $defaultsetting, $paramtype, $size);
     }
 
@@ -2602,6 +2621,20 @@ class admin_setting_configtext_with_maxlength extends admin_setting_configtext {
         } else {
             return $parentvalidation;
         }
+    }
+
+    /**
+     * Return an XHTML string for the setting.
+     *
+     * @param string $data data.
+     * @param string $query query statement.
+     * @return string Returns an XHTML string
+     */
+    public function output_html($data, $query = ''): string {
+        global $PAGE;
+        $PAGE->requires->js_call_amd('core_form/configtext_maxlength', 'init');
+
+        return parent::output_html($data, $query);
     }
 }
 
@@ -3270,6 +3303,7 @@ class admin_setting_configmulticheckbox extends admin_setting {
         $context = (object) [
             'id' => $this->get_id(),
             'name' => $this->get_full_name(),
+            'readonly' => $this->is_readonly(),
         ];
 
         $options = array();
@@ -6131,6 +6165,54 @@ class admin_setting_special_gradeexport extends admin_setting_configmulticheckbo
     }
 }
 
+/**
+ * A setting for the default grade export plugin.
+ *
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class admin_setting_special_gradeexportdefault extends admin_setting_configselect {
+    /**
+     * Calls parent::__construct with specific arguments
+     */
+    public function __construct() {
+        parent::__construct('gradeexport_default', get_string('gradeexportdefault', 'admin'),
+                get_string('configgradeexportdefault', 'admin'), null, null);
+    }
+
+    /**
+     * Returns the default option
+     *
+     * @return string default option
+     */
+    public function get_defaultsetting() {
+        $this->load_choices();
+        $defaultsetting = parent::get_defaultsetting();
+        if (array_key_exists($defaultsetting, $this->choices)) {
+            return $defaultsetting;
+        } else {
+            return array_key_first($this->choices);
+        }
+    }
+
+    /**
+     * Load the available choices for the configselect
+     *
+     * @return bool always returns true
+     */
+    public function load_choices() {
+        if (is_array($this->choices)) {
+            return true;
+        }
+        $this->choices = [];
+
+        if ($plugins = core_component::get_plugin_list('gradeexport')) {
+            foreach ($plugins as $plugin => $unused) {
+                $this->choices[$plugin] = get_string('pluginname', 'gradeexport_'.$plugin);
+            }
+        }
+        return true;
+    }
+}
 
 /**
  * A setting for setting the default grade point value. Must be an integer between 1 and $CFG->gradepointmax.
@@ -6282,7 +6364,7 @@ class admin_setting_gradecat_combo extends admin_setting {
     /**
      * Return the current setting(s) array
      *
-     * @return array Array of value=>xx, forced=>xx, adv=>xx
+     * @return array Array of value=>xx, forced=>xx
      */
     public function get_setting() {
         global $CFG;
@@ -6294,38 +6376,36 @@ class admin_setting_gradecat_combo extends admin_setting {
             return NULL;
         }
 
+        // Bitwise operation is still required, in cases where unused 'advanced' flag is still set.
         $flag   = (int)$flag;
-        $forced = (boolean)(1 & $flag); // first bit
-        $adv    = (boolean)(2 & $flag); // second bit
+        $forced = (bool)(1 & $flag); // First bit.
 
-        return array('value' => $value, 'forced' => $forced, 'adv' => $adv);
+        return array('value' => $value, 'forced' => $forced);
     }
 
     /**
      * Save the new settings passed in $data
      *
      * @todo Add vartype handling to ensure $data is array
-     * @param array $data Associative array of value=>xx, forced=>xx, adv=>xx
+     * @param array $data Associative array of value=>xx, forced=>xx
      * @return string empty or error message
      */
     public function write_setting($data) {
         global $CFG;
 
-        $value  = $data['value'];
+        $value = $data['value'];
         $forced = empty($data['forced']) ? 0 : 1;
-        $adv    = empty($data['adv'])    ? 0 : 2;
-        $flag   = ($forced | $adv); //bitwise or
 
         if (!in_array($value, array_keys($this->choices))) {
             return 'Error setting ';
         }
 
-        $oldvalue  = $this->config_read($this->name);
-        $oldflag   = (int)$this->config_read($this->name.'_flag');
+        $oldvalue = $this->config_read($this->name);
+        $oldflag = (int)$this->config_read($this->name.'_flag');
         $oldforced = (1 & $oldflag); // first bit
 
         $result1 = $this->config_write($this->name, $value);
-        $result2 = $this->config_write($this->name.'_flag', $flag);
+        $result2 = $this->config_write($this->name.'_flag', $forced);
 
         // force regrade if needed
         if ($oldforced != $forced or ($forced and $value != $oldvalue)) {
@@ -6362,9 +6442,6 @@ class admin_setting_gradecat_combo extends admin_setting {
             if (!empty($default['forced'])) {
                 $defaultinfo[] = get_string('force');
             }
-            if (!empty($default['adv'])) {
-                $defaultinfo[] = get_string('advanced');
-            }
             $defaultinfo = implode(', ', $defaultinfo);
 
         } else {
@@ -6376,7 +6453,6 @@ class admin_setting_gradecat_combo extends admin_setting {
             'id' => $this->get_id(),
             'name' => $this->get_full_name(),
             'forced' => !empty($data['forced']),
-            'advanced' => !empty($data['adv']),
             'options' => array_map(function($option) use ($options, $value) {
                 return [
                     'value' => $option,
@@ -6812,7 +6888,7 @@ class admin_setting_manageenrols extends admin_setting {
 
             $test = '';
             if (!empty($enrols_available[$enrol]) and method_exists($enrols_available[$enrol], 'test_settings')) {
-                $testsettingsurl = new moodle_url('/enrol/test_settings.php', array('enrol'=>$enrol, 'sesskey'=>sesskey()));
+                $testsettingsurl = new moodle_url('/enrol/test_settings.php', ['enrol' => $enrol]);
                 $test = html_writer::link($testsettingsurl, $strtest);
             }
 
@@ -7351,7 +7427,7 @@ class admin_setting_manageauths extends admin_setting {
 
             $test = '';
             if (!empty($authplugins[$auth]) and method_exists($authplugins[$auth], 'test_settings')) {
-                $testurl = new moodle_url('/auth/test_settings.php', array('auth'=>$auth, 'sesskey'=>sesskey()));
+                $testurl = new moodle_url('/auth/test_settings.php', ['auth' => $auth]);
                 $test = html_writer::link($testurl, $txt->testsettings);
             }
 
@@ -8721,8 +8797,6 @@ function admin_externalpage_setup($section, $extrabutton = '', array $extraurlpa
         $USER->editing = $adminediting;
     }
 
-    $visiblepathtosection = array_reverse($extpage->visiblepath);
-
     if ($PAGE->user_allowed_editing() && !$PAGE->theme->haseditswitch) {
         if ($PAGE->user_is_editing()) {
             $caption = get_string('blockseditoff');
@@ -8734,7 +8808,7 @@ function admin_externalpage_setup($section, $extrabutton = '', array $extraurlpa
         $PAGE->set_button($OUTPUT->single_button($url, $caption, 'get'));
     }
 
-    $PAGE->set_title("$SITE->shortname: " . implode(": ", $visiblepathtosection));
+    $PAGE->set_title(implode(moodle_page::TITLE_SEPARATOR, $extpage->visiblepath));
     $PAGE->set_heading($SITE->fullname);
 
     if ($hassiteconfig && empty($options['nosearch'])) {
@@ -10002,7 +10076,7 @@ class admin_setting_webservicesoverview extends admin_setting {
         $url = new moodle_url("/admin/search.php?query=enablewebservices");
         $row[0] = "1. " . html_writer::tag('a', get_string('enablews', 'webservice'),
                         array('href' => $url));
-        $status = html_writer::tag('span', get_string('no'), array('class' => 'badge badge-danger'));
+        $status = html_writer::tag('span', get_string('no'), array('class' => 'badge bg-danger text-white'));
         if ($CFG->enablewebservices) {
             $status = get_string('yes');
         }
@@ -10015,7 +10089,7 @@ class admin_setting_webservicesoverview extends admin_setting {
         $url = new moodle_url("/admin/settings.php?section=webserviceprotocols");
         $row[0] = "2. " . html_writer::tag('a', get_string('enableprotocols', 'webservice'),
                         array('href' => $url));
-        $status = html_writer::tag('span', get_string('none'), array('class' => 'badge badge-danger'));
+        $status = html_writer::tag('span', get_string('none'), array('class' => 'badge bg-danger text-white'));
         //retrieve activated protocol
         $active_protocols = empty($CFG->webserviceprotocols) ?
                 array() : explode(',', $CFG->webserviceprotocols);
@@ -10126,7 +10200,7 @@ class admin_setting_webservicesoverview extends admin_setting {
         $url = new moodle_url("/admin/search.php?query=enablewebservices");
         $row[0] = "1. " . html_writer::tag('a', get_string('enablews', 'webservice'),
                         array('href' => $url));
-        $status = html_writer::tag('span', get_string('no'), array('class' => 'badge badge-danger'));
+        $status = html_writer::tag('span', get_string('no'), array('class' => 'badge bg-danger text-white'));
         if ($CFG->enablewebservices) {
             $status = get_string('yes');
         }
@@ -10139,7 +10213,7 @@ class admin_setting_webservicesoverview extends admin_setting {
         $url = new moodle_url("/admin/settings.php?section=webserviceprotocols");
         $row[0] = "2. " . html_writer::tag('a', get_string('enableprotocols', 'webservice'),
                         array('href' => $url));
-        $status = html_writer::tag('span', get_string('none'), array('class' => 'badge badge-danger'));
+        $status = html_writer::tag('span', get_string('none'), array('class' => 'badge bg-danger text-white'));
         //retrieve activated protocol
         $active_protocols = empty($CFG->webserviceprotocols) ?
                 array() : explode(',', $CFG->webserviceprotocols);
@@ -10689,6 +10763,8 @@ class admin_setting_configstoredfile extends admin_setting {
 /**
  * Administration interface for user specified regular expressions for device detection.
  *
+ * @deprecated Moodle 4.3 MDL-78468 - No longer used since the devicedetectregex was removed.
+ * @todo Final deprecation on Moodle 4.7 MDL-79052
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class admin_setting_devicedetectregex extends admin_setting {
@@ -10696,12 +10772,19 @@ class admin_setting_devicedetectregex extends admin_setting {
     /**
      * Calls parent::__construct with specific args
      *
+     * @deprecated Moodle 4.3 MDL-78468 - No longer used since the devicedetectregex was removed.
+     * @todo Final deprecation on Moodle 4.7 MDL-79052
      * @param string $name
      * @param string $visiblename
      * @param string $description
      * @param mixed $defaultsetting
      */
     public function __construct($name, $visiblename, $description, $defaultsetting = '') {
+        debugging(
+            __FUNCTION__ . '() is deprecated.' .
+                'All functions associated with devicedetectregex theme setting are being removed.',
+            DEBUG_DEVELOPER
+        );
         global $CFG;
         parent::__construct($name, $visiblename, $description, $defaultsetting);
     }
@@ -10709,9 +10792,16 @@ class admin_setting_devicedetectregex extends admin_setting {
     /**
      * Return the current setting(s)
      *
+     * @deprecated Moodle 4.3 MDL-78468 - No longer used since the devicedetectregex was removed.
+     * @todo Final deprecation on Moodle 4.7 MDL-79052
      * @return array Current settings array
      */
     public function get_setting() {
+        debugging(
+            __FUNCTION__ . '() is deprecated.' .
+                'All functions associated with devicedetectregex theme setting are being removed.',
+            DEBUG_DEVELOPER
+        );
         global $CFG;
 
         $config = $this->config_read($this->name);
@@ -10725,10 +10815,17 @@ class admin_setting_devicedetectregex extends admin_setting {
     /**
      * Save selected settings
      *
+     * @deprecated Moodle 4.3 MDL-78468 - No longer used since the devicedetectregex was removed.
+     * @todo Final deprecation on Moodle 4.7 MDL-79052
      * @param array $data Array of settings to save
      * @return bool
      */
     public function write_setting($data) {
+        debugging(
+            __FUNCTION__ . '() is deprecated.' .
+                'All functions associated with devicedetectregex theme setting are being removed.',
+            DEBUG_DEVELOPER
+        );
         if (empty($data)) {
             $data = array();
         }
@@ -10743,10 +10840,17 @@ class admin_setting_devicedetectregex extends admin_setting {
     /**
      * Return XHTML field(s) for regexes
      *
+     * @deprecated Moodle 4.3 MDL-78468 - No longer used since the devicedetectregex was removed.
+     * @todo Final deprecation on Moodle 4.7 MDL-79052
      * @param array $data Array of options to set in HTML
      * @return string XHTML string for the fields and wrapping div(s)
      */
     public function output_html($data, $query='') {
+        debugging(
+            __FUNCTION__ . '() is deprecated.' .
+                'All functions associated with devicedetectregex theme setting are being removed.',
+            DEBUG_DEVELOPER
+        );
         global $OUTPUT;
 
         $context = (object) [
@@ -11139,10 +11243,10 @@ class admin_setting_searchsetupinfo extends admin_setting {
         $row[0] = '1. ' . html_writer::tag('a', get_string('selectsearchengine', 'admin'),
                         array('href' => $url));
 
-        $status = html_writer::tag('span', get_string('no'), array('class' => 'badge badge-danger'));
+        $status = html_writer::tag('span', get_string('no'), array('class' => 'badge bg-danger text-white'));
         if (!empty($CFG->searchengine)) {
             $status = html_writer::tag('span', get_string('pluginname', 'search_' . $CFG->searchengine),
-                array('class' => 'badge badge-success'));
+                array('class' => 'badge bg-success text-white'));
 
         }
         $row[1] = $status;
@@ -11154,9 +11258,9 @@ class admin_setting_searchsetupinfo extends admin_setting {
         $row[0] = '2. ' . html_writer::tag('a', get_string('enablesearchareas', 'admin'),
                         array('href' => $url));
 
-        $status = html_writer::tag('span', get_string('no'), array('class' => 'badge badge-danger'));
+        $status = html_writer::tag('span', get_string('no'), array('class' => 'badge bg-danger text-white'));
         if ($anyenabled) {
-            $status = html_writer::tag('span', get_string('yes'), array('class' => 'badge badge-success'));
+            $status = html_writer::tag('span', get_string('yes'), array('class' => 'badge bg-success text-white'));
 
         }
         $row[1] = $status;
@@ -11166,7 +11270,7 @@ class admin_setting_searchsetupinfo extends admin_setting {
         $row = array();
         if (empty($CFG->searchengine)) {
             $row[0] = '3. ' . get_string('setupsearchengine', 'admin');
-            $row[1] = html_writer::tag('span', get_string('no'), array('class' => 'badge badge-danger'));
+            $row[1] = html_writer::tag('span', get_string('no'), array('class' => 'badge bg-danger text-white'));
         } else {
             if ($ADMIN->locate('search' . $CFG->searchengine)) {
                 $url = new moodle_url('/admin/settings.php?section=search' . $CFG->searchengine);
@@ -11183,9 +11287,9 @@ class admin_setting_searchsetupinfo extends admin_setting {
                 $serverstatus = $e->getMessage();
             }
             if ($serverstatus === true) {
-                $status = html_writer::tag('span', get_string('yes'), array('class' => 'badge badge-success'));
+                $status = html_writer::tag('span', get_string('yes'), array('class' => 'badge bg-success text-white'));
             } else {
-                $status = html_writer::tag('span', $serverstatus, array('class' => 'badge badge-danger'));
+                $status = html_writer::tag('span', $serverstatus, array('class' => 'badge bg-danger text-white'));
             }
             $row[1] = $status;
         }
@@ -11196,9 +11300,9 @@ class admin_setting_searchsetupinfo extends admin_setting {
         $url = new moodle_url('/admin/searchareas.php');
         $row[0] = '4. ' . html_writer::tag('a', get_string('indexdata', 'admin'), array('href' => $url));
         if ($anyindexed) {
-            $status = html_writer::tag('span', get_string('yes'), array('class' => 'badge badge-success'));
+            $status = html_writer::tag('span', get_string('yes'), array('class' => 'badge bg-success text-white'));
         } else {
-            $status = html_writer::tag('span', get_string('no'), array('class' => 'badge badge-danger'));
+            $status = html_writer::tag('span', get_string('no'), array('class' => 'badge bg-danger text-white'));
         }
         $row[1] = $status;
         $table->data[] = $row;
@@ -11208,9 +11312,9 @@ class admin_setting_searchsetupinfo extends admin_setting {
         $url = new moodle_url("/admin/search.php?query=enableglobalsearch");
         $row[0] = '5. ' . html_writer::tag('a', get_string('enableglobalsearch', 'admin'),
                         array('href' => $url));
-        $status = html_writer::tag('span', get_string('no'), array('class' => 'badge badge-danger'));
+        $status = html_writer::tag('span', get_string('no'), array('class' => 'badge bg-danger text-white'));
         if (\core_search\manager::is_global_search_enabled()) {
-            $status = html_writer::tag('span', get_string('yes'), array('class' => 'badge badge-success'));
+            $status = html_writer::tag('span', get_string('yes'), array('class' => 'badge bg-success text-white'));
         }
         $row[1] = $status;
         $table->data[] = $row;
@@ -11220,9 +11324,9 @@ class admin_setting_searchsetupinfo extends admin_setting {
         $url = new moodle_url("/admin/search.php?query=searchincludeallcourses");
         $row[0] = '6. ' . html_writer::tag('a', get_string('replacefrontsearch', 'admin'),
                                            array('href' => $url));
-        $status = html_writer::tag('span', get_string('no'), array('class' => 'badge badge-danger'));
+        $status = html_writer::tag('span', get_string('no'), array('class' => 'badge bg-danger text-white'));
         if (\core_search\manager::can_replace_course_search()) {
-            $status = html_writer::tag('span', get_string('yes'), array('class' => 'badge badge-success'));
+            $status = html_writer::tag('span', get_string('yes'), array('class' => 'badge bg-success text-white'));
         }
         $row[1] = $status;
         $table->data[] = $row;
@@ -11618,3 +11722,100 @@ class admin_settings_h5plib_handler_select extends admin_setting_configselect {
         return true;
     }
 }
+
+/**
+ * Displays the result of a check via ajax.
+ *
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author Matthew Hilton <matthewhilton@catalyst-au.net>
+ * @copyright Catalyst IT, 2023
+ */
+class admin_setting_check extends admin_setting {
+
+    /** @var \core\check\check $check the check to use **/
+    private $check;
+
+    /** @var bool $includedetails if the details of result are included. **/
+    private $includedetails;
+
+    /**
+     * Creates check setting.
+     *
+     * @param string $name name of setting
+     * @param \core\check\check $check The check linked to this setting.
+     * @param bool $includedetails if the details of the result are included
+     */
+    public function __construct(string $name, \core\check\check $check, bool $includedetails = false) {
+        $this->check = $check;
+        $this->includedetails = $includedetails;
+        $heading = $check->get_name();
+
+        parent::__construct($name, $heading, '', '');
+    }
+
+    /**
+     * Returns the check linked to this setting.
+     *
+     * @return \core\check\check
+     */
+    public function get_check() {
+        return $this->check;
+    }
+
+    /**
+     * Returns setting (unused)
+     *
+     * @return true
+     */
+    public function get_setting() {
+        return true;
+    }
+
+    /**
+     * Writes the setting (unused)
+     *
+     * @param mixed $data
+     */
+    public function write_setting($data) {
+        return '';
+    }
+
+    /**
+     * Outputs the admin setting HTML to be rendered.
+     *
+     * @param mixed $data
+     * @param string $query
+     * @return string html
+     */
+    public function output_html($data, $query = '') {
+        global $PAGE, $OUTPUT;
+
+        $domref = uniqid($this->check->get_ref());
+
+        // The actual result is obtained via ajax,
+        // since its likely somewhat slow to obtain.
+        $context = [
+            'domselector' => '[data-check-reference="' . $domref . '"]',
+            'admintreeid' => $this->get_id(),
+            'settingname' => $this->name,
+            'includedetails' => $this->includedetails,
+        ];
+        $PAGE->requires->js_call_amd('core/check/check_result', 'getAndRender', $context);
+
+        // Render a generic loading icon while waiting for ajax.
+        $loadingstr = get_string('checkloading', '', $this->check->get_name());
+        $loadingicon = $OUTPUT->pix_icon('i/loading', $loadingstr);
+
+        // Wrap it in a notification so we reduce style changes when loading is finished.
+        $output = $OUTPUT->notification($loadingicon . $loadingstr, \core\output\notification::NOTIFY_INFO, false);
+
+        // Add the action link.
+        $output .= $OUTPUT->render($this->check->get_action_link());
+
+        // Wrap in a div with a reference. The JS getAndRender will replace this with the response from the webservice.
+        $statusdiv = \html_writer::div($output, '', ['data-check-reference' => $domref]);
+
+        return format_admin_setting($this, $this->visiblename, '', $statusdiv);
+    }
+}
+
