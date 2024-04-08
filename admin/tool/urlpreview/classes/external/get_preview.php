@@ -14,12 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace tool_urlpreview\external;
-
+namespace tool_urlpreview;
 use core_external\external_function_parameters;
 use core_external\external_single_structure;
 use core_external\external_api;
 use core_external\external_value;
+require_once($CFG->dirroot . '/admin/tool/urlpreview/db/urlpreview.php');
+require_once($CFG->libdir . '/classes/url/unfurler.php');
+
 
 /**
  * Implementation of web service tool_urlpreview_get_preview
@@ -43,7 +45,7 @@ class get_preview extends external_api {
 
     private static function scrape_url($url) {
 
-        $unfurler = new unfurl($url);
+        $unfurler = new \unfurl($url);
         $scrapeddata = [
             'url' => $url,
             'title' => $unfurler->title,
@@ -83,7 +85,7 @@ class get_preview extends external_api {
         if (!$linteddata) {
             
             // If not in the database, lint the URL.
-            $unfurler = new unfurl($url);
+            $unfurler = new \unfurl($url);
             $renderedoutput = $unfurler->render_unfurl_metadata();
 
             // Save the linted data to the database using the persistent class.
@@ -105,7 +107,7 @@ class get_preview extends external_api {
                 $linteddata->lastpreviewed = $currenttime;
                 $DB->update_record('urlpreview', $linteddata);
             }
-            $renderedoutput = unfurl::formatPreviewData($linteddata);
+            $renderedoutput = \unfurl::formatPreviewData($linteddata);
         }
 
         return $renderedoutput;
