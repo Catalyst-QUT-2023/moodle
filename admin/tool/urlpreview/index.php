@@ -53,8 +53,8 @@ echo $OUTPUT->render_from_template('tool_urlpreview/form', $templatedata);
 
 if ($url !== '') {
     // Check if the linted data for this URL is already in the database.
-    $linteddata = urlpreview::get_record(['url' => $url]);
-
+    $sql = "SELECT * FROM {urlpreview} WHERE " . $DB->sql_compare_text('url') . " = ?";
+    $linteddata = $DB->get_record_sql($sql, [$url]);
     if (!$linteddata) {
         // If not in the database, lint the URL.
         $unfurler = new unfurl($url);
@@ -75,17 +75,19 @@ if ($url !== '') {
     } else {
         // Update the 'lastpreviewed' timestamp only if it's been more than an hour.
         $currenttime = time();
-        if (($currenttime - $linteddata->get('lastpreviewed')) > 3600) { // 3600 seconds = 1 hour
-            $linteddata->set('lastpreviewed', $currenttime);
-            $linteddata->update();
+        if (($currenttime - $linteddata->lastpreviewed) > (1 * HOURSECS)) {
+            $linteddata->lastpreviewed = $currenttime;
+            $DB->update_record('urlpreview', $linteddata);
         }
-        $renderedoutput = rend($linteddata->to_record());
+        $renderedoutput = unfurl::formatPreviewData($linteddata);
     }
 
     echo $renderedoutput;
 }
 
 echo $OUTPUT->footer();
+
+
 
 /**
  * Renders linted data from the database for display.
@@ -109,3 +111,4 @@ function rend($data)
     ];
     return $OUTPUT->render_from_template('tool_urlpreview/metadata', $templatedata);
 }
+

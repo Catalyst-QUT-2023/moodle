@@ -38,7 +38,7 @@ class refresh_old_previews extends scheduled_task {
 
     public function execute() {
         global $DB;
-        $twoweeksago = time() - (2 * 7 * 24 * 60 * 60); // Rxoughly 2 weeks.
+        $twoweeksago = time() - (2 * WEEKSECS);
 
         // This selects records older than 2 weeks that have been previewed in the last 2 weeks.
         $sql = "SELECT * FROM {urlpreview} WHERE timecreated < ? AND lastpreviewed >= ?";
