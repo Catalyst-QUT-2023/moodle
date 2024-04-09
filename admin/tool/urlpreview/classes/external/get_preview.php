@@ -20,6 +20,7 @@ use core_external\external_function_parameters;
 use core_external\external_single_structure;
 use core_external\external_api;
 use core_external\external_value;
+use tool_urlpreview\form\urlpreview;
 require_once($CFG->dirroot . '/admin/tool/urlpreview/db/urlpreview.php');
 require_once($CFG->libdir . '/classes/url/unfurler.php');
 require_once($CFG->dirroot . '/lib/externallib.php');
