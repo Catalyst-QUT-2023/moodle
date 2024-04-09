@@ -104,11 +104,7 @@ class unfurl {
                 !empty($contentattribute) &&
                 preg_match ('/^og:\w/i', $propertyattribute) === 1
             ) {
-                if (preg_match('/&[#a-zA-Z0-9]+;/', $contentattribute)) {
-                    $sanitizedcontent = $contentattribute;
-                } else {
-                    $sanitizedcontent = htmlspecialchars($contentattribute, ENT_QUOTES, 'UTF-8');
-                }
+                $sanitizedcontent = clean_param($contentattribute, PARAM_TEXT);
                 switch ($propertyattribute) {
                     case 'og:title':
                         $this->title = $sanitizedcontent;
@@ -128,6 +124,7 @@ class unfurl {
                         break;
                     case 'og:description':
                         $this->description = $sanitizedcontent;
+                        echo $sanitizedcontent;
                         break;
                     case 'og:url':
                         $this->canonicalurl = $sanitizedcontent;
