@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * This file renders the page for the Admin URL metadata preview tool 
  *
  * @package     tool_urlpreview
- * @copyright   2023 Hanbin Lee <n10324402@qut.edu.au>
+ * @copyright   2024 Team "the Z" <https://github.com/Catalyst-QUT-2023>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -57,16 +57,5 @@ if ($url !== '') {
         $url,
     ]);
 }
-
-// // Code adapted from Matthew Hilton:
-// // Render a generic loading icon while waiting for ajax.
-// $loadingstr = get_string('loading', '', $this->check->get_name());
-// $loadingicon = $OUTPUT->pix_icon('i/loading', $loadingstr);
-
-// // Wrap it in a notification so we reduce style changes when loading is finished.
-// $output = $OUTPUT->notification($loadingicon . $loadingstr, \core\output\notification::NOTIFY_INFO, false);
-
-// // Wrap in a div with a reference. The JS getAndRender will replace this with the response from the webservice.
-// $statusdiv = \html_writer::div($output, '', ['data-check-reference' => $domref]);
 
 echo $OUTPUT->footer();

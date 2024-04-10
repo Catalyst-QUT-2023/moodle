@@ -18,7 +18,7 @@
  * It should eventually generate loading animations while it waits for the data.
  *
  * @module     tool_urlpreview/get_url_data
- * @copyright  2024 Team the Z <your@email.com>
+ * @copyright  2024 Team "the Z" <https://github.com/Catalyst-QUT-2023>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

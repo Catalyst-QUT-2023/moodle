@@ -17,7 +17,7 @@
  * This script fetches the data required from the external service
  *
  * @module     tool_urlpreview/repository
- * @copyright  2024 Team the Z <your@email.com>
+ * @copyright  2024 Team "the Z" <https://github.com/Catalyst-QUT-2023>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

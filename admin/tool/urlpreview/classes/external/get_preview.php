@@ -14,10 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace tool_urlpreview\external;
 
+namespace tool_urlpreview\external;
 use core_external\external_function_parameters;
-use core_external\external_single_structure;
 use core_external\external_api;
 use core_external\external_value;
 use tool_urlpreview\form\urlpreview;
@@ -25,12 +24,11 @@ require_once($CFG->dirroot . '/admin/tool/urlpreview/db/urlpreview.php');
 require_once($CFG->libdir . '/classes/url/unfurler.php');
 require_once($CFG->dirroot . '/lib/externallib.php');
 
-
 /**
  * Implementation of web service tool_urlpreview_get_preview
  *
  * @package    tool_urlpreview
- * @copyright  2024 Team The Z <your@email.com>
+ * @copyright  2024 Team "the Z" <https://github.com/Catalyst-QUT-2023>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_preview extends external_api {
@@ -45,20 +43,6 @@ class get_preview extends external_api {
             array('url' => new external_value(PARAM_URL, 'The URL to get data'))
             );
     }
-
-    private static function scrape_url($url) {
-
-        $unfurler = new \unfurl($url);
-        $scrapeddata = [
-            'url' => $url,
-            'title' => $unfurler->title,
-            'sitename' => $unfurler->sitename,
-            'image' => $unfurler->image,
-            'description' => $unfurler->type,
-        ];
-        return $scrapeddata;
-    }
-
 
     /**
      * Implementation of web service tool_urlpreview_get_preview
