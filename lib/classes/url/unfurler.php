@@ -105,6 +105,7 @@ class unfurl {
                 preg_match ('/^og:\w/i', $propertyattribute) === 1
             ) {
                 $sanitizedcontent = clean_param($contentattribute, PARAM_TEXT);
+                
                 switch ($propertyattribute) {
                     case 'og:title':
                         $this->title = $sanitizedcontent;
@@ -119,17 +120,19 @@ class unfurl {
                             $urlparts = parse_url($url);
                             $this->image = $urlparts['scheme'].'://'.$urlparts['host'].$imageurlparts['path'];
                         } else {
-                            $this->image = $contentattribute;
+                            $sanitizedcontent = clean_param($contentattribute, PARAM_RAW);
+                            $this->image = $sanitizedcontent;
                         }
                         break;
                     case 'og:description':
                         $this->description = $sanitizedcontent;
-                        echo $sanitizedcontent;
                         break;
                     case 'og:url':
+                        $sanitizedcontent = clean_param($contentattribute, PARAM_URL);
                         $this->canonicalurl = $sanitizedcontent;
                         break;
                     case 'og:type':
+                        $sanitizedcontent = clean_param($contentattribute, PARAM_ALPHANUMEXT);
                         $this->type = $sanitizedcontent;
                     default:
                         break;
