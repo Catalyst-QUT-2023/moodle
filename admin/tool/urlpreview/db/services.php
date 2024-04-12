@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,31 +12,24 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
+ *
  * @package     tool_urlpreview
- * @copyright   2023 Thomas Daly <n11134551@qut.edu.au>
+ * @copyright   2023 Hanbin Lee <n10324402@qut.edu.au>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace tool_urlpreview\task;
-
-use core\task\scheduled_task;
-use tool_urlpreview\urlpreview;
-
-
 defined('MOODLE_INTERNAL') || die();
+// Declare the new web service functions.
 
-class delete_unused_previews extends scheduled_task {
+$functions = [
 
-    public function get_name() {
-        return get_string('deleteunusedpreviews', 'tool_urlpreview');
-    }
+    'tool_urlpreview_get_preview' => [
+        'classname' => tool_urlpreview\external\get_preview::class,
+        'description' => 'Gets the preview for a given url',
+        'type' => 'write',
+        'ajax' => true,
+    ],
+];
 
-    public function execute() {
-        global $DB;
-        $threemonthsago = time() - (90 * DAYSECS);
-        $DB->delete_records_select('urlpreview', 'lastpreviewed < ?', [$threemonthsago]);
-    }
-}

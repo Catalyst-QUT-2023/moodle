@@ -24,7 +24,7 @@
  */
 
 
-require_once('../../../config.php');
+
 require_once($CFG->libdir.'/filelib.php');
 
 class unfurl {
@@ -150,5 +150,20 @@ class unfurl {
         // Use the render_from_template method to render Mustache template.
         return $OUTPUT->render_from_template('tool_urlpreview/metadata', $unfurldata);
     }
+    public static function formatPreviewData($data)
+    {
+        global $OUTPUT;
 
+        $templatedata = [
+            'noogmetadata' => empty($data->title) && empty($data->imageurl) && empty($data->sitename)
+                && empty($data->description) && empty($data->type),
+            'canonicalurl' => $data->url,
+            'title'        => $data->title,
+            'image'        => $data->imageurl,
+            'sitename'     => $data->sitename,
+            'description'  => $data->description,
+            'type'         => $data->type,
+        ];
+        return $OUTPUT->render_from_template('tool_urlpreview/metadata', $templatedata);
+    }
 }

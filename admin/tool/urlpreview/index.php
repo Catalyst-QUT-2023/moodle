@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * This file renders the page for the Admin URL metadata preview tool 
  *
  * @package     tool_urlpreview
- * @copyright   2023 Hanbin Lee <n10324402@qut.edu.au>
+ * @copyright   2024 Team "the Z" <https://github.com/Catalyst-QUT-2023>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -51,61 +51,11 @@ $templatedata = [
 
 echo $OUTPUT->render_from_template('tool_urlpreview/form', $templatedata);
 
+// Display output from AJAX Call
 if ($url !== '') {
-    // Check if the linted data for this URL is already in the database.
-    $linteddata = urlpreview::get_record(['url' => $url]);
-
-    if (!$linteddata) {
-        // If not in the database, lint the URL.
-        $unfurler = new unfurl($url);
-        $renderedoutput = $unfurler->render_unfurl_metadata();
-
-        // Save the linted data to the database using the persistent class.
-        $record = new urlpreview();
-        $record->set('url', $url);
-        $record->set('title', $unfurler->title);
-        $record->set('type', $unfurler->type);
-        $record->set('imageurl', $unfurler->image);
-        $record->set('sitename', $unfurler->sitename);
-        $record->set('description', $unfurler->description);
-        $record->set('timecreated', time());
-        $record->set('timemodified', time());
-        $record->set('lastpreviewed', time());
-        $record->create();
-    } else {
-        // Update the 'lastpreviewed' timestamp only if it's been more than an hour.
-        $currenttime = time();
-        if (($currenttime - $linteddata->get('lastpreviewed')) > 3600) { // 3600 seconds = 1 hour
-            $linteddata->set('lastpreviewed', $currenttime);
-            $linteddata->update();
-        }
-        $renderedoutput = rend($linteddata->to_record());
-    }
-
-    echo $renderedoutput;
+    $PAGE->requires->js_call_amd('tool_urlpreview/get_url_data', 'getPreviewTemplate', [
+        $url,
+    ]);
 }
 
 echo $OUTPUT->footer();
-
-/**
- * Renders linted data from the database for display.
- *
- * @param stdClass $data The linted data retrieved from the database.
- * @return string The formatted output for display.
- */
-function rend($data)
-{
-    global $OUTPUT;
-
-    $templatedata = [
-        'noogmetadata' => empty($data->title) && empty($data->imageurl) && empty($data->sitename)
-            && empty($data->description) && empty($data->type),
-        'canonicalurl' => $data->url,
-        'title'        => $data->title,
-        'image'        => $data->imageurl,
-        'sitename'     => $data->sitename,
-        'description'  => $data->description,
-        'type'         => $data->type,
-    ];
-    return $OUTPUT->render_from_template('tool_urlpreview/metadata', $templatedata);
-}

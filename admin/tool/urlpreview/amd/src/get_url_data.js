@@ -1,4 +1,3 @@
-<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,28 +14,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package     tool_urlpreview
- * @copyright   2023 Thomas Daly <n11134551@qut.edu.au>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * This script fetches the data required from the external service.
+ * It should eventually generate loading animations while it waits for the data.
+ *
+ * @module     tool_urlpreview/get_url_data
+ * @copyright  2024 Team "the Z" <https://github.com/Catalyst-QUT-2023>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace tool_urlpreview\task;
+import {getPreview} from './repository';
 
-use core\task\scheduled_task;
-use tool_urlpreview\urlpreview;
-
-
-defined('MOODLE_INTERNAL') || die();
-
-class delete_unused_previews extends scheduled_task {
-
-    public function get_name() {
-        return get_string('deleteunusedpreviews', 'tool_urlpreview');
-    }
-
-    public function execute() {
-        global $DB;
-        $threemonthsago = time() - (90 * DAYSECS);
-        $DB->delete_records_select('urlpreview', 'lastpreviewed < ?', [$threemonthsago]);
-    }
-}
+export const getPreviewTemplate = async(url) => {
+    const response = await getPreview(url);
+    document.getElementById("previewField").innerHTML = response;
+};
