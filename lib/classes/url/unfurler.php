@@ -98,18 +98,20 @@ class unfurl {
 
         foreach ($metataglist as $metatag) {
             $propertyattribute = strtolower(s($metatag->getAttribute('property')));
-            $contentattribute = s($metatag->getAttribute('content'));
+            $contentattribute = $metatag->getAttribute('content');
             if (
                 !empty($propertyattribute) &&
                 !empty($contentattribute) &&
                 preg_match ('/^og:\w/i', $propertyattribute) === 1
             ) {
+                $sanitizedcontent = clean_param($contentattribute, PARAM_TEXT);
+                
                 switch ($propertyattribute) {
                     case 'og:title':
-                        $this->title = $contentattribute;
+                        $this->title = $sanitizedcontent;
                         break;
                     case 'og:site_name':
-                        $this->sitename = $contentattribute;
+                        $this->sitename = $sanitizedcontent;
                         break;
                     case 'og:image':
                         $imageurlparts = parse_url($contentattribute);
@@ -118,17 +120,20 @@ class unfurl {
                             $urlparts = parse_url($url);
                             $this->image = $urlparts['scheme'].'://'.$urlparts['host'].$imageurlparts['path'];
                         } else {
-                            $this->image = $contentattribute;
+                            $sanitizedcontent = clean_param($contentattribute, PARAM_URL);
+                            $this->image = $sanitizedcontent;
                         }
                         break;
                     case 'og:description':
-                        $this->description = $contentattribute;
+                        $this->description = $sanitizedcontent;
                         break;
                     case 'og:url':
-                        $this->canonicalurl = $contentattribute;
+                        $sanitizedcontent = clean_param($contentattribute, PARAM_URL);
+                        $this->canonicalurl = $sanitizedcontent;
                         break;
                     case 'og:type':
-                        $this->type = $contentattribute;
+                        $sanitizedcontent = clean_param($contentattribute, PARAM_ALPHANUMEXT);
+                        $this->type = $sanitizedcontent;
                     default:
                         break;
                 }
