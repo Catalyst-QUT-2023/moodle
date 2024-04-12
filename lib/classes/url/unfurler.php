@@ -120,7 +120,7 @@ class unfurl {
                             $urlparts = parse_url($url);
                             $this->image = $urlparts['scheme'].'://'.$urlparts['host'].$imageurlparts['path'];
                         } else {
-                            $sanitizedcontent = clean_param($contentattribute, PARAM_RAW);
+                            $sanitizedcontent = clean_param($contentattribute, PARAM_URL);
                             $this->image = $sanitizedcontent;
                         }
                         break;
