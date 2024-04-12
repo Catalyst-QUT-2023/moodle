@@ -15,17 +15,21 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
  *
  * @package     tool_urlpreview
- * @copyright   2024 Team "the Z" <https://github.com/Catalyst-QUT-2023>
+ * @copyright   2023 Hanbin Lee <n10324402@qut.edu.au>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
+// Declare the new web service functions.
 
-$plugin->component = 'tool_urlpreview';
-$plugin->release = '0.1.0';
-$plugin->version = 2024040801;
-$plugin->requires = 2022112800;
-$plugin->maturity = MATURITY_ALPHA;
+$functions = [
+
+    'tool_urlpreview_get_preview' => [
+        'classname' => tool_urlpreview\external\get_preview::class,
+        'description' => 'Gets the preview for a given url',
+        'type' => 'write',
+        'ajax' => true,
+    ],
+];
+

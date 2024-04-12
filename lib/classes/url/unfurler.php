@@ -24,7 +24,7 @@
  */
 
 
-require_once('../../../config.php');
+
 require_once($CFG->libdir.'/filelib.php');
 
 class unfurl {

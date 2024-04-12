@@ -1,5 +1,4 @@
-<?php
-// This file is part of Moodle - https://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,20 +11,23 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * This script fetches the data required from the external service
  *
- * @package     tool_urlpreview
- * @copyright   2024 Team "the Z" <https://github.com/Catalyst-QUT-2023>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @module     tool_urlpreview/repository
+ * @copyright  2024 Team "the Z" <https://github.com/Catalyst-QUT-2023>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+import {call as fetchMany} from 'core/ajax';
 
-$plugin->component = 'tool_urlpreview';
-$plugin->release = '0.1.0';
-$plugin->version = 2024040801;
-$plugin->requires = 2022112800;
-$plugin->maturity = MATURITY_ALPHA;
+export const getPreview = (
+    url
+) => fetchMany([{
+    methodname: 'tool_urlpreview_get_preview',
+    args: {
+        url
+    },
+}])[0];
