@@ -1,4 +1,13 @@
-<div style="overflow-x: auto;">
+<style>
+  .content-truncate {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+</style>
+
+<div style="overflow-x: auto; padding: 30px 0;">
     <table class="table table-sm table-bordered">
         <tr>
             <th>Property</th>
@@ -12,33 +21,34 @@
         </tr>
         <tr>
             <td>Slim preview</td>
-            <td>
+            <td class="content-truncate">
                 {{> core/url_preview_slim}}
             </td>
         </tr>
         <tr>
             <td>og:url</td>
-            <td>{{#canonicalurl}}<a href="{{.}}" target="_blank">{{.}}</a>{{/canonicalurl}}{{^canonicalurl}}<i>Not available</i>{{/canonicalurl}}</td>
+            <td class="content-truncate">{{#canonicalurl}}<a href="{{.}}" target="_blank">{{.}}</a>{{/canonicalurl}}{{^canonicalurl}}<i>Not available</i>{{/canonicalurl}}</td>
         </tr>
         <tr>
             <td>og:type</td>
-            <td>{{#type}}{{.}}{{/type}}{{^type}}<i>Not available</i>{{/type}}</td>
+            <td class="content-truncate">
+            {{#type}}{{.}}{{/type}}{{^type}}<i>Not available</i>{{/type}}</td>
         </tr>
         <tr>
             <td>og:title</td>
-            <td>{{#title}}{{.}}{{/title}}{{^title}}<i>Not available</i>{{/title}}</td>
+            <td class="content-truncate">{{#title}}{{.}}{{/title}}{{^title}}<i>Not available</i>{{/title}}</td>
         </tr>
         <tr>
             <td>og:image</td>
-            <td>{{#image}}<a target="_blank" href="{{.}}">{{.}}{{/image}}{{^image}}<i>Not available</i>{{/image}}</td>
+            <td class="content-truncate">{{#image}}<a target="_blank" href="{{.}}">{{.}}{{/image}}{{^image}}<i>Not available</i>{{/image}}</td>
         </tr>
         <tr>
             <td>og:site_name</td>
-            <td>{{#sitename}}{{.}}{{/sitename}}{{^sitename}}<i>Not available</i>{{/sitename}}</td>
+            <td class="content-truncate">{{#sitename}}{{.}}{{/sitename}}{{^sitename}}<i>Not available</i>{{/sitename}}</td>
         </tr>
         <tr>
             <td>og:description</td>
-            <td>{{#description}}{{.}}{{/description}}{{^description}}<i>Not available</i>{{/description}}</td>
+            <td class="content-truncate">{{#description}}{{.}}{{/description}}{{^description}}<i>Not available</i>{{/description}}</td>
         </tr>
     </table>
 </div>
