@@ -1,3 +1,36 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template tool_urlpreview/form
+
+    This is the form that is rendered for the url Metadata Preview form
+
+    Template for the URL Preview form
+    
+    Example context (json):
+    {
+        "canonicalurl" : "https://moodle.org/logo/moodle-logo.svg", 
+        "type" : "Article",
+        "title" : "Example Title",
+        "image" : "https://moodle.org/logo/moodle-logo.svg"
+        "sitename" : "https://moodle.org/",
+        "description" : "Example Description"
+    }
+}}
 <div style="overflow-x: auto;">
     <table class="table table-sm table-bordered">
         <tr>
@@ -5,39 +38,39 @@
             <th>Content</th>
         </tr>
         <tr>
-            <td>Link Preview</td>
+            <td>{{#str}}linkpreview, tool_urlpreview{{/str}}</td>
             <td>
                 {{> core/url_preview_card}}
             </td>
         </tr>
         <tr>
-            <td>Slim preview</td>
+            <td>{{#str}}slimpreview, tool_urlpreview{{/str}}</td>
             <td>
                 {{> core/url_preview_slim}}
             </td>
         </tr>
         <tr>
-            <td>og:url</td>
+            <td>{{#str}}ogurl, tool_urlpreview{{/str}}</td>
             <td>{{#canonicalurl}}<a href="{{.}}" target="_blank">{{.}}</a>{{/canonicalurl}}{{^canonicalurl}}<i>Not available</i>{{/canonicalurl}}</td>
         </tr>
         <tr>
-            <td>og:type</td>
+            <td>{{#str}}ogtype, tool_urlpreview{{/str}}</td>
             <td>{{#type}}{{.}}{{/type}}{{^type}}<i>Not available</i>{{/type}}</td>
         </tr>
         <tr>
-            <td>og:title</td>
+            <td>{{#str}}ogtitle, tool_urlpreview{{/str}}</td>
             <td>{{#title}}{{.}}{{/title}}{{^title}}<i>Not available</i>{{/title}}</td>
         </tr>
         <tr>
-            <td>og:image</td>
+            <td>{{#str}}ogimage, tool_urlpreview{{/str}}</td>
             <td>{{#image}}<a target="_blank" href="{{.}}">{{.}}{{/image}}{{^image}}<i>Not available</i>{{/image}}</td>
         </tr>
         <tr>
-            <td>og:site_name</td>
+            <td>{{#str}}ogsitename, tool_urlpreview{{/str}}</td>
             <td>{{#sitename}}{{.}}{{/sitename}}{{^sitename}}<i>Not available</i>{{/sitename}}</td>
         </tr>
         <tr>
-            <td>og:description</td>
+            <td>{{#str}}ogdescription, tool_urlpreview{{/str}}</td>
             <td>{{#description}}{{.}}{{/description}}{{^description}}<i>Not available</i>{{/description}}</td>
         </tr>
     </table>
