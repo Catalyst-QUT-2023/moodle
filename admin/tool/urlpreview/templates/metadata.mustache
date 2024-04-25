@@ -15,18 +15,17 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template tool_urlpreview/form
-
+    @template tool_urlpreview/metadata
     This is the form that is rendered for the url Metadata Preview form
 
-    Template for the URL Preview form
+    Template for the URL Metadata table
     
     Example context (json):
     {
         "canonicalurl" : "https://moodle.org/logo/moodle-logo.svg", 
-        "type" : "Article",
+        "type" : "Example Article",
         "title" : "Example Title",
-        "image" : "https://moodle.org/logo/moodle-logo.svg"
+        "image" : "https://moodle.org/logo/moodle-logo.svg",
         "sitename" : "https://moodle.org/",
         "description" : "Example Description"
     }
@@ -50,27 +49,27 @@
             </td>
         </tr>
         <tr>
-            <td>{{#str}}ogurl, tool_urlpreview{{/str}}</td>
+            <td>og:url</td>
             <td>{{#canonicalurl}}<a href="{{.}}" target="_blank">{{.}}</a>{{/canonicalurl}}{{^canonicalurl}}<i>Not available</i>{{/canonicalurl}}</td>
         </tr>
         <tr>
-            <td>{{#str}}ogtype, tool_urlpreview{{/str}}</td>
+            <td>og:type</td>
             <td>{{#type}}{{.}}{{/type}}{{^type}}<i>Not available</i>{{/type}}</td>
         </tr>
         <tr>
-            <td>{{#str}}ogtitle, tool_urlpreview{{/str}}</td>
+            <td>og:title</td>
             <td>{{#title}}{{.}}{{/title}}{{^title}}<i>Not available</i>{{/title}}</td>
         </tr>
         <tr>
-            <td>{{#str}}ogimage, tool_urlpreview{{/str}}</td>
+            <td>og:image</td>
             <td>{{#image}}<a target="_blank" href="{{.}}">{{.}}{{/image}}{{^image}}<i>Not available</i>{{/image}}</td>
         </tr>
         <tr>
-            <td>{{#str}}ogsitename, tool_urlpreview{{/str}}</td>
+            <td>og:site_name</td>
             <td>{{#sitename}}{{.}}{{/sitename}}{{^sitename}}<i>Not available</i>{{/sitename}}</td>
         </tr>
         <tr>
-            <td>{{#str}}ogdescription, tool_urlpreview{{/str}}</td>
+            <td>og:description</td>
             <td>{{#description}}{{.}}{{/description}}{{^description}}<i>Not available</i>{{/description}}</td>
         </tr>
     </table>
