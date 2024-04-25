@@ -1,3 +1,35 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template tool_urlpreview/metadata
+    This is the form that is rendered for the url Metadata Preview form
+
+    Template for the URL Metadata table
+    
+    Example context (json):
+    {
+        "canonicalurl" : "https://moodle.org/logo/moodle-logo.svg", 
+        "type" : "Example Article",
+        "title" : "Example Title",
+        "image" : "https://moodle.org/logo/moodle-logo.svg",
+        "sitename" : "https://moodle.org/",
+        "description" : "Example Description"
+    }
+}}
 <div style="overflow-x: auto;">
     <table class="table table-sm table-bordered">
         <tr>
@@ -5,13 +37,13 @@
             <th>Content</th>
         </tr>
         <tr>
-            <td>Link Preview</td>
+            <td>{{#str}}linkpreview, tool_urlpreview{{/str}}</td>
             <td>
                 {{> core/url_preview_card}}
             </td>
         </tr>
         <tr>
-            <td>Slim preview</td>
+            <td>{{#str}}slimpreview, tool_urlpreview{{/str}}</td>
             <td>
                 {{> core/url_preview_slim}}
             </td>

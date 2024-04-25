@@ -17,6 +17,14 @@
 {{!
     @template tool_urlpreview/form
     This is the form that is rendered for the url Metadata Preview form
+
+    Template for the URL Preview form
+    
+    Example context (json):
+    {
+        "action" : "index.php", 
+        "submittedUrl" : "https://moodle.org/"
+    }
 }}
 <form action="{{action}}" method="get" class="simplesearchform mb-3">
     <div class="input-group">
