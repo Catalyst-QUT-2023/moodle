@@ -15,16 +15,28 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Folder module version information
- *
- * @package    mod_url
- * @copyright  2009 Petr Skoda  {@link http://skodak.org}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     core_urlpreview
+ * @copyright   2023 Thomas Daly <n11134551@qut.edu.au>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace core\task;
+
+use core\task\scheduled_task;
+use core\urlpreview;
+
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2024042500;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires  = 2023100400;    // Requires this Moodle version.
-$plugin->component = 'mod_url';        // Full name of the plugin (used for diagnostics)
-$plugin->cron      = 0;
+class delete_unused_previews extends scheduled_task {
+
+    public function get_name() {
+        return get_string('deleteunusedpreviews', 'core_urlpreview');
+    }
+
+    public function execute() {
+        global $DB;
+        $threemonthsago = time() - (90 * DAYSECS);
+        $DB->delete_records_select('urlpreview', 'lastpreviewed < ?', [$threemonthsago]);
+    }
+}

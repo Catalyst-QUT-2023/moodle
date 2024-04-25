@@ -55,6 +55,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
+    'moodle/urlpreview:usetool' => array(
+        'riskbitmask' => RISK_SPAM,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+    ),
     'moodle/site:config' => array(
 
         'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS | RISK_CONFIG | RISK_DATALOSS,
