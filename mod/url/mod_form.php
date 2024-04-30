@@ -91,6 +91,9 @@ class mod_url_mod_form extends moodleform_mod {
 
         if (array_key_exists(RESOURCELIB_DISPLAY_AUTO, $options) or
           array_key_exists(RESOURCELIB_DISPLAY_EMBED, $options) or
+          array_key_exists(RESOURCELIB_DISPLAY_FULL, $options) or
+          array_key_exists(RESOURCELIB_DISPLAY_SLIM, $options) or
+          array_key_exists(RESOURCELIB_DISPLAY_NONE, $options) or
           array_key_exists(RESOURCELIB_DISPLAY_FRAME, $options)) {
             $mform->addElement('checkbox', 'printintro', get_string('printintro', 'url'));
             $mform->hideIf('printintro', 'display', 'eq', RESOURCELIB_DISPLAY_POPUP);

@@ -39,7 +39,11 @@ $string['displayselect_help'] = 'This setting, together with the URL file type a
 * Open - Only the URL is displayed in the browser window
 * In pop-up - The URL is displayed in a new browser window without menus or an address bar
 * In frame - The URL is displayed within a frame below the navigation bar and URL description
-* New window - The URL is displayed in a new browser window with menus and an address bar';
+* New window - The URL is displayed in a new browser window with menus and an address bar
+* Full - The unfuled URL is displayed within a full frame 
+* Slim - The unfuled URL is displayed within a slim frame
+* None - need to fix';
+
 $string['displayselectexplain'] = 'Choose display type, unfortunately not all types are suitable for all URLs.';
 $string['externalurl'] = 'External URL';
 $string['framesize'] = 'Frame height';
@@ -83,7 +87,7 @@ $string['popupwidthexplain'] = 'Specifies default width of popup windows.';
 $string['printintro'] = 'Display URL description';
 $string['printintroexplain'] = 'Display URL description below content? Some display types may not display description even if enabled.';
 $string['privacy:metadata'] = 'The URL resource plugin does not store any personal data.';
-$string['rolesinparams'] = 'Role names as URL variables';
+$string['rolesinparams'] = 'Role names as URL variables';  
 $string['search:activity'] = 'URL';
 $string['serverurl'] = 'Server URL';
 $string['url:addinstance'] = 'Add a new URL resource';
