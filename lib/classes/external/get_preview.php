@@ -20,7 +20,7 @@ use core_external\external_function_parameters;
 use core_external\external_api;
 use core_external\external_value;
 use core\form\urlpreview;
-require_once($CFG->dirroot . '/lib/db/urlpreview.php');
+require_once($CFG->dirroot . '/lib/classes/url/urlpreview.php');
 require_once($CFG->libdir . '/classes/url/unfurler.php');
 require_once($CFG->dirroot . '/lib/externallib.php');
 
@@ -34,7 +34,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
 class get_preview extends external_api {
 
     /**
-     * Describes the parameters for tool_urlpreview_get_preview
+     * Describes the parameters for core_url_get_preview
      *
      * @return external_function_parameters
      */
@@ -45,7 +45,7 @@ class get_preview extends external_api {
     }
 
     /**
-     * Implementation of web service tool_urlpreview_get_preview
+     * Implementation of web service core_url_get_preview
      *
      * @param string $url
      */
@@ -67,7 +67,6 @@ class get_preview extends external_api {
         // Check if the linted data for this URL is already in the database.
         $sql = "SELECT * FROM {urlpreview} WHERE " . $DB->sql_compare_text('url') . " = ?";
         $linteddata = $DB->get_record_sql($sql, [$url]);
-        // $linteddata = null;
 
         if (!$linteddata) {
             
