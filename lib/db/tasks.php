@@ -468,7 +468,6 @@ $tasks = array(
     ],
     [
         'classname' => 'core\task\refresh_old_previews',
-        'blocking' => 0,
         'minute' => 'R',
         'hour' => '2',
         'day' => '*',
@@ -477,7 +476,6 @@ $tasks = array(
     ],
     [
         'classname' => 'core\task\delete_unused_previews',
-        'blocking' => 0,
         'minute' => 'R',
         'hour' => '3',
         'day' => '*',
