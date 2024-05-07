@@ -150,7 +150,7 @@ function resource_set_display_options($data) {
         $displayoptions['popupwidth']  = $data->popupwidth;
         $displayoptions['popupheight'] = $data->popupheight;
     }
-    if (in_array($data->display, array(RESOURCELIB_DISPLAY_AUTO, RESOURCELIB_DISPLAY_EMBED, RESOURCELIB_DISPLAY_FRAME, RESOURCELIB_DISPLAY_FULL. RESOURCELIB_DISPLAY_SLIM. RESOURCELIB_DISPLAY_NONE))) {
+    if (in_array($data->display, array(RESOURCELIB_DISPLAY_AUTO, RESOURCELIB_DISPLAY_EMBED, RESOURCELIB_DISPLAY_FRAME, RESOURCELIB_DISPLAY_FULL, RESOURCELIB_DISPLAY_SLIM, RESOURCELIB_DISPLAY_NONE))) {
         $displayoptions['printintro']   = (int)!empty($data->printintro);
     }
     if (!empty($data->showsize)) {

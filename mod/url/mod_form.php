@@ -57,20 +57,31 @@ class mod_url_mod_form extends moodleform_mod {
         //-------------------------------------------------------
         $mform->addElement('header', 'optionssection', get_string('appearance'));
 
+
         if ($this->current->instance) {
             $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions), $this->current->display);
+            $previewoptions = resourcelib_get_urlpreviewdisplayoptions(explode(',', $config->urlpreviewoptions));
         } else {
             $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions));
+            $previewoptions = resourcelib_get_urlpreviewdisplayoptions(explode(',', $config->urlpreviewoptions));
         }
         if (count($options) == 1) {
             $mform->addElement('hidden', 'display');
             $mform->setType('display', PARAM_INT);
+            $mform->setType('display', PARAM_INT);
             reset($options);
+            reset($previewoptions);
             $mform->setDefault('display', key($options));
+
         } else {
             $mform->addElement('select', 'display', get_string('displayselect', 'url'), $options);
             $mform->setDefault('display', $config->display);
             $mform->addHelpButton('display', 'displayselect', 'url');
+            
+            $mform->addElement('select', 'urlpreview', get_string('urlpreview', 'url'), $previewoptions);
+            $mform->setType('urlpreview', PARAM_URL);
+            $mform->setDefault('urlpreview', key($previewoptions));
+            $mform->addHelpButton('urlpreview', 'urlpreview', 'url');
         }
 
         if (array_key_exists(RESOURCELIB_DISPLAY_POPUP, $options)) {
@@ -88,12 +99,18 @@ class mod_url_mod_form extends moodleform_mod {
             $mform->setType('popupheight', PARAM_INT);
             $mform->setDefault('popupheight', $config->popupheight);
         }
+        if (array_key_exists(RESOURCELIB_DISPLAY_FULL, $previewoptions)) {
+
+        }
+        if (array_key_exists(RESOURCELIB_DISPLAY_SLIM, $previewoptions)) {
+
+        }
+        if (array_key_exists(RESOURCELIB_DISPLAY_NONE, $previewoptions)) {
+
+        }
 
         if (array_key_exists(RESOURCELIB_DISPLAY_AUTO, $options) or
           array_key_exists(RESOURCELIB_DISPLAY_EMBED, $options) or
-          array_key_exists(RESOURCELIB_DISPLAY_FULL, $options) or
-          array_key_exists(RESOURCELIB_DISPLAY_SLIM, $options) or
-          array_key_exists(RESOURCELIB_DISPLAY_NONE, $options) or
           array_key_exists(RESOURCELIB_DISPLAY_FRAME, $options)) {
             $mform->addElement('checkbox', 'printintro', get_string('printintro', 'url'));
             $mform->hideIf('printintro', 'display', 'eq', RESOURCELIB_DISPLAY_POPUP);

@@ -328,7 +328,20 @@ function url_display_embed($url, $cm, $course) {
     echo $OUTPUT->footer();
     die;
 }
+/**
+ * Display full frame
+ * need to edit
+ */
+function url_display_full($url, $cm, $course){
 
+}
+/**
+ * Display slim frame
+ * need to edit
+ */
+function url_display_slim($url, $cm, $course){
+    
+}
 /**
  * Decide the best display format.
  * @param object $url

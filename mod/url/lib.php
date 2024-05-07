@@ -158,7 +158,7 @@ function url_update_instance($data, $mform) {
         $displayoptions['popupwidth']  = $data->popupwidth;
         $displayoptions['popupheight'] = $data->popupheight;
     }
-    if (in_array($data->display, array(RESOURCELIB_DISPLAY_AUTO, RESOURCELIB_DISPLAY_EMBED, RESOURCELIB_DISPLAY_FRAME, RESOURCELIB_DISPLAY_FULL, RESOURCELIB_DISPLAY_SLIM, RESOURCELIB_DISPLAY_NONE))) {
+    if (in_array($data->display, array(RESOURCELIB_DISPLAY_AUTO, RESOURCELIB_DISPLAY_EMBED, RESOURCELIB_DISPLAY_FRAME))) {
         $displayoptions['printintro']   = (int)!empty($data->printintro);
     }
     $data->displayoptions = serialize($displayoptions);
