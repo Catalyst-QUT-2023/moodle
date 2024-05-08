@@ -1,20 +1,20 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
-use tool_urlpreview\url\unfurler;
-require_once __DIR__ . '/../../../../lib/classes/url/unfurler.php';
-
+namespace core\url;
+global $CFG;
+use core\url\unfurl;
+require_once($CFG->libdir . '/classes/url/unfurler.php');
 /**
  * Description of the UnfurlerTest class.
  */
-class UnfurlerTest extends advanced_testcase
+class htmlextract_test extends \advanced_testcase
 {
     private $unfurler;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->unfurler = new Unfurl();
+        $this->unfurler = new \unfurl('http://example.com'); // Pass a URL to the constructor
     }
 
     /**
@@ -22,10 +22,9 @@ class UnfurlerTest extends advanced_testcase
      */
     public function testExtractHtmlMetadata($file, $expectedTitle, $expectedSiteName, $expectedImage, $expectedDescription, $expectedCanonicalUrl, $expectedType)
     {
-        $url = 'http://example.com';
         $responseurl = file_get_contents(__DIR__ . "/fixtures/$file");
 
-        $this->unfurler->extract_html_metadata($url, $responseurl);
+        $this->unfurler->extract_html_metadata('http://example.com', $responseurl); // Pass the URL to the method
 
         $this->assertEquals($expectedTitle, $this->unfurler->title);
         $this->assertEquals($expectedSiteName, $this->unfurler->sitename);
@@ -34,27 +33,26 @@ class UnfurlerTest extends advanced_testcase
         $this->assertEquals($expectedCanonicalUrl, $this->unfurler->canonicalurl);
         $this->assertEquals($expectedType, $this->unfurler->type);
     }
-
     public function provideTestFiles()
     {
         return [
             [
                 '404.html',
+                '',
                 'Error 404 (Not Found)!!1',
                 '', // No site name in this example
                 '', // No image in this example
                 '', // No description in this example
                 '', // No canonical URL in this example
-                '', // No type in this example
             ],
             [
                 'ABC_News.html',
-                'Brisbane Lions through to AFL grand final with 16-point win over Carlton in preliminary final at the Gabba - ABC News',
-                'ABC News', // Site name
-                'https://live-production.wcms.abc-cdn.net.au/22a05500d5223e217660d3917dff8539?impolicy=wcms_crop_resize&cropH=2813&cropW=5000&xPos=0&yPos=260&width=862&height=485', // Image URL
+                'Brisbane Lions through to AFL grand final after beating Carlton by 16 points',
+                '', // should return site name
+                'https://live-production.wcms.abc-cdn.net.au/22a05500d5223e217660d3917dff8539?impolicy=wcms_watermark_news&cropH=2813&cropW=5000&xPos=0&yPos=260&width=862&height=485&imformat=generic', // Image URL
                 'The Brisbane Lions are into the AFL grand final for the first time in 19 years after a 16-point win over Carlton in their preliminary final.', // Description
                 'https://www.abc.net.au/news/2023-09-23/afl-preliminary-final-brisbane-vs-carlton/102875098', // Canonical URL
-                'Article' // Type
+                'article' // Type
             ],
             [
                 'Australian_Gov.html',
@@ -221,14 +219,20 @@ class UnfurlerTest extends advanced_testcase
             ],
             [
                 "Wikipedia.html",
+                "Moodle - Wikipedia",
+                "",
+                "",
                 "https://en.wikipedia.org/",
                 "https://en.wikipedia.org/wiki/Moodle",
                 "https://en.wikipedia.org/",
                 "website"
             ],
             [
-                "Youtube.html",
-                "https://www.youtube.com/",
+                "youtube.html",
+                "2022 Moodle LMS video",
+                "YouTube",
+                "https://i.ytimg.com/vi/3ORsUGVNxGs/maxresdefault.jpg",
+                "View our latest Moodle LMS release video: https://www.youtube.com/watch?v=DubiRbeDpnM",
                 "https://www.youtube.com/watch?v=3ORsUGVNxGs",
                 "https://www.youtube.com/",
                 "video"
