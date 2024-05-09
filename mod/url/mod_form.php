@@ -35,6 +35,7 @@ class mod_url_mod_form extends moodleform_mod {
 
         $config = get_config('url');
 
+
         //-------------------------------------------------------
         $mform->addElement('header', 'general', get_string('general', 'form'));
         $mform->addElement('text', 'name', get_string('name'), array('size'=>'48'));
@@ -60,7 +61,7 @@ class mod_url_mod_form extends moodleform_mod {
 
         if ($this->current->instance) {
             $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions), $this->current->display);
-            $previewoptions = resourcelib_get_urlpreviewdisplayoptions(explode(',', $config->urlpreviewoptions));
+            $previewoptions = resourcelib_get_urlpreviewdisplayoptions(explode(',', $config->urlpreviewoptions), $this->current->urlpreview);
         } else {
             $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions));
             $previewoptions = resourcelib_get_urlpreviewdisplayoptions(explode(',', $config->urlpreviewoptions));
@@ -78,10 +79,10 @@ class mod_url_mod_form extends moodleform_mod {
             $mform->setDefault('display', $config->display);
             $mform->addHelpButton('display', 'displayselect', 'url');
             
-            $mform->addElement('select', 'urlpreview', get_string('urlpreview', 'url'), $previewoptions);
-            $mform->setType('urlpreview', PARAM_URL);
+            $mform->addElement('select', 'urlpreview', get_string('urlpreviewselect', 'url'), $previewoptions);
+            $mform->setType('urlpreview', PARAM_INT);
             $mform->setDefault('urlpreview', key($previewoptions));
-            $mform->addHelpButton('urlpreview', 'urlpreview', 'url');
+            $mform->addHelpButton('urlpreview', 'urlpreviewselect', 'url');
         }
 
         if (array_key_exists(RESOURCELIB_DISPLAY_POPUP, $options)) {
@@ -100,6 +101,7 @@ class mod_url_mod_form extends moodleform_mod {
             $mform->setDefault('popupheight', $config->popupheight);
         }
         if (array_key_exists(RESOURCELIB_DISPLAY_FULL, $previewoptions)) {
+            
 
         }
         if (array_key_exists(RESOURCELIB_DISPLAY_SLIM, $previewoptions)) {

@@ -89,12 +89,11 @@ $string['rolesinparams'] = 'Role names as URL variables';
 $string['search:activity'] = 'URL';
 $string['serverurl'] = 'Server URL';
 $string['url:addinstance'] = 'Add a new URL resource';
-$string['urlpreview_help'] = 'This settin determines how the preview is displayed. Options may include:
+$string['urlpreviewoptions'] = 'Available URL Preview Options';
+$string['urlpreviewselect'] = 'URL Preview';
+$string['urlpreviewselect_help'] = 'This settin determines how the preview is displayed. Options may include:
 
 * Full - The unfuled URL is displayed within a full frame 
 * Slim - The unfuled URL is displayed within a slim frame
 * None - need to fix';
-
-$string['urlpreview'] = 'URL Preview';
-$string['urlpreviewoptions'] = 'URL Preview Options';
 $string['url:view'] = 'View URL';
