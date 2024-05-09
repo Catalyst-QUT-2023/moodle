@@ -174,6 +174,10 @@ class mod_url_mod_form extends moodleform_mod {
                 $i++;
             }
         }
+        if (!empty($default_values['urlpreviewoptions'])){
+            $previewoptions = (array) unserialize_array($default_values['urlpreviewoptions']);
+            $default_values['urlpreviewoptions'] = $previewoptions;
+        }
     }
 
     function validation($data, $files) {
