@@ -142,7 +142,6 @@ class htmlextract_test extends \advanced_testcase
                 "LinkedIn Ads on LinkedIn: Progress your Career",
                 "LinkedIn",
                 "https://static.licdn.com/aero-v1/sc/h/c45fy346jw096z9pbphyyhdz7",
-                "https://www.linkedin.com/",
                 "Are you in the right place to progress your career? More
                 and more marketers are willing to relocate for a bigger salary and a 
                better chance of promotion. Get…",
