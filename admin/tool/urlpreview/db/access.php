@@ -24,20 +24,6 @@
 
  defined('MOODLE_INTERNAL') || die();
 
-<<<<<<< HEAD
- $capabilities = [
-  'tool/urlpreview:usetool' => [
-      'riskbitmask' => RISK_SPAM,
-      'captype' => 'write',
-      'contextlevel' => CONTEXT_SYSTEM,
-      'archetypes' => [
-        'manager' => CAP_ALLOW, 
-    ]
-  ],
-
- ];
-
-=======
 $capabilities = [
     'tool/urlpreview:usetool' => array(
         'riskbitmask' => RISK_SPAM,
@@ -50,4 +36,3 @@ $capabilities = [
         ],
     ),
 ];
->>>>>>> e212d3845dce19ccdc816699dea22f18800100c5
