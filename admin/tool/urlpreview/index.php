@@ -53,7 +53,7 @@ echo $OUTPUT->render_from_template('tool_urlpreview/form', $templatedata);
 
 // Display output from AJAX Call
 if ($url !== '') {
-    $PAGE->requires->js_call_amd('tool_urlpreview/get_url_data', 'getPreviewTemplate', [
+    $PAGE->requires->js_call_amd('core/get_url_data', 'getPreviewTemplate', [
         $url,
     ]);
 }

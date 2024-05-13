@@ -1129,5 +1129,35 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2024030500.02);
     }
 
+    if ($oldversion < 2024032200) {
+
+        // Define table urlpreview to be created.
+        $table = new xmldb_table('urlpreview');
+
+        // Adding fields to table urlpreview.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('url', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('type', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('imageurl', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('sitename', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('lastpreviewed', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table urlpreview.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Conditionally launch create table for urlpreview.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Urlpreview savepoint reached.
+        upgrade_main_savepoint(true, 2024042500.02);
+        // upgrade_plugin_savepoint(true, 2024032200, 'mod', 'urlpreview');
+    }
+
     return true;
 }

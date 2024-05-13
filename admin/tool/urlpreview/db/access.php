@@ -24,12 +24,15 @@
 
  defined('MOODLE_INTERNAL') || die();
 
- $capabilities = [
-  'tool/urlpreview:usetool' => [
-      'riskbitmask' => RISK_SPAM,
-      'captype' => 'write',
-      'contextlevel' => CONTEXT_SYSTEM,
-  ],
-
- ];
-
+$capabilities = [
+    'tool/urlpreview:usetool' => array(
+        'riskbitmask' => RISK_SPAM,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        ],
+    ),
+];
