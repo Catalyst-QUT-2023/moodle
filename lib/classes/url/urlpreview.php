@@ -17,12 +17,12 @@
 /**
  * Class urlpreview
  *
- * @package    tool_urlpreview
+ * @package    mod_url
  * @copyright  2023 YOUR NAME <your@email.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace tool_urlpreview\form;
+namespace core\form;
 
 use core\persistent;
 class urlpreview extends persistent {

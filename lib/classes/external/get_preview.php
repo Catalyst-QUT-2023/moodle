@@ -15,26 +15,26 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 
-namespace tool_urlpreview\external;
+namespace core\external;
 use core_external\external_function_parameters;
 use core_external\external_api;
 use core_external\external_value;
-use tool_urlpreview\form\urlpreview;
-require_once($CFG->dirroot . '/admin/tool/urlpreview/db/urlpreview.php');
+use core\form\urlpreview;
+require_once($CFG->dirroot . '/lib/classes/url/urlpreview.php');
 require_once($CFG->libdir . '/classes/url/unfurler.php');
 require_once($CFG->dirroot . '/lib/externallib.php');
 
 /**
- * Implementation of web service tool_urlpreview_get_preview
+ * Implementation of web service core_get_preview
  *
- * @package    tool_urlpreview
+ * @package    core_urlpreview
  * @copyright  2024 Team "the Z" <https://github.com/Catalyst-QUT-2023>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_preview extends external_api {
 
     /**
-     * Describes the parameters for tool_urlpreview_get_preview
+     * Describes the parameters for core_url_get_preview
      *
      * @return external_function_parameters
      */
@@ -45,7 +45,7 @@ class get_preview extends external_api {
     }
 
     /**
-     * Implementation of web service tool_urlpreview_get_preview
+     * Implementation of web service core_url_get_preview
      *
      * @param string $url
      */
