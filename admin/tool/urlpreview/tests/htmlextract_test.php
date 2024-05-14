@@ -1,13 +1,31 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace core\url;
 
 global $CFG;
 use core\url\unfurl;
 
-require_once ($CFG->libdir . '/classes/url/unfurler.php');
+require_once ($CFG->libdir.'/classes/url/unfurler.php');
 /**
- * Description of the UnfurlerTest class.
+ * URLPreview HTML Extract unit tests
+ *
+ * @package    tool_urlpreview
+ * @copyright  2024 Thomas Daly <n11134551@qut.edu.au>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class htmlextract_test extends \advanced_testcase
 {
@@ -42,19 +60,19 @@ class htmlextract_test extends \advanced_testcase
                 '404.html',
                 'Error 404 (Not Found)!!1',
                 '',
-                '', // No site name in this example
-                '', // No image in this example
-                '', // No description in this example
-                '', // No canonical URL in this example
+                '', 
+                '', 
+                '', 
+                '', 
             ],
             [
                 'ABC_News.html',
                 'Brisbane Lions through to AFL grand final after beating Carlton by 16 points',
                 'ABC News',
                 'https://live-production.wcms.abc-cdn.net.au/22a05500d5223e217660d3917dff8539?impolicy=wcms_watermark_news&cropH=2813&cropW=5000&xPos=0&yPos=260&width=862&height=485&imformat=generic', // Image URL
-                'The Brisbane Lions are into the AFL grand final for the first time in 19 years after a 16-point win over Carlton in their preliminary final.', // Description
-                'https://www.abc.net.au/news/2023-09-23/afl-preliminary-final-brisbane-vs-carlton/102875098', // Canonical URL
-                'article' // Type
+                'The Brisbane Lions are into the AFL grand final for the first time in 19 years after a 16-point win over Carlton in their preliminary final.', 
+                'https://www.abc.net.au/news/2023-09-23/afl-preliminary-final-brisbane-vs-carlton/102875098', 
+                'article' 
             ],
             [
                 'Australian_Gov.html',
@@ -130,12 +148,12 @@ class htmlextract_test extends \advanced_testcase
             ],
             [
                 "Imgur.html",
-                "Arp 142: The Hummingbird Galaxy",
+                "Arp 142: The Hummingbird Galaxy - science post - Imgur",
                 "Imgur",
                 "https://s.imgur.com/images/logo-1200-630.png",
                 "Discover topics like science, astrophotography, nasa, space, and the magic of the internet at Imgur, a community powered entertainment destination. Lift your spirits with funny jokes, trending memes, entertaining gifs, inspiring stories, viral videos, and so much more from users like 16bitStarbuck.",
                 "https://imgur.com/t/space/aAa44rI",
-                "article"
+                ""
             ],
             [
                 "linkedin.html",

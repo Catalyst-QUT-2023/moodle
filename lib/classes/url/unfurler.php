@@ -45,7 +45,7 @@ class unfurl {
             'CURLOPT_RETURNTRANSFER' => true,
             'CURLOPT_TIMEOUT' => 5
         );
-        $this->response = $curl->get($url, null, $options);
+        $this->response = $curl->get($url, $options);
 
         $curlresponse = $this->response;
 
