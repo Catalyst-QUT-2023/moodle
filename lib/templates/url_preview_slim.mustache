@@ -15,31 +15,33 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template core/url_preview_card
-
+    @template core/url_preview_slim
     Template for url preview element
 
     Example context (json):
     {
-        "image": "https://picsum.photos/200",
+        "image": "https://moodle.org/logo/moodle-logo.svg",
         "title": "Title example",
         "description": "Description example",
         "sitename": "Name example",
+        "canonicalurl": "https://moodle.org/"
     }
 }}
 
-<div style="max-width: 800px" class="p-2">
+<div style="max-width: 600px" class="p-2">
     <div class="border shadow-sm rounded">
         <div class="row no-gutters">
             <div class="col-md-2">
                 {{#image}}
-                    <img class="rounded-left" style="max-width: 120px" src="{{{.}}}" alt="">
+                    <img class="rounded-left" style="width: 90%; height: 100%; object-fit: cover;" src="{{{.}}}" alt="">
                 {{/image}}
             </div>
             <div class="col-md-10">
                 <div class="py-2 px-0">
                     {{#title}}
+                    <div class="text-truncate my-0 pr-2">
                         <b class="text-truncate my-0"><a href="{{{canonicalurl}}}" target="_blank" class="card-title stretched-link">{{.}}</a></b>
+                    </div>
                     {{/title}}
                     {{#description}}
                         <div class="text-truncate my-0 pr-2">

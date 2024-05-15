@@ -15,15 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package     tool_urlpreview
+ * @package     core_urlpreview
  * @copyright   2023 Thomas Daly <n11134551@qut.edu.au>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace tool_urlpreview\task;
+namespace core\task;
 
 use core\task\scheduled_task;
-use tool_urlpreview\urlpreview;
+use core\urlpreview;
 
 
 defined('MOODLE_INTERNAL') || die();
@@ -31,12 +31,12 @@ defined('MOODLE_INTERNAL') || die();
 class delete_unused_previews extends scheduled_task {
 
     public function get_name() {
-        return get_string('deleteunusedpreviews', 'tool_urlpreview');
+        return get_string('deleteunusedpreviews', 'core_urlpreview');
     }
 
     public function execute() {
         global $DB;
-        $threemonthsago = time() - (3 * 30 * 24 * 60 * 60); // Roughly 3 months.
+        $threemonthsago = time() - (90 * DAYSECS);
         $DB->delete_records_select('urlpreview', 'lastpreviewed < ?', [$threemonthsago]);
     }
 }

@@ -17,15 +17,15 @@
 /**
  * Class refresh_old_previews
  *
- * @package    tool_urlpreview
+ * @package    core_urlpreview
  * @copyright  2023 YOUR NAME <your@email.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace tool_urlpreview\task;
+namespace core\task;
 
 use core\task\scheduled_task;
-use tool_urlpreview\urlpreview;
+use core\urlpreview;
 
 
 defined('MOODLE_INTERNAL') || die();
@@ -33,12 +33,12 @@ defined('MOODLE_INTERNAL') || die();
 class refresh_old_previews extends scheduled_task {
 
     public function get_name() {
-        return get_string('refresholdpreviews', 'tool_urlpreview');
+        return get_string('refresholdpreviews', 'core_urlpreview');
     }
 
     public function execute() {
         global $DB;
-        $twoweeksago = time() - (2 * 7 * 24 * 60 * 60); // Rxoughly 2 weeks.
+        $twoweeksago = time() - (2 * WEEKSECS);
 
         // This selects records older than 2 weeks that have been previewed in the last 2 weeks.
         $sql = "SELECT * FROM {urlpreview} WHERE timecreated < ? AND lastpreviewed >= ?";
