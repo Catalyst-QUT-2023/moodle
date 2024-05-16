@@ -118,6 +118,7 @@ function url_add_instance($data, $mform) {
         $displayoptions['printintro']   = (int)!empty($data->printintro);
     }
     $data->displayoptions = serialize($displayoptions);
+    $data->$urlpreviewoptions = serialize($urlpreview);
 
     $data->externalurl = url_fix_submitted_url($data->externalurl);
 
@@ -161,7 +162,7 @@ function url_update_instance($data, $mform) {
         $displayoptions['printintro']   = (int)!empty($data->printintro);
     }
     $data->displayoptions = serialize($displayoptions);
-
+    $data->$urlpreviewoptions = serialize($urlpreview);
     $data->externalurl = url_fix_submitted_url($data->externalurl);
 
     $data->timemodified = time();
@@ -208,8 +209,10 @@ function url_delete_instance($id) {
  * @return cached_cm_info info
  */
 function url_get_coursemodule_info($coursemodule) {
-    global $CFG, $DB;
+    global $CFG, $DB, $OUTPUT;
+    
     require_once("$CFG->dirroot/mod/url/locallib.php");
+    require_once("$CFG->dirroot/lib/classes/url/unfurler.php");
 
     if (!$url = $DB->get_record('url', array('id'=>$coursemodule->instance),
             'id, name, display, displayoptions, externalurl, parameters, intro, introformat')) {
@@ -218,6 +221,8 @@ function url_get_coursemodule_info($coursemodule) {
 
     $info = new cached_cm_info();
     $info->name = $url->name;
+    
+    
 
     // Note: there should be a way to differentiate links from normal resources.
     $info->icon = url_guess_icon($url->externalurl);
@@ -243,6 +248,39 @@ function url_get_coursemodule_info($coursemodule) {
         $info->content = format_module_intro('url', $url, $coursemodule->id, false);
     }
 
+    $unfurler = new unfurl($url->externalurl);
+    $config = get_config('url');
+    $urlpreview = $config->urlpreview;
+
+    if ($urlpreview == RESOURCELIB_DISPLAY_FULL) {
+        $metadata = [
+            'title' => $unfurler->title ?: format_string($url->name),
+            'sitename' => $unfurler->sitename,
+            'image' => $unfurler->image,
+            'description' => $unfurler->description,
+            'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,
+        ];
+        $info->content= $OUTPUT->render_from_template('core/url_preview_card', $metadata);
+    } elseif ($urlpreview == RESOURCELIB_DISPLAY_SLIM) {
+        $metadata = [
+            'title' => $unfurler->title ?: format_string($url->name),
+            'sitename' => $unfurler->sitename,
+            'image' => $unfurler->image,
+            'description' => $unfurler->description,
+            'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,
+        ];
+
+        $info->content= $OUTPUT->render_from_template('core/url_preview_slim', $metadata);
+    } else {
+        $metadata = [
+            'title' => $unfurler->title ?: format_string($url->name),
+            'sitename' => $unfurler->sitename,
+            'image' => $unfurler->image,
+            'description' => $unfurler->description,
+            'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,
+        ];
+    }
+    
     $info->customdata['display'] = $display;
     // The icon will be filtered from now on because the custom icons have been updated.
     $info->customdata['filtericon'] = true;

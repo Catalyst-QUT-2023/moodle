@@ -64,21 +64,26 @@ class mod_url_mod_form extends moodleform_mod {
         if (count($options) == 1) {
             $mform->addElement('hidden', 'display');
             $mform->setType('display', PARAM_INT);
-            $mform->setType('display', PARAM_INT);
             reset($options);
-            reset($previewoptions);
             $mform->setDefault('display', key($options));
 
         } else {
             $mform->addElement('select', 'display', get_string('displayselect', 'url'), $options);
             $mform->setDefault('display', $config->display);
             $mform->addHelpButton('display', 'displayselect', 'url');
-            $mform->addElement('select', 'urlpreview', get_string('urlpreviewselect', 'url'), $previewoptions);
+        }
+           
+        if (count($previewoptions) == 1) {
+            $mform->addElement('hidden', 'urlpreview');
             $mform->setType('urlpreview', PARAM_INT);
+            reset($previewoptions);
             $mform->setDefault('urlpreview', key($previewoptions));
+        } else {
+            $mform->addElement('select', 'urlpreview', get_string('urlpreviewselect', 'url'), $previewoptions);
+            $mform->setDefault('urlpreview', $config->urlpreview);
             $mform->addHelpButton('urlpreview', 'urlpreviewselect', 'url');
         }
-
+    
         if (array_key_exists(RESOURCELIB_DISPLAY_POPUP, $options)) {
             $mform->addElement('text', 'popupwidth', get_string('popupwidth', 'url'), array('size'=>3));
             if (count($options) > 1) {
@@ -154,9 +159,9 @@ class mod_url_mod_form extends moodleform_mod {
                 $i++;
             }
         }
-        if (!empty($default_values['urlpreviewoptions'])){
-            $previewoptions = (array) unserialize_array($default_values['urlpreviewoptions']);
-            $default_values['urlpreviewoptions'] = $previewoptions;
+        if (!empty($default_values['urlpreviewoptions'])) {
+            $urlpreviewoptions = (array) unserialize_array($default_values['urlpreviewoptions']);
+            $default_values['urlpreview'] = $urlpreviewoptions; 
         }
     }
 

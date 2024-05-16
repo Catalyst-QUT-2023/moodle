@@ -93,7 +93,6 @@ if ($redirect && !$forceview) {
     }
     redirect($fullurl);
 }
-
 switch ($displaytype) {
     case RESOURCELIB_DISPLAY_EMBED:
         url_display_embed($url, $cm, $course);
@@ -101,18 +100,8 @@ switch ($displaytype) {
     case RESOURCELIB_DISPLAY_FRAME:
         url_display_frame($url, $cm, $course);
         break;
-    case RESOURCELIB_DISPLAY_POPUP:
+    default:
         url_print_workaround($url, $cm, $course);
         break;
-    default:
-        if ($previewtype === 'full') {
-            url_display_full($url, $course);
-        } else if ($previewtype === 'slim') {
-            url_display_slim($url, $course);
-        } else if ($previewtype === 'none') {
-            url_display_none($url, $course);
-        } else {
-            url_print_workaround($url, $cm, $course);
-        }
-        break;
 }
+

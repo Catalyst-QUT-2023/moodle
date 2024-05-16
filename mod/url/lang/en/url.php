@@ -91,6 +91,7 @@ $string['serverurl'] = 'Server URL';
 $string['url:addinstance'] = 'Add a new URL resource';
 $string['urlpreviewoptions'] = 'Available URL Preview Options';
 $string['urlpreviewselect'] = 'URL Preview';
+$string['urlpreviewselectexplain'] = 'Choose urlpreview type, the default is set as None';
 $string['urlpreviewselect_help'] = 'This settin determines how the preview is displayed. Options may include:
 
 * Full - The unfuled URL is displayed within a full frame 
