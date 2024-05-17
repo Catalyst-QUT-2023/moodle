@@ -620,11 +620,66 @@ class moodle_url {
         if ($querystring !== '') {
             $uri .= '?' . $querystring;
         }
-        if (!is_null($this->anchor)) {
-            $uri .= '#'.$this->anchor;
-        }
+
+        $uri .= $this->get_encoded_anchor();
 
         return $uri;
+    }
+
+    /**
+     * Encode the anchor according to RFC 3986.
+     *
+     * @return string The encoded anchor
+     */
+    public function get_encoded_anchor(): string {
+        if (is_null($this->anchor)) {
+            return '';
+        }
+
+        // RFC 3986 allows the following characters in a fragment without them being encoded:
+        // pct-encoded: "%" HEXDIG HEXDIG
+        // unreserved:  ALPHA / DIGIT / "-" / "." / "_" / "~" /
+        // sub-delims:  "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "=" / ":" / "@"
+        // fragment:    "/" / "?"
+        //
+        // All other characters should be encoded.
+        // These should not be encoded in the fragment unless they were already encoded.
+
+        // The following characters are allowed in the fragment without encoding.
+        // In addition to this list is pct-encoded, but we can't easily handle this with a regular expression.
+        $allowed = 'a-zA-Z0-9\\-._~!$&\'()*+,;=:@\/?';
+        $anchor = '#';
+
+        $remainder = $this->anchor;
+        do {
+            // Split the string on any %.
+            $parts = explode('%', $remainder, 2);
+            $anchorparts = array_shift($parts);
+
+            // The first part can go through our preg_replace_callback to quote any relevant characters.
+            $anchor .= preg_replace_callback(
+                '/[^' . $allowed . ']/',
+                fn ($matches) => rawurlencode($matches[0]),
+                $anchorparts,
+            );
+
+            // The second part _might_ be a valid pct-encoded character.
+            if (count($parts) === 0) {
+                break;
+            }
+
+            // If the second part is a valid pct-encoded character, append it to the anchor.
+            $remainder = array_shift($parts);
+            if (preg_match('/^[a-fA-F0-9]{2}/', $remainder, $matches)) {
+                $anchor .= "%{$matches[0]}";
+                $remainder = substr($remainder, 2);
+            } else {
+                // This was not a valid pct-encoded character. Encode the % and continue with the next part.
+                $anchor .= rawurlencode('%');
+            }
+        } while (strlen($remainder) > 0);
+
+        return $anchor;
     }
 
     /**
@@ -640,8 +695,8 @@ class moodle_url {
         $uri .= $this->host ? $this->host : '';
         $uri .= $this->port ? ':'.$this->port : '';
         $uri .= $this->path ? $this->path : '';
-        if ($includeanchor and !is_null($this->anchor)) {
-            $uri .= '#' . $this->anchor;
+        if ($includeanchor) {
+            $uri .= $this->get_encoded_anchor();
         }
 
         return $uri;
@@ -717,15 +772,8 @@ class moodle_url {
         if (is_null($anchor)) {
             // Remove.
             $this->anchor = null;
-        } else if ($anchor === '') {
-            // Special case, used as empty link.
-            $this->anchor = '';
-        } else if (preg_match('|[a-zA-Z\_\:][a-zA-Z0-9\_\-\.\:]*|', $anchor)) {
-            // Match the anchor against the NMTOKEN spec.
-            $this->anchor = $anchor;
         } else {
-            // Bad luck, no valid anchor found.
-            $this->anchor = null;
+            $this->anchor = $anchor;
         }
     }
 
@@ -819,7 +867,7 @@ class moodle_url {
      * @param int $contextid
      * @param string $component
      * @param string $area
-     * @param int $itemid
+     * @param ?int $itemid
      * @param string $pathname
      * @param string $filename
      * @param bool $forcedownload
@@ -1446,7 +1494,7 @@ function reset_text_filters_cache($phpunitreset = false) {
  * @staticvar bool $strcache
  * @param string $string The string to be filtered. Should be plain text, expect
  * possibly for multilang tags.
- * @param boolean $striplinks To strip any link in the result text. Moodle 1.8 default changed from false to true! MDL-8713
+ * @param ?bool $striplinks To strip any link in the result text. Moodle 1.8 default changed from false to true! MDL-8713
  * @param array $options options array/object or courseid
  * @return string
  */
@@ -2643,7 +2691,7 @@ function print_group_picture($group, $courseid, $large = false, $return = false,
  *                 user whose id is the value indicated.
  *                 If the group picture is included in an e-mail or some other location where the audience is a specific
  *                 user who will not be logged in when viewing, then we use a token to authenticate the user.
- * @return moodle_url Returns the url for the group picture.
+ * @return ?moodle_url Returns the url for the group picture.
  */
 function get_group_picture_url($group, $courseid, $large = false, $includetoken = false) {
     global $CFG;
@@ -2678,7 +2726,7 @@ function get_group_picture_url($group, $courseid, $large = false, $includetoken 
  * @param string $link The link to wrap around the text
  * @param bool $return If set to true the HTML is returned rather than echo'd
  * @param string $viewfullnames
- * @return string If $retrun was true returns HTML for a recent activity notice.
+ * @return ?string If $retrun was true returns HTML for a recent activity notice.
  */
 function print_recent_activity_note($time, $user, $text, $link, $return=false, $viewfullnames=null) {
     static $strftimerecent = null;
@@ -2813,7 +2861,7 @@ function navmenulist($course, $sections, $modinfo, $strsection, $strjumpto, $wid
  * @param string $current
  * @param boolean $includenograde Include those with no grades
  * @param boolean $return If set to true returns rather than echo's
- * @return string|bool Depending on value of $return
+ * @return string|bool|null Depending on value of $return
  */
 function print_grade_menu($courseid, $name, $current, $includenograde=true, $return=false) {
     global $OUTPUT;

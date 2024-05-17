@@ -14,22 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Report plugins helper class
- *
- * @package core
- * @subpackage report
- * @copyright 2021 Sujith Haridasan
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace core;
-use moodle_url;
+
+use context_course;
+use stdClass;
 
 /**
  * A helper class with static methods to help report plugins
  *
  * @package core
+ * @subpackage report
  * @copyright 2021 Sujith Haridasan
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -91,23 +85,77 @@ class report_helper {
     }
 
     /**
-     * Save the last selected report in the session
-     *
      * @deprecated since Moodle 4.0
-     * @param int $id The course id
-     * @param moodle_url $url The moodle url
-     * @return void
      */
-    public static function save_selected_report(int $id, moodle_url $url): void {
-        global $USER;
+    #[\core\attribute\deprecated(null, reason: 'It is no longer used', since: '4.0', final: true)]
+    public static function save_selected_report() {
+        \core\deprecation::emit_deprecation_if_present([self::class, __FUNCTION__]);
+    }
 
-        debugging('save_selected_report() has been deprecated because it is no longer used and will be '.
-            'removed in future versions of Moodle', DEBUG_DEVELOPER);
-
-        // Last selected report.
-        if (!isset($USER->course_last_report)) {
-            $USER->course_last_report = [];
+    /**
+     * Retrieve the right SQL / params for the group filter depending on the filterparams, course and group settings.
+     *
+     * Addionnaly, it will return the list of users visible by the current user so
+     * it can be used to filter out records that are not visible. This is mainly
+     * because we cannot use joins as the log tables can be in two different databases.
+     *
+     * @param stdClass $filterparams
+     * @return array
+     */
+    public static function get_group_filter(stdClass $filterparams): array {
+        global $DB, $USER;
+        $useridfilter = null;
+        // First and just in case we are in separate group, just set the $useridfilter to the list
+        // of users visible by this user.
+        $courseid = $filterparams->courseid ?? SITEID;
+        $courseid = $courseid ?: SITEID; // Make sure that if courseid is set to 0 we use SITEID.
+        $course = get_course($courseid);
+        $groupmode = groups_get_course_groupmode($course);
+        $groupid = $filterparams->groupid ?? 0;
+        if ($groupmode == SEPARATEGROUPS || $groupid) {
+            $context = context_course::instance($courseid);
+            if ($groupid) {
+                $cgroups = [(int) $groupid];
+            } else {
+                $cgroups = groups_get_all_groups(
+                    $courseid,
+                    has_capability('moodle/site:accessallgroups', $context) ? 0 : $USER->id
+                );
+                $cgroups = array_keys($cgroups);
+                // If that's the case, limit the users to be in the groups only, defined by the filter.
+                if (has_capability('moodle/site:accessallgroups', $context) || empty($cgroups)) {
+                    $cgroups[] = USERSWITHOUTGROUP;
+                }
+            }
+            // If that's the case, limit the users to be in the groups only, defined by the filter.
+            [$groupmembersql, $groupmemberparams] = groups_get_members_ids_sql($cgroups, $context);
+            $groupusers = $DB->get_fieldset_sql($groupmembersql, $groupmemberparams);
+            $useridfilter = array_fill_keys($groupusers, true);
         }
-        $USER->course_last_report[$id] = $url;
+        $joins = [];
+        $params = [];
+        if (empty($filterparams->userid)) {
+            if ($groupid) {
+                if ($thisgroupusers = groups_get_members($groupid)) {
+                    [$sql, $sqlfilterparams] = $DB->get_in_or_equal(
+                        array_keys($thisgroupusers),
+                        SQL_PARAMS_NAMED,
+                    );
+                    $joins[] = "userid {$sql}";
+                    $params = $sqlfilterparams;
+                } else {
+                    $joins[] = 'userid = 0'; // No users in groups, so we want something that will always be false.
+                }
+            }
+        } else {
+            $joins[] = "userid = :userid";
+            $params['userid'] = $filterparams->userid;
+        }
+
+        return [
+            'joins' => $joins,
+            'params' => $params,
+            'useridfilter' => $useridfilter,
+        ];
     }
 }

@@ -120,16 +120,23 @@ class helper {
             throw new \coding_exception('Invalid action provided.');
         }
 
-        // Get the group mode for this course.
-        $groupmode = $course->groupmode ?? get_course(courseid: $course->id)->groupmode;
         $coursecontext = \context_course::instance(courseid: $course->id);
 
-        // If group mode is not set, then just handle the update normally for these users.
+        $communication = self::load_by_course(
+            courseid: $course->id,
+            context: $coursecontext,
+        );
+
+        // Check we have communication correctly set up before proceeding.
+        if ($communication->get_processor() === null) {
+            return;
+        }
+
+        // Get the group mode for this course.
+        $groupmode = $course->groupmode ?? get_course(courseid: $course->id)->groupmode;
+
         if ((int)$groupmode === NOGROUPS) {
-            $communication = self::load_by_course(
-                courseid: $course->id,
-                context: $coursecontext,
-            );
+            // If group mode is not set, then just handle the update normally for these users.
             $communication->$memberaction($userids);
         } else {
             // If group mode is set, then handle the update for these users with repect to the group they are in.
@@ -424,11 +431,9 @@ class helper {
             $provider = $coursecommunication->get_provider();
         }
 
-        // This nasty logic is here because of hide course doesn't pass anything in the data object.
-        if (!empty($course->communicationroomname)) {
-            $coursecommunicationroomname = $course->communicationroomname;
-        } else {
-            $coursecommunicationroomname = $course->fullname ?? get_course($course->id)->fullname;
+        // Determine the communication room name if none was provided and add it to the course data.
+        if (empty($course->communicationroomname)) {
+            $course->communicationroomname = $course->fullname ?? get_course($course->id)->fullname;
         }
 
         // List of enrolled users for course communication.
@@ -460,7 +465,7 @@ class helper {
             $communication->configure_room_and_membership_by_provider(
                 provider: $provider,
                 instance: $course,
-                communicationroomname: $coursecommunicationroomname,
+                communicationroomname: $course->communicationroomname,
                 users: $enrolledusers,
                 instanceimage: $courseimage,
             );
@@ -475,30 +480,21 @@ class helper {
             $communication = self::load_by_course(
                 courseid: $course->id,
                 context: $coursecontext,
-                provider: $provider === processor::PROVIDER_NONE ? null : $provider,
             );
 
-            if ($communication->get_processor() === null) {
-                // If a course communication instance is not created, create one.
-                $communication->create_and_configure_room(
-                    communicationroomname: $coursecommunicationroomname,
-                    avatar: $courseimage,
-                    instance: $course,
-                    queue: false,
-                );
-            } else {
-                $communication->remove_all_members_from_room();
-                // Now update the course communication instance with the latest changes.
-                // We are not making room for this instance as it is a group mode enabled course.
-                // If provider is none, then we will make the room inactive, otherwise always active in group mode.
-                $communication->update_room(
-                    active: $provider === processor::PROVIDER_NONE ? processor::PROVIDER_INACTIVE : processor::PROVIDER_ACTIVE,
-                    communicationroomname: $coursecommunicationroomname,
-                    avatar: $courseimage,
-                    instance: $course,
-                    queue: false,
-                );
-            }
+            // Now handle the course communication according to the provider.
+            $communication->configure_room_and_membership_by_provider(
+                provider: $provider,
+                instance: $course,
+                communicationroomname: $course->communicationroomname,
+                users: $enrolledusers,
+                instanceimage: $courseimage,
+                queue: false,
+            );
+
+            // As the course is in group mode, make sure no users are in the course room.
+            $communication->reload();
+            $communication->remove_all_members_from_room();
         }
     }
 
@@ -536,12 +532,34 @@ class helper {
                 groupid: $coursegroup->id,
                 context: $coursecontext,
             );
+
+            $communicationroomname = self::format_group_room_name(
+                baseroomname: $course->communicationroomname,
+                groupname: $coursegroup->name,
+            );
+
             $communication->configure_room_and_membership_by_provider(
                 provider: $provider,
                 instance: $course,
-                communicationroomname: $coursegroup->name,
+                communicationroomname: $communicationroomname,
                 users: $groupuserstoadd,
             );
         }
+    }
+
+    /**
+     * Format a group communication room name with the following syntax: 'Group A (Course 1)'.
+     *
+     * @param string $baseroomname The base room name.
+     * @param string $groupname The group name.
+     */
+    public static function format_group_room_name(
+        string $baseroomname,
+        string $groupname
+    ): string {
+        return get_string('communicationgrouproomnameformat', 'core_communication', [
+            'groupname' => $groupname,
+            'baseroomname' => $baseroomname,
+        ]);
     }
 }

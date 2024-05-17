@@ -378,7 +378,6 @@ abstract class backup_cron_automated_helper {
         global $DB;
 
         $asynctask = new \core\task\course_backup_task();
-        $asynctask->set_blocking(false);
         $asynctask->set_custom_data(array(
             'courseid' => $backupcourse->courseid,
             'adminid' => $admin->id
@@ -797,7 +796,7 @@ abstract class backup_cron_automated_helper {
 
         // Exclude events defined by hook.
         $hook = new \core_backup\hook\before_course_modified_check();
-        \core\hook\manager::get_instance()->dispatch($hook);
+        \core\di::get(\core\hook\manager::class)->dispatch($hook);
 
         foreach ($readers as $readerpluginname => $reader) {
             $params = [

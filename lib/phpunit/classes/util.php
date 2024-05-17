@@ -23,6 +23,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\di;
+use core\hook;
+
 require_once(__DIR__.'/../../testing/classes/util.php');
 require_once(__DIR__ . "/coverage_info.php");
 
@@ -105,10 +108,7 @@ class phpunit_util extends testing_util {
         global $DB, $CFG, $USER, $SITE, $COURSE, $PAGE, $OUTPUT, $SESSION, $FULLME, $FILTERLIB_PRIVATE;
 
         // Stop all hook redirections.
-        \core\hook\manager::get_instance()->phpunit_stop_redirections();
-
-        // Reset the hook manager instance.
-        \core\hook\manager::phpunit_reset_instance();
+        di::get(hook\manager::class)->phpunit_stop_redirections();
 
         // Stop any message redirection.
         self::stop_message_redirection();
@@ -988,6 +988,16 @@ class phpunit_util extends testing_util {
      */
     protected static function pad(string $string, int $level): string {
         return str_repeat(" ", $level * 2) . "{$string}\n";
+    }
+
+    /**
+     * Normalise any text to always use unix line endings (line-feeds).
+     *
+     * @param   string  $text The text to normalize
+     * @return  string
+     */
+    public static function normalise_line_endings(string $text): string {
+        return str_replace(["\r\n", "\r"], "\n", $text);
     }
 
     /**

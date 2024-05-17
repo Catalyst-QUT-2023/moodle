@@ -556,11 +556,6 @@ span.editinstructions {
     vertical-align: text-bottom;
 }
 
-#coursesearch {
-    margin-top: 1em;
-    text-align: left;
-}
-
 #page-course-pending .pendingcourserequests {
     margin-bottom: 1em;
 }
@@ -985,43 +980,6 @@ span.editinstructions {
 }
 
 /** Management header styling **/
-.coursecat-management-header {
-    vertical-align: middle;
-
-    h2 {
-        display: inline-block;
-        text-align: left;
-    }
-
-    > div {
-        float: right;
-
-        > div {
-            margin: 10px 0 10px 1em;
-            display: inline-block;
-        }
-    }
-
-    select {
-        max-width: 300px;
-        cursor: pointer;
-        padding: 0.4em 0.5em 0.45em 1em;
-        vertical-align: baseline;
-        white-space: nowrap;
-    }
-
-    .view-mode-selector {
-        .moodle-actionmenu {
-            white-space: nowrap;
-            display: inline-block;
-        }
-
-        .moodle-actionmenu[data-enhanced].show .menu a {
-            padding-left: 1em;
-        }
-    }
-}
-
 .course-being-dragged-proxy {
     border: 0;
     color: $link-color;
@@ -1193,6 +1151,12 @@ $divider-hover-color: $primary !default;
 
     .sectionbadges .badge {
         margin-left: map-get($spacers, 2);
+        font-weight: normal;
+        .icon {
+            font-size: 12px;
+            width: 12px;
+            height: 12px;
+        }
     }
 
     .course-section-header.draggable {
@@ -1257,6 +1221,11 @@ $divider-hover-color: $primary !default;
     .section_goto .icon {
         font-size: $font-size-lg;
         color: $primary;
+    }
+
+    // Add new z-index context for dnd overlay higher divider buttons and quick edit links.
+    .overlay-preview {
+        z-index: 5;
     }
 }
 
@@ -1678,6 +1647,26 @@ $divider-hover-color: $primary !default;
     @include media-breakpoint-down(sm) {
         .course-content {
             margin-left: 2rem;
+        }
+    }
+}
+
+// Custom styles for bulk actions sticky footer in small devices.
+.sticky-footer-content.bulkactions {
+    @include media-breakpoint-down(sm) {
+        position: relative;
+        .form-check,
+        .bulkaction-name,
+        .bulkcount {
+            display: none;
+        }
+        .actions button {
+            padding: 0 map-get($spacers, 2);
+        }
+        .bulkcancel {
+            position: absolute;
+            top: 0;
+            right: 0;
         }
     }
 }

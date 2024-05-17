@@ -137,7 +137,7 @@ function enrol_get_plugins($enabled) {
 /**
  * Returns instance of enrol plugin
  * @param  string $name name of enrol plugin ('manual', 'guest', ...)
- * @return enrol_plugin
+ * @return ?enrol_plugin
  */
 function enrol_get_plugin($name) {
     global $CFG;
@@ -1476,7 +1476,7 @@ function is_enrolled(context $context, $user = null, $withcapability = '', $only
  * @param string|array $capability optional, may include a capability name, or array of names.
  *      If an array is provided then this is the equivalent of a logical 'OR',
  *      i.e. the user needs to have one of these capabilities.
- * @param int|array $groupids The groupids, 0 or [] means all groups and USERSWITHOUTGROUP no group
+ * @param int|array|null $groupids The groupids, 0 or [] means all groups and USERSWITHOUTGROUP no group
  * @param bool $onlyactive consider only active enrolments in enabled plugins and time restrictions
  * @param bool $onlysuspended inverse of onlyactive, consider only suspended enrolments
  * @param int $enrolid The enrolment ID. If not 0, only users enrolled using this enrolment method will be returned.
@@ -1528,7 +1528,7 @@ function get_enrolled_with_capabilities_join(context $context, $prefix = '', $ca
  *
  * @param context $context
  * @param string $withcapability
- * @param int|array $groupids The groupids, 0 or [] means all groups and USERSWITHOUTGROUP no group
+ * @param int|array|null $groupids The groupids, 0 or [] means all groups and USERSWITHOUTGROUP no group
  * @param bool $onlyactive consider only active enrolments in enabled plugins and time restrictions
  * @param bool $onlysuspended inverse of onlyactive, consider only suspended enrolments
  * @param int $enrolid The enrolment ID. If not 0, only users enrolled using this enrolment method will be returned.
@@ -1963,7 +1963,6 @@ abstract class enrol_plugin {
      * Sets plugin config value
      * @param  string $name name of config
      * @param  string $value string config value, null means delete
-     * @return string value
      */
     public function set_config($name, $value) {
         $pluginname = $this->get_name();
@@ -2238,7 +2237,7 @@ abstract class enrol_plugin {
         }
 
         // Dispatch the hook for pre user enrolment update actions.
-        $hook = new \core_enrol\hook\before_user_enrolment_update(
+        $hook = new \core_enrol\hook\before_user_enrolment_updated(
             enrolinstance: $instance,
             userenrolmentinstance: $ue,
             statusmodified: $statusmodified,
@@ -2298,7 +2297,7 @@ abstract class enrol_plugin {
         }
 
         // Dispatch the hook for pre user unenrolment actions.
-        $hook = new \core_enrol\hook\before_user_enrolment_remove(
+        $hook = new \core_enrol\hook\before_user_enrolment_removed(
             enrolinstance: $instance,
             userenrolmentinstance: $ue,
         );
@@ -2428,7 +2427,7 @@ abstract class enrol_plugin {
     /**
      * Returns link to page which may be used to add new instance of enrolment plugin in course.
      * @param int $courseid
-     * @return moodle_url page url
+     * @return ?moodle_url page url
      */
     public function get_newinstance_link($courseid) {
         // override for most plugins, check if instance already exists in cases only one instance is supported
@@ -2469,7 +2468,7 @@ abstract class enrol_plugin {
      * Does the access control tests automatically.
      *
      * @param object $instance
-     * @return moodle_url
+     * @return ?moodle_url
      */
     public function get_manual_enrol_link($instance) {
         return NULL;
@@ -2479,7 +2478,7 @@ abstract class enrol_plugin {
      * Returns list of unenrol links for all enrol instances in course.
      *
      * @param stdClass $instance
-     * @return moodle_url or NULL if self unenrolment not supported
+     * @return ?moodle_url or NULL if self unenrolment not supported
      */
     public function get_unenrolself_link($instance) {
         global $USER, $CFG, $DB;
@@ -2665,7 +2664,7 @@ abstract class enrol_plugin {
      * Not all plugins support this.
      *
      * @param object $course
-     * @return int id of new instance or null if no default supported
+     * @return ?int id of new instance or null if no default supported
      */
     public function add_default_instance($course) {
         return null;
@@ -2763,7 +2762,7 @@ abstract class enrol_plugin {
         }
 
         // Dispatch the hook for pre enrol instance delete actions.
-        $hook = new \core_enrol\hook\before_enrol_instance_delete(
+        $hook = new \core_enrol\hook\before_enrol_instance_deleted(
             enrolinstance: $instance,
         );
         \core\di::get(\core\hook\manager::class)->dispatch($hook);
@@ -3548,33 +3547,13 @@ abstract class enrol_plugin {
      * This is called from the tool_uploadcourse if the plugin supports instance creation in
      * upload course ({@see self::is_csv_upload_supported()})
      *
-     * The fallback is to call the edit_instance_validation() but it will be better if the plugins
-     * implement this method to return better error messages.
+     * Override it if plugin can validate provided data in relevant context.
      *
      * @param array $enrolmentdata enrolment data to validate.
      * @param int|null $courseid Course ID.
      * @return lang_string|null Error
      */
     public function validate_plugin_data_context(array $enrolmentdata, ?int $courseid = null): ?lang_string {
-        global $DB;
-
-        if ($courseid) {
-            $enrolmentdata += ['courseid' => $courseid, 'id' => 0, 'status' => ENROL_INSTANCE_ENABLED];
-            $instance = (object)[
-                'id' => null,
-                'courseid' => $courseid,
-                'status' => $enrolmentdata['status'],
-                'type' => $this->get_name(),
-            ];
-            if (array_key_exists('role', $enrolmentdata)) {
-                $instance->roleid = $DB->get_field('role', 'id', ['shortname' => $enrolmentdata['role']]);
-            }
-            $formerrors = $this->edit_instance_validation($enrolmentdata, [], $instance, context_course::instance($courseid));
-            if (!empty($formerrors)) {
-                $errors = array_map(fn($key) => "{$key}: {$formerrors[$key]}", array_keys($formerrors));
-                return new lang_string('errorcannotcreateorupdateenrolment', 'tool_uploadcourse', $errors);
-            }
-        }
         return null;
     }
 
@@ -3590,5 +3569,163 @@ abstract class enrol_plugin {
         // By default, we assume we can't uniquely identify an instance so better not update any.
         // Plugins can override this if they can uniquely identify an instance.
         return null;
+    }
+
+    /**
+     * Get the "from" contact which the message will be sent from.
+     *
+     * @param int $sendoption send email from constant ENROL_SEND_EMAIL_FROM_*
+     * @param context $context where the user will be fetched from.
+     * @return null|stdClass the contact user object.
+     */
+    public function get_welcome_message_contact(
+        int $sendoption,
+        context $context,
+    ): ?stdClass {
+        global $CFG;
+
+        $acceptedsendoptions = [
+            ENROL_DO_NOT_SEND_EMAIL,
+            ENROL_SEND_EMAIL_FROM_COURSE_CONTACT,
+            ENROL_SEND_EMAIL_FROM_KEY_HOLDER,
+            ENROL_SEND_EMAIL_FROM_NOREPLY,
+        ];
+        if (!in_array($sendoption, $acceptedsendoptions)) {
+            throw new coding_exception('Invalid send option');
+        }
+        if ($sendoption === ENROL_DO_NOT_SEND_EMAIL) {
+            return null;
+        }
+        $contact = null;
+        // Send as the first user assigned as the course contact.
+        if ($sendoption === ENROL_SEND_EMAIL_FROM_COURSE_CONTACT) {
+            $rusers = [];
+            if (!empty($CFG->coursecontact)) {
+                $croles = explode(',', $CFG->coursecontact);
+                [$sort, $sortparams] = users_order_by_sql('u');
+                // We only use the first user.
+                $i = 0;
+                do {
+                    $userfieldsapi = \core_user\fields::for_name();
+                    $allnames = $userfieldsapi->get_sql('u', false, '', '', false)->selects;
+                    $rusers = get_role_users($croles[$i], $context, true, 'u.id,  u.confirmed, u.username, '. $allnames . ',
+                    u.email, r.sortorder, ra.id AS raid', 'r.sortorder, ra.id ASC, ' . $sort, null, '', '', '', '', $sortparams);
+                    $i++;
+                } while (empty($rusers) && !empty($croles[$i]));
+            }
+            if ($rusers) {
+                $contact = array_values($rusers)[0];
+            }
+        } else if ($sendoption === ENROL_SEND_EMAIL_FROM_KEY_HOLDER) {
+            // Send as the first user with enrol/self:holdkey capability assigned in the course.
+            [$sort] = users_order_by_sql('u');
+            $keyholders = get_users_by_capability($context, 'enrol/self:holdkey', 'u.*', $sort);
+            if (!empty($keyholders)) {
+                $contact = array_values($keyholders)[0];
+            }
+        }
+
+        if ($sendoption === ENROL_SEND_EMAIL_FROM_NOREPLY) {
+            $contact = core_user::get_noreply_user();
+        }
+
+        return $contact;
+    }
+
+    /**
+     * Send course welcome message to user.
+     *
+     * @param stdClass $instance Enrol instance.
+     * @param int $userid User ID.
+     * @param int $sendoption Send email from constant ENROL_SEND_EMAIL_FROM_*
+     * @param null|string $message Message to send to the user.
+     */
+    public function send_course_welcome_message_to_user(
+        stdClass $instance,
+        int $userid,
+        int $sendoption,
+        ?string $message = '',
+    ): void {
+        global $DB;
+        $context = context_course::instance($instance->courseid);
+        $user = core_user::get_user($userid);
+        $course = get_course($instance->courseid);
+        $courserole = $DB->get_field(
+            table: 'role',
+            return: 'shortname',
+            conditions: ['id' => $instance->roleid],
+        );
+
+        $a = new stdClass();
+        $a->coursename = format_string($course->fullname, true, ['context' => $context]);
+        $a->profileurl = (new moodle_url(
+            url: '/user/view.php',
+            params: [
+                'id' => $user->id,
+                'course' => $instance->courseid,
+            ],
+        ))->out();
+        $a->fullname = fullname($user);
+
+        if ($message && trim($message) !== '') {
+            $placeholders = [
+                '{$a->coursename}',
+                '{$a->profileurl}',
+                '{$a->fullname}',
+                '{$a->email}',
+                '{$a->firstname}',
+                '{$a->lastname}',
+                '{$a->courserole}',
+            ];
+            $values = [
+                $a->coursename,
+                $a->profileurl,
+                fullname($user),
+                $user->email,
+                $user->firstname,
+                $user->lastname,
+                $courserole,
+            ];
+            $message = str_replace($placeholders, $values, $message);
+            if (strpos($message, '<') === false) {
+                // Plain text only.
+                $messagetext = $message;
+                $messagehtml = text_to_html($messagetext, null, false, true);
+            } else {
+                // This is most probably the tag/newline soup known as FORMAT_MOODLE.
+                $messagehtml = format_text($message, FORMAT_MOODLE,
+                    ['context' => $context, 'para' => false, 'newlines' => true, 'filter' => true]);
+                $messagetext = html_to_text($messagehtml);
+            }
+        } else {
+            $messagetext = get_string('customwelcomemessageplaceholder', 'core_enrol', $a);
+            $messagehtml = text_to_html($messagetext, null, false, true);
+        }
+
+        $subject = get_string('welcometocourse', 'moodle', format_string($course->fullname, true, ['context' => $context]));
+        $contact = $this->get_welcome_message_contact(
+            sendoption: $sendoption,
+            context: $context,
+        );
+        if (!$contact) {
+            // Cannot find the contact to send the message from.
+            return;
+        }
+
+        $message = new \core\message\message();
+        $message->courseid = $instance->courseid;
+        $message->component = 'moodle';
+        $message->name = 'enrolcoursewelcomemessage';
+        $message->userfrom = $contact;
+        $message->userto = $user;
+        $message->subject = $subject;
+        $message->fullmessage = $messagetext;
+        $message->fullmessageformat = FORMAT_MARKDOWN;
+        $message->fullmessagehtml = $messagehtml;
+        $message->notification = 1;
+        $message->contexturl = $a->profileurl;
+        $message->contexturlname = $course->fullname;
+
+        message_send($message);
     }
 }

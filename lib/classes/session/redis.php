@@ -213,6 +213,11 @@ class redis extends handler implements SessionHandlerInterface {
             throw new exception('sessionhandlerproblem', 'error', '', null, 'redis extension version must be at least 2.0');
         }
 
+        $result = session_set_save_handler($this);
+        if (!$result) {
+            throw new exception('redissessionhandlerproblem', 'error');
+        }
+
         $encrypt = (bool) ($this->sslopts ?? false);
         // Set Redis server(s).
         $trimmedservers = [];
@@ -257,27 +262,13 @@ class redis extends handler implements SessionHandlerInterface {
             try {
                 // Create a $redis object of a RedisCluster or Redis class.
                 if ($this->clustermode) {
-                    $this->connection = new \RedisCluster(
-                        name: null,
-                        seeds: $trimmedservers,
-                        timeout: 1,
-                        read_timeout: 1,
-                        persistent: true,
-                        auth: $this->auth,
-                        context: !empty($opts) ? $opts : null,
-                    );
+                    $this->connection = new \RedisCluster(null, $trimmedservers, 1, 1, true,
+                        $this->auth, !empty($opts) ? $opts : null);
                 } else {
                     $delay = rand(100, 500);
                     list($server, $port) = explode(':', $trimmedservers[0]);
                     $this->connection = new \Redis();
-                    $this->connection->connect(
-                        host: $server,
-                        port: $this->port ?? $port,
-                        timeout: 1,
-                        retry_interval: $delay,
-                        read_timeout: 1,
-                        context: $opts,
-                    );
+                    $this->connection->connect($server, $this->port ?? $port, 1, null, $delay, 1, $opts);
                     if ($this->auth !== '' && !$this->connection->auth($this->auth)) {
                         throw new $exceptionclass('Unable to authenticate.');
                     }

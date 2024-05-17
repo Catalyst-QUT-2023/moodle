@@ -870,7 +870,7 @@ function xmldb_main_upgrade($oldversion) {
         $field = new xmldb_field(
             name: 'attemptsavailable',
             type: XMLDB_TYPE_INTEGER,
-            precision: '1',
+            precision: '2',
             unsigned: null,
             notnull: null,
             sequence: null,

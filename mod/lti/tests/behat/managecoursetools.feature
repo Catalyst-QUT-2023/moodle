@@ -17,6 +17,8 @@ Feature: Manage course tools
     And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
+    And the following config values are set as admin:
+      | enableasyncbackup | 0 |
 
   Scenario: Create a course tool from the zero state
     Given I am on the "Course 1" course page logged in as teacher1
@@ -277,7 +279,7 @@ Feature: Manage course tools
     And I restore "test_backup.mbz" backup into a new course using this options:
       | Schema | Course name | Restored course |
     And I should see "Restored course"
-    And I click on "Add an activity or resource" "button" in the "New section" "section"
+    And I click on "Add an activity or resource" "button" in the "General" "section"
     Then I should not see "Teaching Tool 1" in the ".modal-body" "css_element"
     And I should see "Teaching Tool 2" in the ".modal-body" "css_element"
     And I should not see "Course Tool 2" in the ".modal-body" "css_element"

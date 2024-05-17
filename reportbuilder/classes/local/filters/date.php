@@ -67,6 +67,9 @@ class date extends base {
     /** @var int Date before [X relative date unit(s)] */
     public const DATE_BEFORE = 9;
 
+    /** @var int Date after [X relative date unit(s)] */
+    public const DATE_AFTER = 10;
+
     /** @var int Relative date unit for an hour */
     public const DATE_UNIT_HOUR = 0;
 
@@ -94,6 +97,7 @@ class date extends base {
             self::DATE_EMPTY => new lang_string('filterisempty', 'core_reportbuilder'),
             self::DATE_RANGE => new lang_string('filterrange', 'core_reportbuilder'),
             self::DATE_BEFORE => new lang_string('filterdatebefore', 'core_reportbuilder'),
+            self::DATE_AFTER => new lang_string('filterdateafter', 'core_reportbuilder'),
             self::DATE_LAST => new lang_string('filterdatelast', 'core_reportbuilder'),
             self::DATE_CURRENT => new lang_string('filterdatecurrent', 'core_reportbuilder'),
             self::DATE_NEXT => new lang_string('filterdatenext', 'core_reportbuilder'),
@@ -147,14 +151,14 @@ class date extends base {
             ->setHiddenLabel(true);
 
         // Date selectors for range operator.
-        $mform->addElement('date_selector', "{$this->name}_from", get_string('filterdatefrom', 'core_reportbuilder'),
-            ['optional' => true]);
+        $mform->addElement('date_selector', "{$this->name}_from",
+            get_string('filterfieldfrom', 'core_reportbuilder', $this->get_header()), ['optional' => true]);
         $mform->setType("{$this->name}_from", PARAM_INT);
         $mform->setDefault("{$this->name}_from", 0);
         $mform->hideIf("{$this->name}_from", "{$this->name}_operator", 'neq', self::DATE_RANGE);
 
-        $mform->addElement('date_selector', "{$this->name}_to", get_string('filterdateto', 'core_reportbuilder'),
-            ['optional' => true]);
+        $mform->addElement('date_selector', "{$this->name}_to",
+            get_string('filterfieldto', 'core_reportbuilder', $this->get_header()), ['optional' => true]);
         $mform->setType("{$this->name}_to", PARAM_INT);
         $mform->setDefault("{$this->name}_to", 0);
         $mform->hideIf("{$this->name}_to", "{$this->name}_operator", 'neq', self::DATE_RANGE);
@@ -208,6 +212,13 @@ class date extends base {
                 // We can use the start date of the "Last" operator as the end date here.
                 $sql = "{$fieldsql} < :{$param}";
                 $params[$param] = self::get_relative_timeframe(self::DATE_LAST, $dateunitvalue, $dateunit)[0];
+                break;
+            case self::DATE_AFTER:
+                $param = database::generate_param_name();
+
+                // We can use the end date of the "Next" operator as the start date here.
+                $sql = "{$fieldsql} > :{$param}";
+                $params[$param] = self::get_relative_timeframe(self::DATE_NEXT, $dateunitvalue, $dateunit)[1];
                 break;
             // Relative helper method can handle these three cases.
             case self::DATE_LAST:

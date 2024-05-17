@@ -1,6 +1,13 @@
 This files describes API changes in core libraries and APIs,
 information provided here is intended especially for developers.
 
+=== 4.5 ===
+
+* Final deprecation and removal of the function core_text::reset_caches().
+* The previously deprecated function `search_generate_text_SQL` has been removed and can no longer be used.
+* The following previously deprecated methods have been removed and can no longer be used:
+  - `renderer_base::should_display_main_logo`
+
 === 4.4 ===
 
 * New modinfo methods related to delegated sections (sections controlled by a component):
@@ -35,10 +42,19 @@ information provided here is intended especially for developers.
       By default, tasks will be retried until they succeed, other tasks can override this method to change this behaviour.
     - set_attempts_available(): Used to set the number of attempts available for the task
     - get_attempts_available(): Used to get the number of attempts available for the task.
+* Support for blocking tasks has been removed. See MDL-67667 for further information.
+  Please note that this feature never worked correctly and can cause serious performance issues.
+  It is also not possible to deprecate this feature in a notifiable way.
 * There is a new DML method $DB->get_fieldset. For some reason, this did not exist even though get_fieldset_select etc. did.
 * The following callbacks have been migrated to hooks:
   - before_standard_html_head() -> core\hook\output\before_standard_head_html_generation
   - bulk_user_actions() -> core_user\hook\extend_bulk_user_actions
+  - before_http_headers() -> core\hook\output\before_http_headers
+  - before_standard_top_of_body_html() -> core\hook\output\before_standard_top_of_body_html_generation
+  - standard_after_main_region_html() -> core\hook\output\after_standard_main_region_html_generation
+  - before_footer() -> core\hook\output\before_footer_html_generation
+  - standard_footer_html() -> core\hook\output\before_standard_footer_html_generation
+  - add_htmlattributes() -> core\hook\output\before_html_attributes
 * Deprecated PARAM_ types with the exception of PARAM_CLEAN now emit a deprecation exception. These were all deprecated in Moodle 2.0.
 * A new \core\attribute\deprecated attribute can be used to more clearly describe deprecated methods.
 * A new \core\deprecation class can be used to inspect for deprecated attributes:
@@ -97,8 +113,6 @@ information provided here is intended especially for developers.
 * Deprecated core\hook\manager::is_deprecated_plugin_callback() in favour of ::get_hooks_deprecating_plugin_callback(),
   which will return the classnames of hooks deprecating a callback, or null if it's not deprecated. The return value can be cast
   to bool if the original functionality is desired.
-* core\hook\manager::phpunit_get_instance() now sets self::$instance to the mocked instance if the optional $persist argument is
-  true, so future calls to ::get_instance() will return it.
 * The triggerSelector method in the `core/comboboxsearch/search_combobox` JS module is deprecated. It was not used.
 * PHPUnit has been upgraded to 9.6 (see MDL-81266 for details).
   The main goal of the update is to allow developers to know in advance,
@@ -137,6 +151,13 @@ information provided here is intended especially for developers.
     because there aren't cases in core.
   - Deprecation: Cannot use the "Test" suffix on abstract test case classes. Proceed to
     rename them to end with "TestCase" instead.
+* A new hook called after_failed_task_max_delay has been created. This hook will be triggered when an Ad-hoc or Scheduled task reaches its maximum failure delay.
+* There is a new method called enrol_plugin::get_welcome_message_contact() that returns the contact details for the course welcome message.
+* There is a new method called enrol_plugin::send_course_welcome_message_to_user() that sends the course welcome message to a user.
+* The list of standard, and deleted, plugins is now located as JSON at lib/plugins.json.
+* groups_get_user_groups() in grouplib has a new $includehidden paramater, which will return groups for user even if they have
+  GROUP_VISIBILITY_NONE. This is false by default, and should be used with care. The calling code must ensure that these groups
+  are not exposed to the user as this may be a privacy issue.
 
 === 4.3 ===
 

@@ -24546,8 +24546,8 @@ audio.mediaplugin_html5audio {
 .modchooser .modal-body .loading-icon .icon {
   display: block;
   font-size: 3em;
-  height: 1em;
-  width: 1em;
+  max-height: 3em;
+  max-width: 3em;
 }
 .modchooser .modal-body .carousel-item .loading-icon .icon {
   margin: 1em auto;
@@ -25282,9 +25282,9 @@ h3.sectionname .inplaceeditable.inplaceeditingon .editinstructions {
   transform: translate(-50%, -50%);
 }
 .overlay-icon-container .loading-icon .icon {
-  height: 30px;
-  width: 30px;
-  font-size: 30px;
+  max-height: 2em;
+  max-width: 2em;
+  font-size: 2em;
 }
 
 .w-auto {
@@ -26060,6 +26060,11 @@ blockquote {
   vertical-align: middle;
 }
 
+/* General card customisations. */
+.card.active {
+  border-color: #8f959e;
+}
+
 .action-menu .dropdown-toggle {
   text-decoration: none;
   display: inline-block;
@@ -26365,6 +26370,26 @@ body.behat-site .action-menu .dropdown-subpanel-content.show {
   margin: 0;
   height: 32px;
   width: 32px;
+}
+
+.icon-circle {
+  display: inline-block;
+  background-color: #c2cad1;
+  border-radius: 50%;
+  padding: 1.3rem;
+}
+.icon-circle .icon {
+  margin: 0;
+  text-align: center;
+  max-width: unset;
+  max-height: unset;
+  color: #000;
+}
+.icon-circle.reversed {
+  background-color: #b7c0c8;
+}
+.icon-circle.reversed .icon {
+  color: #fff;
 }
 
 :root {
@@ -26961,6 +26986,9 @@ body.behat-site .action-menu .dropdown-subpanel-content.show {
   background-color: #d7e4d6;
 }
 
+/**
+ Blocks
+ */
 .blockmovetarget .accesshide {
   position: relative;
   left: initial;
@@ -27090,76 +27118,36 @@ body.behat-site .action-menu .dropdown-subpanel-content.show {
   border-radius: 50%;
 }
 
-.dashboard-card-deck.one-row {
-  flex-flow: nowrap;
-  overflow-x: scroll;
+.card-grid {
+  display: flex;
+}
+.card-grid .card {
+  flex: 1;
+}
+.drawercontent .card-grid .col, .blockcolumn .card-grid .col {
+  flex: 0 0 auto;
+  max-width: 100%;
 }
 
-.summaryimage {
-  height: 5rem;
-  width: 5rem;
-  background-position: center;
-  background-size: cover;
+.card-carousel {
+  display: flex;
 }
-
-.dashboard-list-img {
-  height: 5rem;
-  width: 20rem;
-  background-position: center;
-  background-size: cover;
-}
-@media (max-width: 1199.98px) {
-  .dashboard-list-img {
-    width: 100%;
-  }
-}
-
-.dashboard-card-deck .dashboard-card {
-  margin-bottom: 0.5rem;
-  flex-basis: auto;
-  width: 100%;
-  flex-grow: 0;
-  flex-shrink: 0;
-}
-.dashboard-card-deck .dashboard-card .dashboard-card-img {
-  height: 7rem;
-  background-position: center;
-  background-size: cover;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-.dashboard-card-deck .dashboard-card .dashboard-card-footer {
-  padding: 0.8rem;
+.card-carousel .card {
+  flex: 1;
 }
 @media (min-width: 576px) {
-  .dashboard-card-deck.fixed-width-cards .dashboard-card {
-    width: 300px;
+  .card-carousel .card {
+    flex: 0 1 auto;
+    width: 240px;
     max-width: 100%;
   }
 }
 
-@media (min-width: 576px) {
-  .dashboard-card-deck:not(.fixed-width-cards) .dashboard-card {
-    width: calc(50% - 0.5rem);
-  }
-}
-@media (min-width: 840px) {
-  .dashboard-card-deck:not(.fixed-width-cards) .dashboard-card {
-    width: calc(33.33% - 0.5rem);
-  }
-}
-
-#block-region-side-pre .dashboard-card-deck:not(.fixed-width-cards) {
-  margin-left: 0;
-  margin-right: 0;
-}
-#block-region-side-pre .dashboard-card-deck:not(.fixed-width-cards) .dashboard-card {
-  width: calc(100% - 0.5rem) !important;
-}
-@media (max-width: 575.98px) {
-  #block-region-side-pre .dashboard-card-deck:not(.fixed-width-cards) .dashboard-card {
-    width: 100% !important;
-  }
+.course-card .card-img-top,
+.theme-card .card-img-top {
+  height: 7rem;
+  background-position: center;
+  background-size: cover;
 }
 
 .block_recentlyaccessedcourses .paging-bar-container {
@@ -27181,23 +27169,19 @@ body.behat-site .action-menu .dropdown-subpanel-content.show {
   width: 40px;
   height: 40px;
 }
-aside[id^=block-region-side-] .block_recentlyaccesseditems .dashboard-card-deck.one-row {
-  flex-flow: wrap;
-  overflow-x: hidden;
-}
-aside[id^=block-region-side-] .block_recentlyaccesseditems .dashboard-card-deck .card:nth-of-type(n+4) {
+aside[id^=block-region-side-] .block_recentlyaccesseditems .card:nth-of-type(n+4) {
   display: none;
 }
 #block-region-content .block_recentlyaccesseditems [data-region=more-items-button-container] {
   display: none;
 }
-.block_recentlyaccesseditems a.dashboard-card:hover, .block_recentlyaccesseditems a.dashboard-card:focus {
+.block_recentlyaccesseditems a.card:hover, .block_recentlyaccesseditems a.card:focus {
   text-decoration: none;
 }
-.block_recentlyaccesseditems a.dashboard-card:hover h6, .block_recentlyaccesseditems a.dashboard-card:focus h6 {
+.block_recentlyaccesseditems a.card:hover h6, .block_recentlyaccesseditems a.card:focus h6 {
   text-decoration: underline;
 }
-.block_recentlyaccesseditems a.dashboard-card small {
+.block_recentlyaccesseditems a.card small {
   color: #1d2125;
 }
 
@@ -27206,6 +27190,23 @@ aside[id^=block-region-side-] .block_recentlyaccesseditems .dashboard-card-deck 
 }
 .block_myoverview .paged-content-page-container {
   min-height: 13rem;
+}
+.block_myoverview .summary-image {
+  height: 5rem;
+  width: 5rem;
+  background-position: center;
+  background-size: cover;
+}
+.block_myoverview .list-image {
+  height: 5rem;
+  width: 20rem;
+  background-position: center;
+  background-size: cover;
+}
+@media (max-width: 1199.98px) {
+  .block_myoverview .list-image {
+    width: 100%;
+  }
 }
 
 .block_timeline .paged-content-page-container {
@@ -28485,11 +28486,6 @@ span.editinstructions .alert-link {
   vertical-align: text-bottom;
 }
 
-#coursesearch {
-  margin-top: 1em;
-  text-align: left;
-}
-
 #page-course-pending .pendingcourserequests {
   margin-bottom: 1em;
 }
@@ -28884,35 +28880,6 @@ span.editinstructions .alert-link {
 }
 
 /** Management header styling **/
-.coursecat-management-header {
-  vertical-align: middle;
-}
-.coursecat-management-header h2 {
-  display: inline-block;
-  text-align: left;
-}
-.coursecat-management-header > div {
-  float: right;
-}
-.coursecat-management-header > div > div {
-  margin: 10px 0 10px 1em;
-  display: inline-block;
-}
-.coursecat-management-header select {
-  max-width: 300px;
-  cursor: pointer;
-  padding: 0.4em 0.5em 0.45em 1em;
-  vertical-align: baseline;
-  white-space: nowrap;
-}
-.coursecat-management-header .view-mode-selector .moodle-actionmenu {
-  white-space: nowrap;
-  display: inline-block;
-}
-.coursecat-management-header .view-mode-selector .moodle-actionmenu[data-enhanced].show .menu a {
-  padding-left: 1em;
-}
-
 .course-being-dragged-proxy {
   border: 0;
   color: #0f6cbf;
@@ -29024,6 +28991,12 @@ span.editinstructions .alert-link {
 }
 .course-section .sectionbadges .badge {
   margin-left: 0.5rem;
+  font-weight: normal;
+}
+.course-section .sectionbadges .badge .icon {
+  font-size: 12px;
+  width: 12px;
+  height: 12px;
 }
 .course-section .course-section-header.draggable {
   cursor: move;
@@ -29069,6 +29042,9 @@ span.editinstructions .alert-link {
 .course-section .section_goto .icon {
   font-size: 1.171875rem;
   color: #0f6cbf;
+}
+.course-section .overlay-preview {
+  z-index: 5;
 }
 
 .btn.add-section {
@@ -29831,6 +29807,25 @@ span.editinstructions .alert-link {
 @media (max-width: 767.98px) {
   .bulkenabled .course-content {
     margin-left: 2rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .sticky-footer-content.bulkactions {
+    position: relative;
+  }
+  .sticky-footer-content.bulkactions .form-check,
+  .sticky-footer-content.bulkactions .bulkaction-name,
+  .sticky-footer-content.bulkactions .bulkcount {
+    display: none;
+  }
+  .sticky-footer-content.bulkactions .actions button {
+    padding: 0 0.5rem;
+  }
+  .sticky-footer-content.bulkactions .bulkcancel {
+    position: absolute;
+    top: 0;
+    right: 0;
   }
 }
 
@@ -31980,11 +31975,7 @@ table.question-bank-table {
   table-layout: fixed;
   overflow-x: scroll;
   width: min-content;
-}
-table.question-bank-table td,
-table.question-bank-table th {
-  max-width: 40vw;
-  width: max-content;
+  max-width: 100%;
 }
 table.question-bank-table th {
   text-align: left;
@@ -32528,12 +32519,6 @@ body.path-question-type .mform fieldset.hidden {
   }
   .que .content {
     margin: 0;
-  }
-}
-@media (max-width: 991.98px) {
-  .question-bank-table td,
-  .question-bank-table th {
-    max-width: 75vw;
   }
 }
 /* user.less */
@@ -33108,10 +33093,6 @@ div#dateselector-calendar-panel {
   z-index: 3100; /* Set higher than the z-index of the filemanager - see MDL-39047. */
 }
 
-fieldset.coursesearchbox label {
-  display: inline;
-}
-
 /**
  * Show the labels above text editors and file managers except on wide screens.
  */
@@ -33120,13 +33101,6 @@ fieldset.coursesearchbox label {
 #id_availabilityconditionsjson[aria-hidden=true],
 .availability-field [aria-hidden=true] {
   display: none;
-}
-
-.availability-field label {
-  display: inline-flex;
-}
-.availability-field .availability-group label {
-  vertical-align: top;
 }
 
 .availability-eye {
@@ -35155,8 +35129,8 @@ table .sticky-column {
   top: 200px;
 }
 .table-dynamic .loading-icon .icon {
-  height: 3rem;
-  width: 3rem;
+  max-height: 3rem;
+  max-width: 3rem;
   font-size: 3rem;
 }
 
@@ -36870,8 +36844,8 @@ span[data-flexitour=container][x-placement=right] div[data-role=arrow]:after, sp
   position: fixed;
 }
 .layout.fullscreen .loading-icon .icon {
-  width: 1em;
-  height: 1em;
+  max-width: 4em;
+  max-height: 4em;
   font-size: 4em;
 }
 
@@ -38646,9 +38620,9 @@ div.editor_atto_toolbar button .icon {
   padding: 1rem;
 }
 .moodlenet-share-dialog .modal-body .moodlenet-share-modal-content .loading-icon .icon {
-  width: 60px;
-  height: 60px;
-  font-size: 60px;
+  max-width: 4em;
+  max-height: 4em;
+  font-size: 4em;
 }
 .moodlenet-share-dialog .modal-body .moodlenet-share-modal-content .moodlenet-circle-status {
   height: 18rem;
