@@ -385,11 +385,13 @@ function get_whoops(): ?\Whoops\Run {
 
     // Append a custom handler to add some more information to the frames.
     $whoops->appendHandler(function ($exception, $inspector, $run) {
-        // Moodle exceptions often have a link to the Moodle docs pages for them.
-        // Add that to the first frame in the stack.
         $collection = $inspector->getFrames();
 
-        $isdebugging = str_ends_with($collection[1]->getFile(), '/lib/weblib.php');
+        // Detect if the Whoops handler was immediately invoked by a call to `debugging()`.
+        // If so, we remove the top frames in the collection to avoid showing the inner
+        // workings of debugging, and the point that we trigger the error that is picked up by Whoops.
+        $isdebugging = count($collection) > 2;
+        $isdebugging = $isdebugging && str_ends_with($collection[1]->getFile(), '/lib/weblib.php');
         $isdebugging = $isdebugging && $collection[2]->getFunction() === 'debugging';
 
         if ($isdebugging) {
@@ -398,6 +400,8 @@ function get_whoops(): ?\Whoops\Run {
                 return array_search($frame, $remove) === false;
             });
         } else {
+            // Moodle exceptions often have a link to the Moodle docs pages for them.
+            // Add that to the first frame in the stack.
             $info = get_exception_info($exception);
             if ($info->moreinfourl) {
                 $collection[0]->addComment("{$info->moreinfourl}", 'More info');
@@ -2080,10 +2084,10 @@ class bootstrap_renderer {
      * Returns nicely formatted error message in a div box.
      * @static
      * @param string $message error message
-     * @param string $moreinfourl (ignored in early errors)
-     * @param string $link (ignored in early errors)
-     * @param array $backtrace
-     * @param string $debuginfo
+     * @param ?string $moreinfourl (ignored in early errors)
+     * @param ?string $link (ignored in early errors)
+     * @param ?array $backtrace
+     * @param ?string $debuginfo
      * @return string
      */
     public static function early_error_content($message, $moreinfourl, $link, $backtrace, $debuginfo = null) {
@@ -2125,7 +2129,7 @@ class bootstrap_renderer {
      * @param string $link (ignored in early errors)
      * @param array $backtrace
      * @param string $debuginfo extra information for developers
-     * @return string
+     * @return ?string
      */
     public static function early_error($message, $moreinfourl, $link, $backtrace, $debuginfo = null, $errorcode = null) {
         global $CFG;

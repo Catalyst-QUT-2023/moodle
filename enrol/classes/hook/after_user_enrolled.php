@@ -28,7 +28,6 @@ use stdClass;
 #[\core\attribute\label('Allows plugins or features to perform actions after a user is enrolled in a course.')]
 #[\core\attribute\tags('enrol', 'user')]
 class after_user_enrolled {
-
     /**
      * Constructor for the hook.
      *
@@ -36,7 +35,9 @@ class after_user_enrolled {
      * @param stdClass $userenrolmentinstance The user enrolment instance.
      */
     public function __construct(
+        /** @var stdClass The enrol instance */
         public readonly stdClass $enrolinstance,
+        /** @var stdClass The user enrolment instance */
         public readonly stdClass $userenrolmentinstance,
     ) {
     }
@@ -48,5 +49,14 @@ class after_user_enrolled {
      */
     public function get_userid(): int {
         return $this->userenrolmentinstance->userid;
+    }
+
+    /**
+     * Get the enrol instance.
+     *
+     * @return stdClass The enrol instance.
+     */
+    public function get_enrolinstance(): stdClass {
+        return $this->enrolinstance;
     }
 }

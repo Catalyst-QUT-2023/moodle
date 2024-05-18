@@ -37,6 +37,12 @@
 
 use core\di;
 use core\hook\manager as hook_manager;
+use core\hook\output\after_standard_main_region_html_generation;
+use core\hook\output\before_footer_html_generation;
+use core\hook\output\before_html_attributes;
+use core\hook\output\before_http_headers;
+use core\hook\output\before_standard_footer_html_generation;
+use core\hook\output\before_standard_top_of_body_html_generation;
 use core\output\named_templatable;
 use core_completion\cm_completion_details;
 use core_course\output\activity_information;
@@ -415,25 +421,12 @@ class renderer_base {
     }
 
     /**
-     * Whether we should display the main logo.
      * @deprecated since Moodle 4.0
-     * @todo final deprecation. To be removed in Moodle 4.4 MDL-73165.
-     * @param int $headinglevel The heading level we want to check against.
-     * @return bool
      */
-    public function should_display_main_logo($headinglevel = 1) {
-        debugging('should_display_main_logo() is deprecated and will be removed in Moodle 4.4.', DEBUG_DEVELOPER);
-        // Only render the logo if we're on the front page or login page and the we have a logo.
-        $logo = $this->get_logo_url();
-        if ($headinglevel == 1 && !empty($logo)) {
-            if ($this->page->pagelayout == 'frontpage' || $this->page->pagelayout == 'login') {
-                return true;
-            }
-        }
-
-        return false;
+    #[\core\attribute\deprecated(null, reason: 'It is no longer used', since: '4.0', final: true)]
+    public function should_display_main_logo() {
+        \core\deprecation::emit_deprecation_if_present([self::class, __FUNCTION__]);
     }
-
 }
 
 
@@ -654,26 +647,22 @@ class core_renderer extends renderer_base {
      */
     public function htmlattributes() {
         $return = get_html_lang(true);
-        $attributes = array();
+
+        // Ensure that the callback exists prior to cache purge.
+        // This is a critical page path.
+        // TODO MDL-81134 Remove after LTS+1.
+        require_once(__DIR__ . '/classes/hook/output/before_html_attributes.php');
+
+        $hook = new before_html_attributes($this);
+
         if ($this->page->theme->doctype !== 'html5') {
-            $attributes['xmlns'] = 'http://www.w3.org/1999/xhtml';
+            $hook->add_attribute('xmlns', 'http://www.w3.org/1999/xhtml');
         }
 
-        // Give plugins an opportunity to add things like xml namespaces to the html element.
-        // This function should return an array of html attribute names => values.
-        $pluginswithfunction = get_plugins_with_function('add_htmlattributes', 'lib.php');
-        foreach ($pluginswithfunction as $plugins) {
-            foreach ($plugins as $function) {
-                $newattrs = $function();
-                unset($newattrs['dir']);
-                unset($newattrs['lang']);
-                unset($newattrs['xmlns']);
-                unset($newattrs['xml:lang']);
-                $attributes += $newattrs;
-            }
-        }
+        $hook->process_legacy_callbacks();
+        di::get(hook_manager::class)->dispatch($hook);
 
-        foreach ($attributes as $key => $val) {
+        foreach ($hook->get_attributes() as $key => $val) {
             $val = s($val);
             $return .= " $key=\"$val\"";
         }
@@ -704,8 +693,8 @@ class core_renderer extends renderer_base {
         // must always return a string containing valid html head content.
 
         $hook = new \core\hook\output\before_standard_head_html_generation($this);
-        di::get(hook_manager::class)->dispatch($hook);
         $hook->process_legacy_callbacks();
+        di::get(hook_manager::class)->dispatch($hook);
 
         // Allow a url_rewrite plugin to setup any dynamic head content.
         if (isset($CFG->urlrewriteclass) && !isset($CFG->upgraderunning)) {
@@ -811,22 +800,16 @@ class core_renderer extends renderer_base {
             $output .= "\n".$CFG->additionalhtmltopofbody;
         }
 
-        // Give subsystems an opportunity to inject extra html content. The callback
-        // must always return a string containing valid html.
-        foreach (\core_component::get_core_subsystems() as $name => $path) {
-            if ($path) {
-                $output .= component_callback($name, 'before_standard_top_of_body_html', [], '');
-            }
-        }
+        // Ensure that the callback exists prior to cache purge.
+        // This is a critical page path.
+        // TODO MDL-81134 Remove after LTS+1.
+        require_once(__DIR__ . '/classes/hook/output/before_standard_top_of_body_html_generation.php');
 
-        // Give plugins an opportunity to inject extra html content. The callback
-        // must always return a string containing valid html.
-        $pluginswithfunction = get_plugins_with_function('before_standard_top_of_body_html', 'lib.php');
-        foreach ($pluginswithfunction as $plugins) {
-            foreach ($plugins as $function) {
-                $output .= $function();
-            }
-        }
+        // Allow components to add content to the top of the body.
+        $hook = new before_standard_top_of_body_html_generation($this, $output);
+        $hook->process_legacy_callbacks();
+        di::get(hook_manager::class)->dispatch($hook);
+        $output = $hook->get_output();
 
         $output .= $this->maintenance_warning();
 
@@ -877,29 +860,21 @@ class core_renderer extends renderer_base {
      * @return string HTML fragment.
      */
     public function standard_footer_html() {
-        global $CFG;
-
-        $output = '';
         if (during_initial_install()) {
             // Debugging info can not work before install is finished,
             // in any case we do not want any links during installation!
-            return $output;
+            return '';
         }
 
-        // Give plugins an opportunity to add any footer elements.
-        // The callback must always return a string containing valid html footer content.
-        $pluginswithfunction = get_plugins_with_function('standard_footer_html', 'lib.php');
-        foreach ($pluginswithfunction as $plugins) {
-            foreach ($plugins as $function) {
-                $output .= $function();
-            }
-        }
+        // Ensure that the callback exists prior to cache purge.
+        // This is a critical page path.
+        // TODO MDL-81134 Remove after LTS+1.
+        require_once(__DIR__ . '/classes/hook/output/before_standard_footer_html_generation.php');
 
-        if (core_userfeedback::can_give_feedback()) {
-            $output .= html_writer::div(
-                $this->render_from_template('core/userfeedback_footer_link', ['url' => core_userfeedback::make_link()->out(false)])
-            );
-        }
+        $hook = new before_standard_footer_html_generation($this);
+        $hook->process_legacy_callbacks();
+        di::get(hook_manager::class)->dispatch($hook);
+        $output = $hook->get_output();
 
         if ($this->page->devicetypeinuse == 'legacy') {
             // The legacy theme is in use print the notification
@@ -1121,29 +1096,23 @@ class core_renderer extends renderer_base {
      */
     public function standard_after_main_region_html() {
         global $CFG;
-        $output = '';
+
+        // Ensure that the callback exists prior to cache purge.
+        // This is a critical page path.
+        // TODO MDL-81134 Remove after LTS+1.
+        require_once(__DIR__ . '/classes/hook/output/after_standard_main_region_html_generation.php');
+
+        $hook = new after_standard_main_region_html_generation($this);
+
         if ($this->page->pagelayout !== 'embedded' && !empty($CFG->additionalhtmlbottomofbody)) {
-            $output .= "\n".$CFG->additionalhtmlbottomofbody;
+            $hook->add_html("\n");
+            $hook->add_html($CFG->additionalhtmlbottomofbody);
         }
 
-        // Give subsystems an opportunity to inject extra html content. The callback
-        // must always return a string containing valid html.
-        foreach (\core_component::get_core_subsystems() as $name => $path) {
-            if ($path) {
-                $output .= component_callback($name, 'standard_after_main_region_html', [], '');
-            }
-        }
+        $hook->process_legacy_callbacks();
+        di::get(hook_manager::class)->dispatch($hook);
 
-        // Give plugins an opportunity to inject extra html content. The callback
-        // must always return a string containing valid html.
-        $pluginswithfunction = get_plugins_with_function('standard_after_main_region_html', 'lib.php');
-        foreach ($pluginswithfunction as $plugins) {
-            foreach ($plugins as $function) {
-                $output .= $function();
-            }
-        }
-
-        return $output;
+        return $hook->get_output();
     }
 
     /**
@@ -1378,14 +1347,14 @@ class core_renderer extends renderer_base {
     public function header() {
         global $USER, $CFG, $SESSION;
 
-        // Give plugins an opportunity touch things before the http headers are sent
-        // such as adding additional headers. The return value is ignored.
-        $pluginswithfunction = get_plugins_with_function('before_http_headers', 'lib.php');
-        foreach ($pluginswithfunction as $plugins) {
-            foreach ($plugins as $function) {
-                $function();
-            }
-        }
+        // Ensure that the callback exists prior to cache purge.
+        // This is a critical page path.
+        // TODO MDL-81134 Remove after LTS+1.
+        require_once(__DIR__ . '/classes/hook/output/before_http_headers.php');
+
+        $hook = new before_http_headers($this);
+        $hook->process_legacy_callbacks();
+        di::get(hook_manager::class)->dispatch($hook);
 
         if (\core\session\manager::is_loggedinas()) {
             $this->page->add_body_class('userloggedinas');
@@ -1428,6 +1397,7 @@ class core_renderer extends renderer_base {
         if ($cutpos === false) {
             throw new coding_exception('page layout file ' . $layoutfile . ' does not contain the main content placeholder, please include "<?php echo $OUTPUT->main_content() ?>" in theme layout file.');
         }
+
         $header = substr($rendered, 0, $cutpos);
         $footer = substr($rendered, $cutpos + strlen($token));
 
@@ -1502,20 +1472,16 @@ class core_renderer extends renderer_base {
     public function footer() {
         global $CFG, $DB, $PERF;
 
-        $output = '';
+        // Ensure that the callback exists prior to cache purge.
+        // This is a critical page path.
+        // TODO MDL-81134 Remove after LTS+1.
+        require_once(__DIR__ . '/classes/hook/output/before_footer_html_generation.php');
 
-        // Give plugins an opportunity to touch the page before JS is finalized.
-        $pluginswithfunction = get_plugins_with_function('before_footer', 'lib.php');
-        foreach ($pluginswithfunction as $plugins) {
-            foreach ($plugins as $function) {
-                $extrafooter = $function();
-                if (is_string($extrafooter)) {
-                    $output .= $extrafooter;
-                }
-            }
-        }
-
-        $output .= $this->container_end_all(true);
+        $hook = new before_footer_html_generation($this);
+        $hook->process_legacy_callbacks();
+        di::get(hook_manager::class)->dispatch($hook);
+        $hook->add_html($this->container_end_all(true));
+        $output = $hook->get_output();
 
         $footer = $this->opencontainers->pop('header/footer');
 
@@ -1927,7 +1893,7 @@ class core_renderer extends renderer_base {
     /**
      * Renders a primary action_menu_filler item.
      *
-     * @param action_menu_link_filler $action
+     * @param action_menu_filler $action
      * @return string HTML fragment
      */
     protected function render_action_menu_filler(action_menu_filler $action) {
@@ -2140,13 +2106,18 @@ class core_renderer extends renderer_base {
             $attributes['class'] = 'action-icon';
         }
 
-        $icon = $this->render($pixicon);
-
         if ($linktext) {
             $text = $pixicon->attributes['alt'];
+            // Set the icon as a decorative image if we're displaying the action text.
+            // Otherwise, the action name will be read twice by assistive technologies.
+            $pixicon->attributes['alt'] = '';
+            $pixicon->attributes['title'] = '';
+            $pixicon->attributes['aria-hidden'] = 'true';
         } else {
             $text = '';
         }
+
+        $icon = $this->render($pixicon);
 
         return $this->action_link($url, $text.$icon, $action, $attributes);
     }
@@ -2385,7 +2356,7 @@ class core_renderer extends renderer_base {
     public function doc_link($path, $text = '', $forcepopup = false, array $attributes = []) {
         global $CFG;
 
-        $icon = $this->pix_icon('book', '', 'moodle', array('class' => 'iconhelp icon-pre', 'role' => 'presentation'));
+        $icon = $this->pix_icon('book', '', 'moodle', array('class' => 'iconhelp icon-pre'));
 
         $attributes['href'] = new moodle_url(get_docs_url($path));
         $newwindowicon = '';
@@ -2958,7 +2929,7 @@ EOD;
      *
      * @param moodle_url $url The URL + params to send through when clicking the button
      * @param string $method
-     * @return string HTML the button
+     * @return ?string HTML the button
      */
     public function edit_button(moodle_url $url, string $method = 'post') {
 
@@ -2980,7 +2951,7 @@ EOD;
     /**
      * Create a navbar switch for toggling editing mode.
      *
-     * @return string Html containing the edit switch
+     * @return ?string Html containing the edit switch
      */
     public function edit_switch() {
         if ($this->page->user_allowed_editing()) {
@@ -4679,15 +4650,14 @@ EOD;
                     if ($button['buttontype'] === 'message') {
                         \core_message\helper::messageuser_requirejs();
                     }
-                    $image = $this->pix_icon($button['formattedimage'], $button['title'], 'moodle', array(
+                    $image = $this->pix_icon($button['formattedimage'], '', 'moodle', array(
                         'class' => 'iconsmall',
-                        'role' => 'presentation'
                     ));
                     $image .= html_writer::span($button['title'], 'header-button-title');
                 } else {
                     $image = html_writer::empty_tag('img', array(
                         'src' => $button['formattedimage'],
-                        'role' => 'presentation'
+                        'alt' => $button['title'],
                     ));
                 }
                 $html .= html_writer::link($button['url'], html_writer::tag('span', $image), $button['linkattributes']);
@@ -5127,7 +5097,7 @@ EOD;
     /**
      * Render the login signup form into a nice template for the theme.
      *
-     * @param mform $form
+     * @param moodleform $form
      * @return string
      */
     public function render_login_signup_form($form) {
@@ -5228,7 +5198,7 @@ EOD;
 
     /**
      * Renders release information in the footer popup
-     * @return string Moodle release info.
+     * @return ?string Moodle release info.
      */
     public function moodle_release() {
         global $CFG;
@@ -5433,7 +5403,7 @@ class core_renderer_cli extends core_renderer {
     /**
      * Renders a Check API result
      *
-     * @param result $result
+     * @param core\check\result $result
      * @return string fragment
      */
     public function check_result(core\check\result $result) {
@@ -5921,7 +5891,7 @@ class core_renderer_maintenance extends core_renderer {
     /**
      * Does nothing. The maintenance renderer has no need for login information.
      *
-     * @param null $withlinks
+     * @param mixed $withlinks
      * @return string
      */
     public function login_info($withlinks = null) {

@@ -160,7 +160,7 @@ function user_update_user($user, $updatepassword = true, $triggerevent = true) {
     $currentrecord = $DB->get_record('user', ['id' => $user->id]);
 
     // Dispatch the hook for pre user update actions.
-    $hook = new \core_user\hook\before_user_update(
+    $hook = new \core_user\hook\before_user_updated(
         user: $user,
         currentuserdata: $currentrecord,
     );
@@ -394,7 +394,7 @@ function user_get_user_details($user, $course = null, array $userfields = array(
             foreach ($fields as $formfield) {
                 if ($formfield->show_field_content()) {
                     $userdetails['customfields'][] = [
-                        'name' => $formfield->field->name,
+                        'name' => $formfield->display_name(),
                         'value' => $formfield->data,
                         'displayvalue' => $formfield->display_data(),
                         'type' => $formfield->field->datatype,

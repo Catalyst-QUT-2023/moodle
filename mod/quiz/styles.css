@@ -505,15 +505,6 @@ table.quizreviewsummary td.cell {
     min-height: 2.85em;
 }
 
-@media (max-width: 576px) {
-    #page-mod-quiz-edit .maxgrade {
-        margin-bottom: 0.6em;
-    }
-    #page-mod-quiz-edit .maxgrade .form-control {
-        display: inline-block;
-        vertical-align: middle;
-    }
-}
 #page-mod-quiz-edit .maxgrade label {
     display: inline;
 }
@@ -568,7 +559,6 @@ table.quizreviewsummary td.cell {
 }
 
 #page-mod-quiz-edit .section-heading .instancesectioncontainer {
-    font-size: 24px;
     display: inline;
 }
 
@@ -1089,6 +1079,9 @@ table.quizreviewsummary td.cell {
 #page-mod-quiz-edit .inplaceeditable-text {
     color: #000;
     text-align: right;
+}
+#page-mod-quiz-editgrading .inplaceeditable .quickeditlink {
+    color: var(--primary);
 }
 #page-mod-quiz-edit .inplaceeditable .quickeditlink {
     color: var(--primary);

@@ -28,6 +28,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\di;
+use core\hook;
+
 defined('MOODLE_INTERNAL') || die();
 
 // CONSTANTS (Encased in phpdoc proper comments).
@@ -537,6 +540,11 @@ define('HOMEPAGE_MYCOURSES', 3);
 defined('HUB_MOODLEORGHUBURL') || define('HUB_MOODLEORGHUBURL', 'https://stats.moodle.org');
 
 /**
+ * URL of main Moodle site for marketing, products and services.
+ */
+defined('MOODLE_PRODUCTURL') || define('MOODLE_PRODUCTURL', 'https://moodle.com');
+
+/**
  * URL of the statistic server public key.
  */
 defined('HUB_STATSPUBLICKEY') || define('HUB_STATSPUBLICKEY', 'https://moodle.org/static/statspubkey.pem');
@@ -910,7 +918,8 @@ function html_is_blank($string) {
  * NOTE: this function is called from lib/db/upgrade.php
  *
  * @param string $name the key to set
- * @param string $value the value to set (without magic quotes)
+ * @param string|int|bool|null $value the value to set (without magic quotes),
+ *               null to unset the value
  * @param string $plugin (optional) the plugin scope, default null
  * @return bool true or exception
  */
@@ -1183,7 +1192,7 @@ function purge_all_caches() {
  *        'other'  Purge all other caches?
  */
 function purge_caches($options = []) {
-    $defaults = array_fill_keys(['muc', 'theme', 'lang', 'js', 'template', 'filter', 'other'], false);
+    $defaults = array_fill_keys(['muc', 'courses', 'theme', 'lang', 'js', 'template', 'filter', 'other'], false);
     if (empty(array_filter($options))) {
         $options = array_fill_keys(array_keys($defaults), true); // Set all options to true.
     } else {
@@ -1191,6 +1200,14 @@ function purge_caches($options = []) {
     }
     if ($options['muc']) {
         cache_helper::purge_all();
+    }
+    if ($options['courses']) {
+        if ($options['courses'] === true) {
+            $courseids = [];
+        } else {
+            $courseids = preg_split('/\s*,\s*/', $options['courses'], -1, PREG_SPLIT_NO_EMPTY);
+        }
+        course_modinfo::purge_course_caches($courseids);
     }
     if ($options['theme']) {
         theme_reset_all_caches();
@@ -1449,7 +1466,7 @@ function mark_user_preferences_changed($userid) {
  * @category preference
  * @access   public
  * @param    string            $name  The key to set as preference for the specified user
- * @param    string            $value The value to set for the $name key in the specified user's
+ * @param    string|int|bool|null $value The value to set for the $name key in the specified user's
  *                                    record, null means delete current value.
  * @param    stdClass|int|null $user  A moodle user object or id, null means current user
  * @throws   coding_exception
@@ -3576,7 +3593,7 @@ function delete_user(stdClass $user) {
     $hook = new \core_user\hook\before_user_deleted(
         user: $user,
     );
-    \core\di::get(\core\hook\manager::class)->dispatch($hook);
+    di::get(hook\manager::class)->dispatch($hook);
 
     // Keep user record before updating it, as we have to pass this to user_deleted event.
     $olduser = clone $user;
@@ -4078,6 +4095,9 @@ function complete_user_login($user, array $extrauserinfo = []) {
         )
     );
     $event->trigger();
+
+    // Allow plugins to callback as soon possible after user has completed login.
+    di::get(\core\hook\manager::class)->dispatch(new \core_user\hook\after_login_completed());
 
     // Check if the user is using a new browser or session (a new MoodleSession cookie is set in that case).
     // If the user is accessing from the same IP, ignore everything (most of the time will be a new session in the same browser).
@@ -4631,7 +4651,7 @@ function delete_course($courseorid, $showfeedback = true) {
     }
 
     // Dispatch the hook for pre course delete actions.
-    $hook = new \core_course\hook\before_course_delete(
+    $hook = new \core_course\hook\before_course_deleted(
         course: $course,
     );
     \core\di::get(\core\hook\manager::class)->dispatch($hook);
@@ -6223,7 +6243,7 @@ function email_is_not_allowed($email) {
 /**
  * Returns local file storage instance
  *
- * @return file_storage
+ * @return ?file_storage
  */
 function get_file_storage($reset = false) {
     global $CFG;
@@ -6271,7 +6291,7 @@ function get_file_browser() {
  * Returns file packer
  *
  * @param string $mimetype default application/zip
- * @return file_packer
+ * @return file_packer|false
  */
 function get_file_packer($mimetype='application/zip') {
     global $CFG;
@@ -6385,7 +6405,7 @@ function get_max_upload_file_size($sitebytes=0, $coursebytes=0, $modulebytes=0, 
  * @param int $sitebytes Set maximum size
  * @param int $coursebytes Current course $course->maxbytes (in bytes)
  * @param int $modulebytes Current module ->maxbytes (in bytes)
- * @param stdClass $user The user
+ * @param stdClass|int|null $user The user
  * @param bool $unused This parameter has been deprecated and is not used any more.
  * @return int The maximum size for uploading files.
  */
@@ -7427,8 +7447,8 @@ function get_plugins_with_function($function, $file = 'lib.php', $include = true
         foreach ($pluginfunctions as $plugintype => $plugins) {
             foreach ($plugins as $plugin => $unusedfunction) {
                 $component = $plugintype . '_' . $plugin;
-                if ($hooks = \core\hook\manager::get_instance()->get_hooks_deprecating_plugin_callback($plugincallback)) {
-                    if (\core\hook\manager::get_instance()->is_deprecating_hook_present($component, $plugincallback)) {
+                if ($hooks = di::get(hook\manager::class)->get_hooks_deprecating_plugin_callback($plugincallback)) {
+                    if (di::get(hook\manager::class)->is_deprecating_hook_present($component, $plugincallback)) {
                         // Ignore the old callback, it is there only for older Moodle versions.
                         unset($pluginfunctions[$plugintype][$plugin]);
                     } else {
@@ -7666,8 +7686,9 @@ function component_callback($component, $function, array $params = array(), $def
 
     if ($functionname) {
         if ($migratedtohook) {
-            if ($hooks = \core\hook\manager::get_instance()->get_hooks_deprecating_plugin_callback($function)) {
-                if (\core\hook\manager::get_instance()->is_deprecating_hook_present($component, $function)) {
+            $hookmanager = di::get(hook\manager::class);
+            if ($hooks = $hookmanager->get_hooks_deprecating_plugin_callback($function)) {
+                if ($hookmanager->is_deprecating_hook_present($component, $function)) {
                     // Do not call the old lib.php callback,
                     // it is there for compatibility with older Moodle versions only.
                     return null;
@@ -7767,8 +7788,9 @@ function component_class_callback($classname, $methodname, array $params, $defau
         $functionparts = explode('\\', trim($fullfunction, '\\'));
         $component = $functionparts[0];
         $callback = end($functionparts);
-        if ($hooks = \core\hook\manager::get_instance()->get_hooks_deprecating_plugin_callback($callback)) {
-            if (\core\hook\manager::get_instance()->is_deprecating_hook_present($component, $callback)) {
+        $hookmanager = di::get(hook\manager::class);
+        if ($hooks = $hookmanager->get_hooks_deprecating_plugin_callback($callback)) {
+            if ($hookmanager->is_deprecating_hook_present($component, $callback)) {
                 // Do not call the old class callback,
                 // it is there for compatibility with older Moodle versions only.
                 return null;
@@ -10069,7 +10091,7 @@ function get_mnet_environment() {
  * during xmlrpc server code execution, any code wishing to access
  * information about the remote peer must use this to get it.
  *
- * @return mnet_remote_client the equivalent of old $MNETREMOTE_CLIENT global
+ * @return mnet_remote_client|false the equivalent of old $MNETREMOTE_CLIENT global
  */
 function get_mnet_remote_client() {
     if (!defined('MNET_SERVER')) {
@@ -10449,7 +10471,7 @@ class lang_string {
      * string properties... the string cannot be regenerated so we need to ensure
      * it is generated for this.
      *
-     * @return string
+     * @return array
      */
     public function __sleep() {
         $this->get_string();

@@ -57,11 +57,6 @@ class manager {
     const ADHOC_TASK_FAILED_RETENTION = 4 * WEEKSECS;
 
     /**
-     * @var int Used for max retry.
-     */
-    const MAX_RETRY = 9;
-
-    /**
      * @var ?task_base $runningtask Used to tell what is the current running task in this process.
      */
     public static ?task_base $runningtask = null;
@@ -261,7 +256,7 @@ class manager {
         }
 
         // Check if the task is allowed to be retried or not.
-        $record->attemptsavailable = $task->retry_until_success() ? self::MAX_RETRY : 1;
+        $record->attemptsavailable = $task->retry_until_success() ? $record->attemptsavailable : 1;
         // Set the time the task was created.
         $record->timecreated = time();
 
@@ -309,7 +304,6 @@ class manager {
         $record = new \stdClass();
         $record->classname = self::get_canonical_class_name($task);
         $record->component = $task->get_component();
-        $record->blocking = $task->is_blocking();
         $record->customised = $task->is_customised();
         $record->lastruntime = $task->get_last_run_time();
         $record->nextruntime = $task->get_next_run_time();
@@ -338,7 +332,6 @@ class manager {
         $record->classname = self::get_canonical_class_name($task);
         $record->id = $task->get_id();
         $record->component = $task->get_component();
-        $record->blocking = $task->is_blocking();
         $record->nextruntime = $task->get_next_run_time();
         $record->faildelay = $task->get_fail_delay();
         $record->customdata = $task->get_custom_data_as_string();
@@ -373,7 +366,6 @@ class manager {
         if (isset($record->component)) {
             $task->set_component($record->component);
         }
-        $task->set_blocking(!empty($record->blocking));
         if (isset($record->faildelay)) {
             $task->set_fail_delay($record->faildelay);
         }
@@ -435,7 +427,6 @@ class manager {
         if (isset($record->component)) {
             $task->set_component($record->component);
         }
-        $task->set_blocking(!empty($record->blocking));
         if (isset($record->minute)) {
             $task->set_minute($record->minute, $expandr);
         }
@@ -1045,11 +1036,7 @@ class manager {
         }
 
         $task->set_lock($lock);
-        if (!$task->is_blocking()) {
-            $cronlock->release();
-        } else {
-            $task->set_cron_lock($cronlock);
-        }
+        $cronlock->release();
     }
 
     /**
@@ -1112,11 +1099,7 @@ class manager {
                     throw new \moodle_exception('locktimeout');
                 }
 
-                if (!$task->is_blocking()) {
-                    $cronlock->release();
-                } else {
-                    $task->set_cron_lock($cronlock);
-                }
+                $cronlock->release();
                 return $task;
             }
         }
@@ -1180,8 +1163,14 @@ class manager {
         }
 
         // Max of 24 hour delay.
-        if ($delay > 86400) {
+        if ($delay >= 86400) {
             $delay = 86400;
+
+            // Dispatch hook when max fail delay has reached.
+            $hook = new \core\hook\task\after_failed_task_max_delay(
+                task: $task,
+            );
+            \core\di::get(\core\hook\manager::class)->dispatch($hook);
         }
 
         // Reschedule and then release the locks.
@@ -1197,9 +1186,6 @@ class manager {
         $DB->update_record('task_adhoc', $record);
 
         $task->release_concurrency_lock();
-        if ($task->is_blocking()) {
-            $task->get_cron_lock()->release();
-        }
         $task->get_lock()->release();
 
         self::$runningtask = null;
@@ -1258,9 +1244,6 @@ class manager {
 
         // Release the locks.
         $task->release_concurrency_lock();
-        if ($task->is_blocking()) {
-            $task->get_cron_lock()->release();
-        }
         $task->get_lock()->release();
 
         self::$runningtask = null;
@@ -1286,8 +1269,14 @@ class manager {
         }
 
         // Max of 24 hour delay.
-        if ($delay > 86400) {
+        if ($delay >= 86400) {
             $delay = 86400;
+
+            // Dispatch hook when max fail delay has reached.
+            $hook = new \core\hook\task\after_failed_task_max_delay(
+                task: $task,
+            );
+            \core\di::get(\core\hook\manager::class)->dispatch($hook);
         }
 
         $task->set_timestarted();
@@ -1304,9 +1293,6 @@ class manager {
         $record->pid = null;
         $DB->update_record('task_scheduled', $record);
 
-        if ($task->is_blocking()) {
-            $task->get_cron_lock()->release();
-        }
         $task->get_lock()->release();
 
         self::$runningtask = null;
@@ -1387,9 +1373,6 @@ class manager {
         }
 
         // Reschedule and then release the locks.
-        if ($task->is_blocking()) {
-            $task->get_cron_lock()->release();
-        }
         $task->get_lock()->release();
 
         self::$runningtask = null;

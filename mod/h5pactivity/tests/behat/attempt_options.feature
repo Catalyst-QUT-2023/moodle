@@ -51,10 +51,9 @@ Feature: Attempts review settings.
       | teacher1 | 1              | 0          | exist              | see         | not see         | not see                 | see          |
       | teacher1 | 0              | 1          | not exist          | see         | see             | see                     | not see      |
       | teacher2 | 0              | 1          | not exist          | see         | see             | not see                 | not see      |
-      # TODO: The non-editing teachers will be able to see attempts when MDL-80028 is fixed.
-      | teacher2 | 1              | 1          | not exist          | see         | not see         | not see                 | not see      |
+      | teacher2 | 1              | 1          | exist              | see         | not see         | not see                 | see          |
 
-  Scenario: View attempts link behaviour
+  Scenario: View link behaviour
     Given the following "activity" exists:
       | activity       | h5pactivity          |
       | name           | H5P package          |
@@ -80,4 +79,4 @@ Feature: Attempts review settings.
       | success         | 1           |
     And I am on the "H5P package" "h5pactivity activity" page
     And I follow "View attempts (1)"
-    And I should see "View user attempts"
+    And I should see "View (1)"
