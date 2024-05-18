@@ -96,5 +96,5 @@ $string['urlpreviewselect_help'] = 'This settin determines how the preview is di
 
 * Full - The unfuled URL is displayed within a full frame 
 * Slim - The unfuled URL is displayed within a slim frame
-* None - need to fix';
+* None - The unfuled URL is not displayed';
 $string['url:view'] = 'View URL';

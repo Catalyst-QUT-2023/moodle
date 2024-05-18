@@ -95,9 +95,9 @@ function url_get_post_actions() {
  */
 function url_add_instance($data, $mform) {
     global $CFG, $DB;
-
+    
     require_once($CFG->dirroot.'/mod/url/locallib.php');
-
+    $config = get_config('url');
     $parameters = array();
     for ($i=0; $i < 100; $i++) {
         $parameter = "parameter_$i";
@@ -118,8 +118,6 @@ function url_add_instance($data, $mform) {
         $displayoptions['printintro']   = (int)!empty($data->printintro);
     }
     $data->displayoptions = serialize($displayoptions);
-    $data->$urlpreviewoptions = serialize($urlpreview);
-
     $data->externalurl = url_fix_submitted_url($data->externalurl);
 
     $data->timemodified = time();
@@ -141,7 +139,6 @@ function url_update_instance($data, $mform) {
     global $CFG, $DB;
 
     require_once($CFG->dirroot.'/mod/url/locallib.php');
-
     $parameters = array();
     for ($i=0; $i < 100; $i++) {
         $parameter = "parameter_$i";
@@ -162,7 +159,6 @@ function url_update_instance($data, $mform) {
         $displayoptions['printintro']   = (int)!empty($data->printintro);
     }
     $data->displayoptions = serialize($displayoptions);
-    $data->$urlpreviewoptions = serialize($urlpreview);
     $data->externalurl = url_fix_submitted_url($data->externalurl);
 
     $data->timemodified = time();
@@ -215,7 +211,7 @@ function url_get_coursemodule_info($coursemodule) {
     require_once("$CFG->dirroot/lib/classes/url/unfurler.php");
 
     if (!$url = $DB->get_record('url', array('id'=>$coursemodule->instance),
-            'id, name, display, displayoptions, externalurl, parameters, intro, introformat')) {
+            'id, name, display, displayoptions, externalurl, parameters, intro, introformat, urlpreview')) {
         return NULL;
     }
 
@@ -249,8 +245,7 @@ function url_get_coursemodule_info($coursemodule) {
     }
 
     $unfurler = new unfurl($url->externalurl);
-    $config = get_config('url');
-    $urlpreview = $config->urlpreview;
+    $urlpreview = $url->urlpreview;
 
     if ($urlpreview == RESOURCELIB_DISPLAY_FULL) {
         $metadata = [
@@ -259,6 +254,8 @@ function url_get_coursemodule_info($coursemodule) {
             'image' => $unfurler->image,
             'description' => $unfurler->description,
             'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,
+            'type' => $unfurler->type,
+            
         ];
         $info->content= $OUTPUT->render_from_template('core/url_preview_card', $metadata);
     } elseif ($urlpreview == RESOURCELIB_DISPLAY_SLIM) {
@@ -268,6 +265,7 @@ function url_get_coursemodule_info($coursemodule) {
             'image' => $unfurler->image,
             'description' => $unfurler->description,
             'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,
+            'type' => $unfurler->type,
         ];
 
         $info->content= $OUTPUT->render_from_template('core/url_preview_slim', $metadata);
@@ -278,6 +276,7 @@ function url_get_coursemodule_info($coursemodule) {
             'image' => $unfurler->image,
             'description' => $unfurler->description,
             'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,
+            'type' => $unfurler->type,
         ];
     }
     
