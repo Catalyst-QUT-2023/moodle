@@ -29,10 +29,13 @@
     }
 }}
 
-<div style="max-width: 100%" class="p-2">
+<div style="max-width: 60%; padding: 0px !important" class="p-2">
     <div class="card shadow-sm">
         {{#image}}
-            <img class="card-img-top" src="{{{.}}}" alt="Preview Image">
+            <img class="card-img-top" 
+            src="{{{.}}}" 
+            alt="Preview Image" 
+            style="border-radius: calc(0.5rem - 1px) calc(0.5rem - 1px) 0 0;">
         {{/image}}
         <div class="card-footer">
             {{#title}}
