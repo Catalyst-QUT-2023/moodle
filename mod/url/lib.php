@@ -254,7 +254,6 @@ function url_get_coursemodule_info($coursemodule) {
             'image' => $unfurler->image,
             'description' => $unfurler->description,
             'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,
-            'type' => $unfurler->type,
             
         ];
         $info->content= $OUTPUT->render_from_template('core/url_preview_card', $metadata);
@@ -265,7 +264,6 @@ function url_get_coursemodule_info($coursemodule) {
             'image' => $unfurler->image,
             'description' => $unfurler->description,
             'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,
-            'type' => $unfurler->type,
         ];
 
         $info->content= $OUTPUT->render_from_template('core/url_preview_slim', $metadata);
