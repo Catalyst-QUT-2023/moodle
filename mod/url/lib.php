@@ -253,8 +253,7 @@ function url_get_coursemodule_info($coursemodule) {
             'sitename' => $unfurler->sitename,
             'image' => $unfurler->image,
             'description' => $unfurler->description,
-            'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,
-            
+            'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,          
         ];
         $info->content= $OUTPUT->render_from_template('core/url_preview_card', $metadata);
     } elseif ($urlpreview == RESOURCELIB_DISPLAY_SLIM) {
@@ -274,7 +273,6 @@ function url_get_coursemodule_info($coursemodule) {
             'image' => $unfurler->image,
             'description' => $unfurler->description,
             'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,
-            'type' => $unfurler->type,
         ];
     }
     
