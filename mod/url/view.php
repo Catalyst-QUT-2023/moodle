@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -32,6 +31,7 @@ $id       = optional_param('id', 0, PARAM_INT);        // Course module ID
 $u        = optional_param('u', 0, PARAM_INT);         // URL instance id
 $redirect = optional_param('redirect', 0, PARAM_BOOL);
 $forceview = optional_param('forceview', 0, PARAM_BOOL);
+$previewtype = optional_param('preview', '', PARAM_ALPHA);
 
 if ($u) {  // Two ways to specify the module
     $url = $DB->get_record('url', array('id'=>$u), '*', MUST_EXIST);
@@ -69,6 +69,7 @@ if ($displaytype == RESOURCELIB_DISPLAY_OPEN) {
     $redirect = true;
 }
 
+
 if ($redirect && !$forceview) {
     // coming from course page or url index page,
     // the redirection is needed for completion tracking and logging
@@ -92,7 +93,6 @@ if ($redirect && !$forceview) {
     }
     redirect($fullurl);
 }
-
 switch ($displaytype) {
     case RESOURCELIB_DISPLAY_EMBED:
         url_display_embed($url, $cm, $course);
@@ -104,3 +104,4 @@ switch ($displaytype) {
         url_print_workaround($url, $cm, $course);
         break;
 }
+

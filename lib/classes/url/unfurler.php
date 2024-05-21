@@ -39,48 +39,42 @@ class unfurl {
 
     public function __construct($url) {
 
-        // Initialize cURL session
+        // Initialize cURL session.
         $curl = new curl();
         $options = array(
             'CURLOPT_RETURNTRANSFER' => true,
-            'CURLOPT_TIMEOUT' => 5
+            'CURLOPT_TIMEOUT' => 5,
         );
         $this->response = $curl->get($url, $options);
 
         $curlresponse = $this->response;
 
-        $error_no = $curl->get_errno();
-        if ($error_no === CURLE_OPERATION_TIMEOUTED) {
-            echo "Timeout occurred while fetching URL: $url"; 
+        $errorno = $curl->get_errno();
+        if ($errorno === CURLE_OPERATION_TIMEOUTED) {
+            echo "Timeout occurred while fetching URL: $url";
             return;
         }
-        
-        $this->extract_html_metadata($url,$curlresponse);
-
-    
-        
+        $this->extract_html_metadata($url, $curlresponse);
     }
 
-    public function extract_html_metadata($url, $responseurl){
+    public function extract_html_metadata($url, $responseurl) {
         $doc = new DOMDocument();
         @$doc->loadHTML('<?xml encoding="UTF-8">' . $responseurl);
         $metataglist = $doc->getElementsByTagName('meta');
+        // Default html title.
+        $titleelement = $doc->getElementsByTagName('title')->item(0);
+        $h1element = $doc->getElementsByTagName('h1')->item(0);
+        $h2element = $doc->getElementsByTagName('h2')->item(0);
 
-        //set default values
-        //default html title
-        $titleElement = $doc->getElementsByTagName('title')->item(0);
-        $h1Element = $doc->getElementsByTagName('h1')->item(0);
-        $h2Element = $doc->getElementsByTagName('h2')->item(0);
-
-        if ($titleElement) {
-            $this->title = $titleElement->textContent;
-        } elseif ($h1Element) {
-            $this->title = $h1Element->textContent;
-        } elseif ($h2Element) {
-            $this->title = $h2Element->textContent;
+        if ($titleelement) {
+            $this->title = $titleelement->textContent;
+        } else if ($h1element) {
+            $this->title = $h1element->textContent;
+        } else if ($h2element) {
+            $this->title = $h2element->textContent;
         }
 
-        //iterate through meta tags
+        // Iterate through meta tags.
         foreach ($metataglist as $metatag) {
             $propertyattribute = strtolower(s($metatag->getAttribute('property')));
             if (
@@ -105,7 +99,6 @@ class unfurl {
                 preg_match ('/^og:\w/i', $propertyattribute) === 1
             ) {
                 $sanitizedcontent = clean_param($contentattribute, PARAM_TEXT);
-                
                 switch ($propertyattribute) {
                     case 'og:title':
                         $this->title = $sanitizedcontent;
@@ -115,7 +108,6 @@ class unfurl {
                         break;
                     case 'og:image':
                         $imageurlparts = parse_url($contentattribute);
-                        // Some websites only give the path.
                         if (empty($imageurlparts['host']) && !empty($imageurlparts['path'])) {
                             $urlparts = parse_url($url);
                             $this->image = $urlparts['scheme'].'://'.$urlparts['host'].$imageurlparts['path'];
@@ -140,18 +132,16 @@ class unfurl {
             }
         }
     }
-    
+
     public function render_unfurl_metadata() {
         global $OUTPUT;  // Use the global $OUTPUT variable, Moodle's core renderer.
-
         // Get the properties of this object as an array.
         $unfurldata = get_object_vars($this);
 
         // Use the render_from_template method to render Mustache template.
         return $OUTPUT->render_from_template('tool_urlpreview/metadata', $unfurldata);
     }
-    public static function formatPreviewData($data)
-    {
+    public static function formatPreviewData($data) {
         global $OUTPUT;
 
         $templatedata = [

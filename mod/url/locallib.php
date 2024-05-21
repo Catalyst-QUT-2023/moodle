@@ -329,6 +329,56 @@ function url_display_embed($url, $cm, $course) {
     echo $OUTPUT->footer();
     die;
 }
+/**
+ * Display full frame
+ * need to edit
+ */
+function url_display_full($url, $course){
+    global $PAGE, $OUTPUT;
+
+    $PAGE->set_title(format_string($course->shortname . ';' . $url->name));
+    $PAGE->set_heading($course->fullname);
+
+    
+    $unfurler = new unfurl($url->externalurl);
+        
+    $metadata = [
+        'title' => $unfurler->title,
+        'sitename' => $unfurler->sitename,
+        'image' => $unfurler->image,
+        'description' => $unfurler->description,
+        'canonicalurl' => $unfurler->canonicalurl
+    ];
+
+    echo $OUTPUT->render_from_template('core/url_preview_card', $metadata);
+    
+    echo $OUTPUT->footer();
+}
+/**
+ * Display slim frame
+ * need to edit
+ */
+function url_display_slim($url, $course) {
+    global $PAGE, $OUTPUT;
+
+    $PAGE->set_title(format_string($course->shortname . ': ' . $url->name));
+    $PAGE->set_heading($course->fullname);
+
+    
+    $unfurler = new unfurl($url->externalurl);
+        
+    $metadata = [
+        'title' => $unfurler->title,
+        'sitename' => $unfurler->sitename,
+        'image' => $unfurler->image,
+        'description' => $unfurler->description,
+        'canonicalurl' => $unfurler->canonicalurl
+        ];
+
+    echo $OUTPUT->render_from_template('core/url_preview_slim', $metadata);
+
+    echo $OUTPUT->footer();
+}
 
 /**
  * Decide the best display format.
@@ -371,6 +421,9 @@ function url_get_final_display_type($url) {
     // let the browser deal with it somehow
     return RESOURCELIB_DISPLAY_OPEN;
 }
+
+
+
 
 /**
  * Get the parameters that may be appended to URL

@@ -23,7 +23,6 @@
  */
 
 require_once('../../../config.php');
-require_once('../../../lib/classes/url/unfurler.php');
 use tool_urlpreview\form\urlpreview;
 
 $url = optional_param('url', '', PARAM_URL);
@@ -34,7 +33,6 @@ $PAGE->set_url(new moodle_url('/admin/tool/urlpreview/index.php'));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title($SITE->fullname);
 $PAGE->set_heading(get_string('menuname', 'tool_urlpreview'));
-$allowuse = has_capability('tool/urlpreview:usetool', $context);
 
 require_login();
 require_capability('tool/urlpreview:usetool', $context);
@@ -51,7 +49,6 @@ $templatedata = [
 
 echo $OUTPUT->render_from_template('tool_urlpreview/form', $templatedata);
 
-// Display output from AJAX Call
 if ($url !== '') {
     $PAGE->requires->js_call_amd('core/get_url_data', 'getPreviewTemplate', [
         $url,
