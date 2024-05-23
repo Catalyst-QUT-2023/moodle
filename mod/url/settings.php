@@ -40,11 +40,13 @@ if ($ADMIN->fulltree) {
                                    RESOURCELIB_DISPLAY_OPEN,
                                    RESOURCELIB_DISPLAY_POPUP,
                                   );
-    
-    $urlpreviewoptions = resourcelib_get_urlpreviewdisplayoptions(array(RESOURCELIB_DISPLAY_FULL,
-                                                                        RESOURCELIB_DISPLAY_SLIM,
-                                                                        RESOURCELIB_DISPLAY_NONE,
-                                                                        ));
+
+    $urlpreviewoptions = resourcelib_get_urlpreviewdisplayoptions([
+        RESOURCELIB_DISPLAY_FULL,
+        RESOURCELIB_DISPLAY_SLIM,
+        RESOURCELIB_DISPLAY_NONE,
+    ]);
+
     $defaulturlpreviewoptions = array(RESOURCELIB_DISPLAY_FULL,
                                      RESOURCELIB_DISPLAY_SLIM,
                                      RESOURCELIB_DISPLAY_NONE,
@@ -66,7 +68,6 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configmultiselect('url/urlpreviewoptions',
         get_string('urlpreviewoptions', 'url'), get_string('configurlpreviewoptions', 'url'),
         $defaulturlpreviewoptions, $urlpreviewoptions));
-    
 
     //--- modedit defaults -----------------------------------------------------------------------------------
     $settings->add(new admin_setting_heading('urlmodeditdefaults', get_string('modeditdefaults', 'admin'), get_string('condifmodeditdefaults', 'admin')));
@@ -80,5 +81,6 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('url/popupheight',
         get_string('popupheight', 'url'), get_string('popupheightexplain', 'url'), 450, PARAM_INT, 7));
     $settings->add(new admin_setting_configselect('url/urlpreview',
-        get_string('urlpreviewselect', 'url'), get_string('urlpreviewselectexplain', 'url'), RESOURCELIB_DISPLAY_FULL, $urlpreviewoptions));
+        get_string('urlpreviewselect', 'url'), 
+        get_string('urlpreviewselectexplain', 'url'), RESOURCELIB_DISPLAY_FULL, $urlpreviewoptions));
 }

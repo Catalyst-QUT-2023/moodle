@@ -87,16 +87,16 @@ $string['popupwidthexplain'] = 'Specifies default width of popup windows.';
 $string['printintro'] = 'Display URL description';
 $string['printintroexplain'] = 'Display URL description below content? Some display types may not display description even if enabled.';
 $string['privacy:metadata'] = 'The URL resource plugin does not store any personal data.';
-$string['rolesinparams'] = 'Role names as URL variables';  
+$string['rolesinparams'] = 'Role names as URL variables';
 $string['search:activity'] = 'URL';
 $string['serverurl'] = 'Server URL';
 $string['url:addinstance'] = 'Add a new URL resource';
 $string['urlpreviewoptions'] = 'Available URL Preview Options';
 $string['urlpreviewselect'] = 'URL Preview';
-$string['urlpreviewselectexplain'] = 'Choose urlpreview type, the default is set as None';
-$string['urlpreviewselect_help'] = 'This settin determines how the preview is displayed. Options may include:
+$string['urlpreviewselect_help'] = 'This setting determines how the preview is displayed. Options may include:
 
-* Full - The unfuled URL is displayed within a full frame 
-* Slim - The unfuled URL is displayed within a slim frame
-* None - The unfuled URL is not displayed';
+* Full - The unfurled URL is displayed within a full frame
+* Slim - The unfurled URL is displayed within a slim frame
+* None - The unfurled URL is not displayed';
+$string['urlpreviewselectexplain'] = 'Choose urlpreview type, the default is set as None';
 $string['url:view'] = 'View URL';

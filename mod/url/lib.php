@@ -95,7 +95,7 @@ function url_get_post_actions() {
  */
 function url_add_instance($data, $mform) {
     global $CFG, $DB;
-    
+
     require_once($CFG->dirroot.'/mod/url/locallib.php');
     $config = get_config('url');
     $parameters = array();
@@ -206,7 +206,7 @@ function url_delete_instance($id) {
  */
 function url_get_coursemodule_info($coursemodule) {
     global $CFG, $DB, $OUTPUT;
-    
+
     require_once("$CFG->dirroot/mod/url/locallib.php");
     require_once("$CFG->dirroot/lib/classes/url/unfurler.php");
 
@@ -217,8 +217,6 @@ function url_get_coursemodule_info($coursemodule) {
 
     $info = new cached_cm_info();
     $info->name = $url->name;
-    
-    
 
     // Note: there should be a way to differentiate links from normal resources.
     $info->icon = url_guess_icon($url->externalurl);
@@ -253,10 +251,10 @@ function url_get_coursemodule_info($coursemodule) {
             'sitename' => $unfurler->sitename,
             'image' => $unfurler->image,
             'description' => $unfurler->description,
-            'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,          
+            'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,
         ];
-        $info->content= $OUTPUT->render_from_template('core/url_preview_card', $metadata);
-    } elseif ($urlpreview == RESOURCELIB_DISPLAY_SLIM) {
+        $info->content = $OUTPUT->render_from_template('core/url_preview_card', $metadata);
+    } else if ($urlpreview == RESOURCELIB_DISPLAY_SLIM) {
         $metadata = [
             'title' => $unfurler->title ?: format_string($url->name),
             'sitename' => $unfurler->sitename,
@@ -265,7 +263,7 @@ function url_get_coursemodule_info($coursemodule) {
             'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,
         ];
 
-        $info->content= $OUTPUT->render_from_template('core/url_preview_slim', $metadata);
+        $info->content = $OUTPUT->render_from_template('core/url_preview_slim', $metadata);
     } else {
         $metadata = [
             'title' => $unfurler->title ?: format_string($url->name),
@@ -275,7 +273,7 @@ function url_get_coursemodule_info($coursemodule) {
             'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,
         ];
     }
-    
+
     $info->customdata['display'] = $display;
     // The icon will be filtered from now on because the custom icons have been updated.
     $info->customdata['filtericon'] = true;
