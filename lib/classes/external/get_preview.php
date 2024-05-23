@@ -16,6 +16,8 @@
 
 
 namespace core\external;
+defined('MOODLE_INTERNAL') || die();
+
 use core_external\external_function_parameters;
 use core_external\external_api;
 use core_external\external_value;
@@ -27,7 +29,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
 /**
  * Implementation of web service core_get_preview
  *
- * @package    core_urlpreview
+ * @package    core
  * @copyright  2024 Team "the Z" <https://github.com/Catalyst-QUT-2023>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -40,8 +42,7 @@ class get_preview extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters(
-            array('url' => new external_value(PARAM_URL, 'The URL to get data'))
-            );
+            ['url' => new external_value(PARAM_URL, 'The URL to get data')]);
     }
 
     /**
@@ -57,10 +58,8 @@ class get_preview extends external_api {
         );
 
         // From web services we don't call require_login(), but rather validate_context.
-        $context = \context_system::instance(); // TODO change if required.
+        $context = \context_system::instance();
         self::validate_context($context);
-
-        // TODO check permissions
 
         global $DB;
 
@@ -69,7 +68,6 @@ class get_preview extends external_api {
         $linteddata = $DB->get_record_sql($sql, [$url]);
 
         if (!$linteddata) {
-            
             // If not in the database, lint the URL.
             $unfurler = new \unfurl($url);
             $renderedoutput = $unfurler->render_unfurl_metadata();

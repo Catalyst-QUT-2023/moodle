@@ -1156,7 +1156,6 @@ function xmldb_main_upgrade($oldversion) {
 
         // Urlpreview savepoint reached.
         upgrade_main_savepoint(true, 2024042500.02);
-        // upgrade_plugin_savepoint(true, 2024032200, 'mod', 'urlpreview');
     }
 
     return true;

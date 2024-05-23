@@ -23,28 +23,67 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/filelib.php');
 
+/**
+ * Class unfurl
+ * This class is responsible for unfurling URLs to extract and format metadata.
+ */
 class unfurl {
+    /**
+     * The title of the URL.
+     * @var string
+     */
     public $title = '';
+    /**
+     * The sitename of the URL.
+     * @var string
+     */
     public $sitename = '';
+    /**
+     * The image of the URL.
+     * @var string
+     */
     public $image = '';
+    /**
+     * The description of the URL.
+     * @var string
+     */
     public $description = '';
+    /**
+     * The canonical URL.
+     * @var string
+     */
     public $canonicalurl = '';
+    /**
+     * The type of the URL.
+     * @var string
+     */
     public $type = '';
+    /**
+     * Indicates whether Noog metadata is enabled.
+     * @var bool
+     */
     public $noogmetadata = true;
+    /**
+     * The response data.
+     * @var string
+     */
     private $response;
 
+    /**
+     * Unfurler contructor.
+     */
     public function __construct($url) {
 
         // Initialize cURL session.
         $curl = new curl();
-        $options = array(
+        $options = [
             'CURLOPT_RETURNTRANSFER' => true,
             'CURLOPT_TIMEOUT' => 5,
-        );
+        ];
         $this->response = $curl->get($url, $options);
 
         $curlresponse = $this->response;
@@ -56,7 +95,9 @@ class unfurl {
         }
         $this->extract_html_metadata($url, $curlresponse);
     }
-
+    /**
+     * Extract metadata from url.
+     */
     public function extract_html_metadata($url, $responseurl) {
         $doc = new DOMDocument();
         @$doc->loadHTML('<?xml encoding="UTF-8">' . $responseurl);
@@ -132,16 +173,21 @@ class unfurl {
             }
         }
     }
-
+    /**
+     * Render metadata.
+     */
     public function render_unfurl_metadata() {
-        global $OUTPUT;  // Use the global $OUTPUT variable, Moodle's core renderer.
+        global $OUTPUT;
         // Get the properties of this object as an array.
         $unfurldata = get_object_vars($this);
 
         // Use the render_from_template method to render Mustache template.
         return $OUTPUT->render_from_template('tool_urlpreview/metadata', $unfurldata);
     }
-    public static function formatPreviewData($data) {
+    /**
+     * Formatting preview data.
+     */
+    public static function format_preview_data($data) {
         global $OUTPUT;
 
         $templatedata = [

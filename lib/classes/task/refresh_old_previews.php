@@ -17,7 +17,7 @@
 /**
  * Class refresh_old_previews
  *
- * @package    core_urlpreview
+ * @package    core
  * @copyright  2024 Team "the Z" <https://github.com/Catalyst-QUT-2023>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,15 +27,19 @@ namespace core\task;
 use core\task\scheduled_task;
 use core\urlpreview;
 
-
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * A simple task to refresh old previews.
+ */
 class refresh_old_previews extends scheduled_task {
-
+    /**
+     * Get the name.
+     */
     public function get_name() {
         return get_string('refresholdpreviews', 'core_urlpreview');
     }
-
+    /**
+     * Do the job.
+     */
     public function execute() {
         global $DB;
         $twoweeksago = time() - (2 * WEEKSECS);

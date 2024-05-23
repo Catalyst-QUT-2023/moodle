@@ -15,7 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package     core_urlpreview
+ * A schduled taks to delete unused previews
+ * @package     core
  * @copyright   2023 Thomas Daly <n11134551@qut.edu.au>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -25,15 +26,19 @@ namespace core\task;
 use core\task\scheduled_task;
 use core\urlpreview;
 
-
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Simple task to delete unused previews.
+ */
 class delete_unused_previews extends scheduled_task {
-
+    /**
+     * Get the name.
+     */
     public function get_name() {
         return get_string('deleteunusedpreviews', 'core_urlpreview');
     }
-
+    /**
+     * Do the job.
+     */
     public function execute() {
         global $DB;
         $threemonthsago = time() - (90 * DAYSECS);

@@ -17,7 +17,7 @@
 /**
  * Class urlpreview
  *
- * @package    mod_url
+ * @package    core
  * @copyright  2024 Team "the Z" <https://github.com/Catalyst-QUT-2023>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -25,8 +25,15 @@
 namespace core\form;
 
 use core\persistent;
+
+/**
+ * Class urlpreview
+ * This clas handles the persistent storage of URL preview data.
+ */
 class urlpreview extends persistent {
-    /** The table name. */
+    /**
+     * The name of the table used to store URL preview data.
+     */
     const TABLE = 'urlpreview';
 
     /**
