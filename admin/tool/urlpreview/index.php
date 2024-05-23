@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * This file renders the page for the Admin URL metadata preview tool 
+ * This file renders the page for the Admin URL metadata preview tool
  *
  * @package     tool_urlpreview
  * @copyright   2024 Team "the Z" <https://github.com/Catalyst-QUT-2023>

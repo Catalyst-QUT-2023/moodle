@@ -14,191 +14,193 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace core\url;
+namespace tool_urlpreview;
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 use core\url\unfurl;
 
-require_once ($CFG->libdir . '/classes/url/unfurler.php');
+require_once($CFG->libdir . '/classes/url/unfurler.php');
 /**
  * URLPreview HTML Extract unit tests
  *
  * @package    tool_urlpreview
- * @copyright  2024 Thomas Daly <n11134551@qut.edu.au>
+ * @copyright  2024 Team "the Z" <https://github.com/Catalyst-QUT-2023>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class htmlextract_test extends \advanced_testcase
-{
+final class htmlextract_test extends \advanced_testcase {
     private $unfurler;
 
-    protected function setUp(): void
-    {
+    protected function setUp(): void {
         parent::setUp();
-        $this->unfurler = new \unfurl('http://example.xyz'); // Pass a URL to the constructor
+        $this->unfurler = new \unfurl('http://example.xyz'); // Pass a URL to the constructor.
     }
 
     /**
      * Unit test for \tool_urlpreview
      *
-     * @dataProvider provideTestFiles
+     * @dataProvider providetestfiles
      * @param string $file name of the test fixture html file
-     * @param string $expectedTitle expected title
-     * @param string $expectedSiteName expected site name
-     * @param string $expectedImage expected image
-     * @param string $expectedDescription expected description
-     * @param string $expectedCanonicalUrl expected canonical URL
-     * @param string $expectedType expected type
+     * @param string $expectedtitle expected title
+     * @param string $expectedsitename expected site name
+     * @param string $expectedimage expected image
+     * @param string $expecteddescription expected description
+     * @param string $expectedcanonicalurl expected canonical URL
+     * @param string $expectedtype expected type
      */
-    public function testExtractHtmlMetadata($file, $expectedTitle, $expectedSiteName, $expectedImage, $expectedDescription, $expectedCanonicalUrl, $expectedType)
-    {
+    public function test_extract_html_metadata($file, $expectedtitle, $expectedsitename, $expectedimage,
+            $expecteddescription, $expectedcanonicalurl, $expectedtype) {
         $responseurl = file_get_contents(__DIR__ . "/fixtures/$file");
-        
-        // Extract metadata from the HTML file
-        $this->unfurler->extract_html_metadata('http://example.com', $responseurl); // Pass the URL to the method
-        
-        // Check the extracted metadata
-        $this->assertEquals($expectedTitle, $this->unfurler->title);
-        $this->assertEquals($expectedSiteName, $this->unfurler->sitename);
-        $this->assertEquals($expectedImage, $this->unfurler->image);
-        $this->assertEquals($expectedDescription, $this->unfurler->description);
-        $this->assertEquals($expectedCanonicalUrl, $this->unfurler->canonicalurl);
-        $this->assertEquals($expectedType, $this->unfurler->type);
+
+        // Extract metadata from the HTML file.
+        $this->unfurler->extract_html_metadata('http://example.com', $responseurl); // Pass the URL to the method.
+
+        // Check the extracted metadata.
+        $this->assertEquals($expectedtitle, $this->unfurler->title);
+        $this->assertEquals($expectedsitename, $this->unfurler->sitename);
+        $this->assertEquals($expectedimage, $this->unfurler->image);
+        $this->assertEquals($expecteddescription, $this->unfurler->description);
+        $this->assertEquals($expectedcanonicalurl, $this->unfurler->canonicalurl);
+        $this->assertEquals($expectedtype, $this->unfurler->type);
     }
-    public function provideTestFiles()
-    {
+
+    /**
+     * Provides data for test function
+     */
+    public static function providetestfiles() {
         return [
-            ['01-no_metadata.html', 
-            'Basic html with no metadata', 
-            '', 
-            '', 
-            '', 
-            '', 
+            ['01-no_metadata.html',
+            'Basic html with no metadata',
+            '',
+            '',
+            '',
+            '',
             ''],
 
-            ['02-basic_metadata.html', 
-            'Basic html with og image metadata', 
-            '', 'https://picsum.photos/600/300', 
-            '', 
-            '', 
+            ['02-basic_metadata.html',
+            'Basic html with og image metadata',
+            '', 'https://picsum.photos/600/300',
+            '',
+            '',
             ''],
 
-            ['03-no_title.html', 
-            '', 
-            '', 
-            '', 
-            '', 
-            '', 
+            ['03-no_title.html',
+            '',
+            '',
+            '',
+            '',
+            '',
             ''],
 
-            ['04-only_h1.html', 
-            'Title 1', 
-            '', 
-            '', 
-            '', 
-            '', 
+            ['04-only_h1.html',
+            'Title 1',
+            '',
+            '',
+            '',
+            '',
             ''],
 
-            ['05-h1_h2.html', 
-            'Title 1', 
-            '', 
-            '', 
-            '', 
-            '', 
+            ['05-h1_h2.html',
+            'Title 1',
+            '',
+            '',
+            '',
+            '',
             ''],
 
-            ['06-no_title_only_h2.html', 
-            'Title 2', 
-            '', 
-            '', 
-            '', 
-            '', 
+            ['06-no_title_only_h2.html',
+            'Title 2',
+            '',
+            '',
+            '',
+            '',
             ''],
 
-            ['07-malicious.html', 
-            'alert(\'Malicious script executed for og:title!\');', 
-            'alert(\'Malicious script executed for og:site_name!\');', 
-            'https://picsum.photos/600/300', 
-            'alert(\'Malicious script executed for og:description!\');', 
-            '', 
+            ['07-malicious.html',
+            'alert(\'Malicious script executed for og:title!\');',
+            'alert(\'Malicious script executed for og:site_name!\');',
+            'https://picsum.photos/600/300',
+            'alert(\'Malicious script executed for og:description!\');',
+            '',
             'scriptalertMaliciousscriptexecutedforogtypescript'],
-            
-            ['08-long_strings.html', 
-            'TitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitle', 
-            '', 
-            'https://picsum.photos/600/300', 
-            '', 
-            '', 
+
+            ['08-long_strings.html',
+            'TitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitle',
+            '',
+            'https://picsum.photos/600/300',
+            '',
+            '',
             ''],
-            
-            ['09-longer_strings.html', 
-            'TitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitle', 
-            'NameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameName', 
-            'http://example.comImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImage', 
+
+            ['09-longer_strings.html',
+            'TitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitle',
+            'NameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameName',
+            'http://example.comImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImageImage',
             'DescriptionDescriptionDescriptionDescriptionDescriptionDescriptionDescriptionDescriptionDescriptionDescriptionDescriptionDescription',
-            '', 
-            'PagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePage'],
-            
-            ['10-longer_strings_whitespace.html', 
-            'Title TitleTitle TitleTitle TitleTitle TitleTitle TitleTitle TitleTitle TitleTitle TitleTitle TitleTitle TitleTitle TitleTitle TitleTitle TitleTitle Title', 
-            'Name NameName NameName NameName NameName NameName NameName NameName NameName NameName NameName NameName NameName NameName NameName Name', 
-            'http://example.comImage ImageImage ImageImage ImageImage ImageImage ImageImage ImageImage ImageImage ImageImage ImageImage ImageImage ImageImage ImageImage ImageImage ImageImage', 
-            'Description DescriptionDescription DescriptionDescription DescriptionDescription DescriptionDescription DescriptionDescription Description', 
-            '', 
+            '',
             'PagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePage'],
 
-            ['11-404.html', 
-            '404 Not Found', 
-            'Example Site', 
-            'https://example.com/image.jpg', 
-            'Example description.', 
-            'https://example.com', 
+            ['10-longer_strings_whitespace.html',
+            'Title TitleTitle TitleTitle TitleTitle TitleTitle TitleTitle TitleTitle TitleTitle TitleTitle TitleTitle TitleTitle TitleTitle TitleTitle TitleTitle Title',
+            'Name NameName NameName NameName NameName NameName NameName NameName NameName NameName NameName NameName NameName NameName NameName Name',
+            'http://example.comImage ImageImage ImageImage ImageImage ImageImage ImageImage ImageImage ImageImage ImageImage ImageImage ImageImage ImageImage ImageImage ImageImage ImageImage',
+            'Description DescriptionDescription DescriptionDescription DescriptionDescription DescriptionDescription DescriptionDescription Description',
+            '',
+            'PagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePagePage'],
+
+            ['11-404.html',
+            '404 Not Found',
+            'Example Site',
+            'https://example.com/image.jpg',
+            'Example description.',
+            'https://example.com',
             'website'],
-            
-            ['12-missing_title.html', 
-            '', 
-            'Example Site', 
-            'https://example.com/image.jpg', 
-            'Example description.', 
-            'https://missingtitle.com', 
+
+            ['12-missing_title.html',
+            '',
+            'Example Site',
+            'https://example.com/image.jpg',
+            'Example description.',
+            'https://missingtitle.com',
             'article'],
 
-            ['13-missing_sitename.html', 
-            'Missing Sitename', 
-            '', 
-            'https://example.com/image.jpg', 
-            'Example description.', 
-            'https://example.com', 
+            ['13-missing_sitename.html',
+            'Missing Sitename',
+            '',
+            'https://example.com/image.jpg',
+            'Example description.',
+            'https://example.com',
             'website'],
 
-            ['14-missing_image.html', 
-            'Missing Image', 
-            'Example Site', 
-            '', 
-            'Example description.', 
-            'https://example.com', 
+            ['14-missing_image.html',
+            'Missing Image',
+            'Example Site',
+            '',
+            'Example description.',
+            'https://example.com',
             'website'],
 
-            ['15-missing_description.html', 
-            'Missing Description', 
-            'Example Site', 
-            'https://example.com/image.jpg', 
-            '', 
-            'https://example.com', 
+            ['15-missing_description.html',
+            'Missing Description',
+            'Example Site',
+            'https://example.com/image.jpg',
+            '',
+            'https://example.com',
             'website'],
 
-            ['16-missing_canonicalurl.html', 
-            'Missing URL', 
-            'Example Site', 
-            'https://example.com/image.jpg', 
-            'Example description.', 
-            '', 
+            ['16-missing_canonicalurl.html',
+            'Missing URL',
+            'Example Site',
+            'https://example.com/image.jpg',
+            'Example description.',
+            '',
             'website'],
 
-            ['17-missing_type.html', 
-            'Missing Type', 
-            'Example Site', 
-            'https://example.com/image.jpg', 
-            'Example description.', 
+            ['17-missing_type.html',
+            'Missing Type',
+            'Example Site',
+            'https://example.com/image.jpg',
+            'Example description.',
             'https://example.com', ''],
         ];
     }

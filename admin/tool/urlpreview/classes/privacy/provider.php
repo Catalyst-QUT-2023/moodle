@@ -14,22 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Privacy Subsystem implementation for block_calendar_month.
- *
- * @package    tool_urlpreview
- * @copyright  2023 Zave Bradshaw <n11024801@qut.edu.au>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace tool_urlpreview\privacy;
-
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Privacy Subsystem for urlpreview implementing null_provider.
- *
- * @copyright  2023 Zave Bradshaw <n11024801@qut.edu.au>
+ * @package    tool_urlpreview
+ * @copyright  2024 Zave Bradshaw <n11024801@qut.edu.au>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements \core_privacy\local\metadata\null_provider {
@@ -40,7 +29,7 @@ class provider implements \core_privacy\local\metadata\null_provider {
      *
      * @return  string
      */
-    public static function get_reason() : string {
+    public static function get_reason(): string {
         return 'privacy:metadata';
     }
 }
