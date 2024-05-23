@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * Plugin version info.
  *
  * @package     tool_urlpreview
  * @copyright   2024 Team "the Z" <https://github.com/Catalyst-QUT-2023>

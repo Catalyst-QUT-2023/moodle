@@ -18,7 +18,7 @@
  * Class refresh_old_previews
  *
  * @package    core_urlpreview
- * @copyright  2023 YOUR NAME <your@email.com>
+ * @copyright  2024 Team "the Z" <https://github.com/Catalyst-QUT-2023>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
