@@ -20,7 +20,6 @@ use core\event\course_module_created;
 use core\event\course_module_updated;
 use tool_brickfield\area_base;
 
-
 /**
  * Base class for all areas that represent a field from the module table (such as 'intro' or 'name')
  *
@@ -111,5 +110,4 @@ abstract class module_area_base extends area_base {
     public static function get_edit_url(\stdClass $componentinfo): \moodle_url {
         return new \moodle_url('/course/mod.php', ['update' => $componentinfo->cmid, 'sr' => null, 'sesskey' => sesskey()]);
     }
-
 }
