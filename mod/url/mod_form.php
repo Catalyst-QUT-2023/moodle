@@ -56,13 +56,11 @@ class mod_url_mod_form extends moodleform_mod {
 
         if ($this->current->instance) {
             $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions), $this->current->display);
-            $previewoptions = resourcelib_get_urlpreviewdisplayoptions(
-                explode(',', $config->urlpreviewoptions),
-                $this->current->urlpreview
-            );            
+            $previewoptions = resourcelib_get_urlpreviewdisplayoptions($this->current->urlpreview);            
         } else {
             $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions));
-            $previewoptions = resourcelib_get_urlpreviewdisplayoptions(explode(',', $config->urlpreviewoptions));
+            $previewoptions = resourcelib_get_urlpreviewdisplayoptions();
+            
         }
         if (count($options) == 1) {
             $mform->addElement('hidden', 'display');
@@ -163,10 +161,6 @@ class mod_url_mod_form extends moodleform_mod {
                 $default_values['variable_'.$i]  = $variable;
                 $i++;
             }
-        }
-        if (!empty($default_values['urlpreviewoptions'])) {
-            $urlpreviewoptions = (array) unserialize_array($default_values['urlpreviewoptions']);
-            $default_values['urlpreview'] = $urlpreviewoptions;
         }
     }
 
