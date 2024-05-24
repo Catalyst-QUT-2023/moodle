@@ -47,10 +47,11 @@ if ($ADMIN->fulltree) {
         RESOURCELIB_DISPLAY_NONE,
     ]);
 
-    $defaulturlpreviewoptions = array(RESOURCELIB_DISPLAY_FULL,
-                                     RESOURCELIB_DISPLAY_SLIM,
-                                     RESOURCELIB_DISPLAY_NONE,
-                                    );
+    $defaulturlpreviewoptions = [
+        RESOURCELIB_DISPLAY_FULL,
+        RESOURCELIB_DISPLAY_SLIM,
+        RESOURCELIB_DISPLAY_NONE,
+    ];
 
     //--- general settings -----------------------------------------------------------------------------------
     $settings->add(new admin_setting_configtext('url/framesize',
@@ -81,6 +82,6 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('url/popupheight',
         get_string('popupheight', 'url'), get_string('popupheightexplain', 'url'), 450, PARAM_INT, 7));
     $settings->add(new admin_setting_configselect('url/urlpreview',
-        get_string('urlpreviewselect', 'url'), 
+        get_string('urlpreviewselect', 'url'),
         get_string('urlpreviewselectexplain', 'url'), RESOURCELIB_DISPLAY_FULL, $urlpreviewoptions));
 }
