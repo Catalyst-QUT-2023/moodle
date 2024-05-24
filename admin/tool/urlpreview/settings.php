@@ -30,10 +30,3 @@ if ($hassiteconfig) {
     get_string('menuname', 'tool_urlpreview'),
     "$CFG->wwwroot/admin/tool/urlpreview/index.php"));
 }
-
-
-
-
-
-
-

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * A schduled taks to delete unused previews
+ * A scheduled task to delete unused urlpreviews from the DB
  * @package     core
  * @copyright   2023 Thomas Daly <n11134551@qut.edu.au>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -37,7 +37,7 @@ class delete_unused_previews extends scheduled_task {
         return get_string('deleteunusedpreviews', 'core_urlpreview');
     }
     /**
-     * Do the job.
+     * Delete the preview from the DB if it hasn't been used in at least 3 months.
      */
     public function execute() {
         global $DB;

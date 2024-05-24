@@ -19,7 +19,7 @@
  * Receives Open Graph protocol metadata (a.k.a social media metadata) from link
  *
  * @package    core
- * @copyright  2021 Jon Green <jgreen01@stanford.edu>
+ * @copyright  2024 Team "the Z" https://github.com/Catalyst-QUT-2023 based on code from 2021 Jon Green <jgreen01@stanford.edu>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

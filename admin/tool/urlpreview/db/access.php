@@ -18,7 +18,7 @@
  * defines capabilities for access to urlpreview tool
  *
  * @package     tool_urlpreview
- * @copyright   2023 Hanbin Lee <n10324402@qut.edu.au>
+ * @copyright   2024 Team "the Z" https://github.com/Catalyst-QUT-2023
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
