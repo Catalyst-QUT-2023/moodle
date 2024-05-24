@@ -91,7 +91,7 @@ class get_preview extends external_api {
                 $linteddata->lastpreviewed = $currenttime;
                 $DB->update_record('urlpreview', $linteddata);
             }
-            $renderedoutput = \unfurl::formatPreviewData($linteddata);
+            $renderedoutput = \unfurl::format_preview_data($linteddata);
         }
 
         return $renderedoutput;
