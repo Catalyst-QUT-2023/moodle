@@ -372,9 +372,6 @@ function url_get_final_display_type($url) {
     return RESOURCELIB_DISPLAY_OPEN;
 }
 
-
-
-
 /**
  * Get the parameters that may be appended to URL
  * @param object $config url module config options
