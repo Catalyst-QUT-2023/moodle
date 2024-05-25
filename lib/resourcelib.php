@@ -148,12 +148,22 @@ function resourcelib_get_displayoptions(array $enabled, $current=null) {
  * @param int $current current display options for existing instances
  * @return array of key=>name pairs
  */
-function resourcelib_get_urlpreviewdisplayoptions($current=null) {
-
+function resourcelib_get_urlpreviewdisplayoptions(array $enabled, $current=null) {
+    if (is_number($current)) {
+        $enabled[] = $current;
+    }
     $options = [RESOURCELIB_DISPLAY_FULL    => get_string('resourcedisplayfull'),
                 RESOURCELIB_DISPLAY_SLIM    => get_string('resourcedisplayslim'),
                 RESOURCELIB_DISPLAY_NONE    => get_string('resourcedisplaynone')];
-    return $options;
+
+    $result = [];
+
+    foreach ($options as $key => $value) {
+        if (in_array($key, $enabled)) {
+            $result[$key] = $value;
+        }
+    }
+    return $result;
 }
 
 /**

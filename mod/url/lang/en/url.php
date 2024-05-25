@@ -30,7 +30,7 @@ $string['configdisplayoptions'] = 'Select all options that should be available, 
 $string['configframesize'] = 'When a web page or an uploaded file is displayed within a frame, this value is the height (in pixels) of the top frame (which contains the navigation).';
 $string['configrolesinparams'] = 'Should customised role names (from the course settings) be available as variables for URL parameters?';
 $string['configsecretphrase'] = 'This secret phrase is used to produce encrypted code value that can be sent to some servers as a parameter.  The encrypted code is produced by an md5 value of the current user IP address concatenated with your secret phrase. ie code = md5(IP.secretphrase). Please note that this is not reliable because IP address may change and is often shared by different computers.';
-$string['configurlpreviewoptions'] = 'Select display options for URL previews.';
+$string['configurlpreviewoptions'] = 'Select display options for URL previews. Hold CTRL key to select multiple fields.';
 $string['contentheader'] = 'Content';
 $string['createurl'] = 'Create a URL';
 $string['displayoptions'] = 'Available display options';
@@ -98,5 +98,5 @@ $string['urlpreviewselect_help'] = 'This setting determines how the preview is d
 * Full - The unfurled URL is displayed within a full frame
 * Slim - The unfurled URL is displayed within a slim frame
 * None - The unfurled URL is not displayed';
-$string['urlpreviewselectexplain'] = 'Choose urlpreview type, the default is set as None';
+$string['urlpreviewselectexplain'] = 'Choose urlpreview type, the default is set as Full';
 $string['url:view'] = 'View URL';
