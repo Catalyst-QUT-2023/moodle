@@ -75,6 +75,7 @@ class unfurl {
 
     /**
      * Unfurler contructor.
+     * @param string $url 
      */
     public function __construct($url) {
 
@@ -97,6 +98,8 @@ class unfurl {
     }
     /**
      * Extract metadata from url.
+     * @param string $url The URL from which to extract metadata.
+     * @param string $responseurl The URL to respond to with the extracted metadata.
      */
     public function extract_html_metadata($url, $responseurl) {
         $doc = new DOMDocument();

@@ -143,9 +143,9 @@ function resourcelib_get_displayoptions(array $enabled, $current=null) {
     return $result;
 }
 /**
- * Returns list of available urlpreview display options
+ * Returns list of available urlpreview options
  * @param array $enabled list of options enabled in module configuration
- * @param int $current current display options for existing instances
+ * @param int|null $current current display options for existing instances
  * @return array of key=>name pairs
  */
 function resourcelib_get_urlpreviewdisplayoptions(array $enabled, $current=null) {
