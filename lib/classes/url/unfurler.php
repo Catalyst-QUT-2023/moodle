@@ -75,7 +75,7 @@ class unfurl {
 
     /**
      * Unfurler contructor.
-     * @param string $url 
+     * @param string $url
      */
     public function __construct($url) {
 
