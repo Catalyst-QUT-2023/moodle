@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -69,7 +70,6 @@ if ($displaytype == RESOURCELIB_DISPLAY_OPEN) {
     $redirect = true;
 }
 
-
 if ($redirect && !$forceview) {
     // coming from course page or url index page,
     // the redirection is needed for completion tracking and logging
@@ -93,6 +93,7 @@ if ($redirect && !$forceview) {
     }
     redirect($fullurl);
 }
+
 switch ($displaytype) {
     case RESOURCELIB_DISPLAY_EMBED:
         url_display_embed($url, $cm, $course);
@@ -104,4 +105,3 @@ switch ($displaytype) {
         url_print_workaround($url, $cm, $course);
         break;
 }
-

@@ -81,5 +81,4 @@ if ($ADMIN->fulltree) {
         get_string('popupwidth', 'url'), get_string('popupwidthexplain', 'url'), 620, PARAM_INT, 7));
     $settings->add(new admin_setting_configtext('url/popupheight',
         get_string('popupheight', 'url'), get_string('popupheightexplain', 'url'), 450, PARAM_INT, 7));
-
 }
