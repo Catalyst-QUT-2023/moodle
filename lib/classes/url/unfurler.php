@@ -188,7 +188,8 @@ class unfurl {
         return $OUTPUT->render_from_template('tool_urlpreview/metadata', $unfurldata);
     }
     /**
-     * Formatting preview data.
+     * Formats url preview data by passing it to the render_from_template function.
+     * @param array $data retrieved data from urlpreview table to be rendered.
      */
     public static function format_preview_data($data) {
         global $OUTPUT;
