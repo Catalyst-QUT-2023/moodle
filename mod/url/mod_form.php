@@ -59,7 +59,7 @@ class mod_url_mod_form extends moodleform_mod {
 
         if ($this->current->instance) {
             $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions), $this->current->display);
-            $previewoptions = resourcelib_get_urlpreviewdisplayoptions(explode(',', $config->urlpreviewoptions), 
+            $previewoptions = resourcelib_get_urlpreviewdisplayoptions(explode(',', $config->urlpreviewoptions),
                 $this->current->urlpreview);
         } else {
             $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions));
