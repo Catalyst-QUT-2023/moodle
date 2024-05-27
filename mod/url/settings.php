@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
     require_once("$CFG->libdir/resourcelib.php");
+    require_once("$CFG->dirroot/lib/classes/url/unfurler.php");
 
     $displayoptions = resourcelib_get_displayoptions(array(RESOURCELIB_DISPLAY_AUTO,
                                                            RESOURCELIB_DISPLAY_EMBED,
@@ -41,7 +42,7 @@ if ($ADMIN->fulltree) {
                                    RESOURCELIB_DISPLAY_POPUP,
                                   );
 
-    $urlpreviewoptions = resourcelib_get_urlpreviewdisplayoptions([
+    $urlpreviewoptions = unfurl::resourcelib_get_urlpreviewdisplayoptions([
         RESOURCELIB_DISPLAY_FULL,
         RESOURCELIB_DISPLAY_SLIM,
         RESOURCELIB_DISPLAY_NONE,

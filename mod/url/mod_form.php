@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once ($CFG->dirroot.'/course/moodleform_mod.php');
 require_once($CFG->dirroot.'/mod/url/locallib.php');
+require_once("$CFG->dirroot/lib/classes/url/unfurler.php");
 
 class mod_url_mod_form extends moodleform_mod {
     function definition() {
@@ -56,10 +57,10 @@ class mod_url_mod_form extends moodleform_mod {
 
         if ($this->current->instance) {
             $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions), $this->current->display);
-            $previewoptions = resourcelib_get_urlpreviewdisplayoptions(explode(',', $config->urlpreviewoptions), $this->current->urlpreview);
+            $previewoptions = unfurl::resourcelib_get_urlpreviewdisplayoptions(explode(',', $config->urlpreviewoptions), $this->current->urlpreview);
         } else {
             $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions));
-            $previewoptions = resourcelib_get_urlpreviewdisplayoptions(explode(',', $config->urlpreviewoptions));
+            $previewoptions = unfurl::resourcelib_get_urlpreviewdisplayoptions(explode(',', $config->urlpreviewoptions));
         }
         if (count($options) == 1) {
             $mform->addElement('hidden', 'display');

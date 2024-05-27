@@ -25,6 +25,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/** Display full frame */
+define('RESOURCELIB_DISPLAY_FULL', 0);
+/** Display slim frame */
+define('RESOURCELIB_DISPLAY_SLIM', 1);
+/** Display none */
+define('RESOURCELIB_DISPLAY_NONE', 2);
+
 require_once($CFG->libdir.'/filelib.php');
 
 /**
@@ -204,5 +211,31 @@ class unfurl {
             'type'         => $data->type,
         ];
         return $OUTPUT->render_from_template('tool_urlpreview/metadata', $templatedata);
+    }
+
+    /**
+    * Returns list of available urlpreview options.
+    * @param array $enabled List of options enabled in module configuration.
+    * @param int|null $current Current display option for existing instances.
+    * @return array of key=>name pairs
+    */
+    public static function resourcelib_get_urlpreviewdisplayoptions(array $enabled, $current = null) {
+        if ($current !== null && is_numeric($current)) {
+            $enabled[] = $current;
+        }
+    
+        $options = [
+            RESOURCELIB_DISPLAY_FULL => get_string('resourcedisplayfull'),
+            RESOURCELIB_DISPLAY_SLIM => get_string('resourcedisplayslim'),
+            RESOURCELIB_DISPLAY_NONE => get_string('resourcedisplaynone')
+        ];
+
+        $result = [];
+        foreach ($options as $key => $value) {
+            if (in_array($key, $enabled)) {
+                $result[$key] = $value;
+            }
+        }
+        return $result;
     }
 }

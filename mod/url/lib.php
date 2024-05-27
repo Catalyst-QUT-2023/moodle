@@ -244,7 +244,7 @@ function url_get_coursemodule_info($coursemodule) {
 
     $unfurler = new unfurl($url->externalurl);
     $urlpreview = $url->urlpreview;
-
+    
     if ($urlpreview == RESOURCELIB_DISPLAY_FULL) {
         $metadata = [
             'title' => $unfurler->title ?: format_string($url->name),
@@ -273,7 +273,7 @@ function url_get_coursemodule_info($coursemodule) {
             'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,
         ];
     }
-
+    
     $info->customdata['display'] = $display;
     // The icon will be filtered from now on because the custom icons have been updated.
     $info->customdata['filtericon'] = true;
