@@ -43,15 +43,15 @@ if ($ADMIN->fulltree) {
                                   );
 
     $urlpreviewoptions = unfurl::resourcelib_get_urlpreviewdisplayoptions([
-        RESOURCELIB_DISPLAY_FULL,
-        RESOURCELIB_DISPLAY_SLIM,
-        RESOURCELIB_DISPLAY_NONE,
+        URLPREVIEW_DISPLAY_FULL,
+        URLPREVIEW_DISPLAY_SLIM,
+        URLPREVIEW_DISPLAY_NONE,
     ]);
 
     $defaulturlpreviewoptions = [
-        RESOURCELIB_DISPLAY_FULL,
-        RESOURCELIB_DISPLAY_SLIM,
-        RESOURCELIB_DISPLAY_NONE,
+        URLPREVIEW_DISPLAY_FULL,
+        URLPREVIEW_DISPLAY_SLIM,
+        URLPREVIEW_DISPLAY_NONE,
     ];
 
     //--- general settings -----------------------------------------------------------------------------------

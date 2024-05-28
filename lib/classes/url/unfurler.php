@@ -26,11 +26,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 /** Display full frame */
-define('RESOURCELIB_DISPLAY_FULL', 0);
+define('URLPREVIEW_DISPLAY_FULL', 0);
 /** Display slim frame */
-define('RESOURCELIB_DISPLAY_SLIM', 1);
+define('URLPREVIEW_DISPLAY_SLIM', 1);
 /** Display none */
-define('RESOURCELIB_DISPLAY_NONE', 2);
+define('URLPREVIEW_DISPLAY_NONE', 2);
 
 require_once($CFG->libdir.'/filelib.php');
 
@@ -225,9 +225,9 @@ class unfurl {
         }
     
         $options = [
-            RESOURCELIB_DISPLAY_FULL => get_string('resourcedisplayfull'),
-            RESOURCELIB_DISPLAY_SLIM => get_string('resourcedisplayslim'),
-            RESOURCELIB_DISPLAY_NONE => get_string('resourcedisplaynone')
+            URLPREVIEW_DISPLAY_FULL => get_string('resourcedisplayfull'),
+            URLPREVIEW_DISPLAY_SLIM => get_string('resourcedisplayslim'),
+            URLPREVIEW_DISPLAY_NONE => get_string('resourcedisplaynone')
         ];
 
         $result = [];

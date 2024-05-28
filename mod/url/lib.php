@@ -245,7 +245,7 @@ function url_get_coursemodule_info($coursemodule) {
     $unfurler = new unfurl($url->externalurl);
     $urlpreview = $url->urlpreview;
     
-    if ($urlpreview == RESOURCELIB_DISPLAY_FULL) {
+    if ($urlpreview == URLPREVIEW_DISPLAY_FULL) {
         $metadata = [
             'title' => $unfurler->title ?: format_string($url->name),
             'sitename' => $unfurler->sitename,
@@ -254,7 +254,7 @@ function url_get_coursemodule_info($coursemodule) {
             'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,
         ];
         $info->content = $OUTPUT->render_from_template('core/url_preview_card', $metadata);
-    } else if ($urlpreview == RESOURCELIB_DISPLAY_SLIM) {
+    } else if ($urlpreview == URLPREVIEW_DISPLAY_SLIM) {
         $metadata = [
             'title' => $unfurler->title ?: format_string($url->name),
             'sitename' => $unfurler->sitename,
