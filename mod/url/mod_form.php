@@ -73,18 +73,17 @@ class mod_url_mod_form extends moodleform_mod {
             $mform->setDefault('display', $config->display);
             $mform->addHelpButton('display', 'displayselect', 'url');
         }
-
+        
         if (count($previewoptions) == 1) {
             $mform->addElement('hidden', 'urlpreview');
             $mform->setType('urlpreview', PARAM_INT);
-            reset($previewoptions);
-            $mform->setDefault('urlpreview', key($previewoptions));
         } else {
             $mform->addElement('select', 'urlpreview', get_string('urlpreviewselect', 'url'), $previewoptions);
-            $mform->setDefault('urlpreview', $config->urlpreview);
             $mform->addHelpButton('urlpreview', 'urlpreviewselect', 'url');
         }
-
+        reset($previewoptions);
+        $mform->setDefault('urlpreview', key($previewoptions));
+        
         if (array_key_exists(RESOURCELIB_DISPLAY_POPUP, $options)) {
             $mform->addElement('text', 'popupwidth', get_string('popupwidth', 'url'), array('size'=>3));
             if (count($options) > 1) {
