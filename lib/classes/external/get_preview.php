@@ -62,8 +62,6 @@ class get_preview extends external_api {
         $context = \context_system::instance();
         self::validate_context($context);
 
-        
-
         // Check if the linted data for this URL is already in the database.
         $sql = "SELECT * FROM {urlpreview} WHERE " . $DB->sql_compare_text('url') . " = ?";
         $linteddata = $DB->get_record_sql($sql, [$url]);
