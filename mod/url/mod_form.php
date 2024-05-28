@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -35,6 +36,7 @@ class mod_url_mod_form extends moodleform_mod {
 
         $config = get_config('url');
 
+        //-------------------------------------------------------
         $mform->addElement('header', 'general', get_string('general', 'form'));
         $mform->addElement('text', 'name', get_string('name'), array('size'=>'48'));
         $mform->addHelpButton('name', 'name', 'url');
@@ -53,11 +55,13 @@ class mod_url_mod_form extends moodleform_mod {
         $attributes = $element->getAttributes();
         $attributes['rows'] = 5;
         $element->setAttributes($attributes);
+        //-------------------------------------------------------
         $mform->addElement('header', 'optionssection', get_string('appearance'));
 
         if ($this->current->instance) {
             $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions), $this->current->display);
-            $previewoptions = unfurl::resourcelib_get_urlpreviewdisplayoptions(explode(',', $config->urlpreviewoptions), $this->current->urlpreview);
+            $previewoptions = unfurl::resourcelib_get_urlpreviewdisplayoptions(explode(',', $config->urlpreviewoptions),
+                $this->current->urlpreview);
         } else {
             $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions));
             $previewoptions = unfurl::resourcelib_get_urlpreviewdisplayoptions(explode(',', $config->urlpreviewoptions));
@@ -67,7 +71,6 @@ class mod_url_mod_form extends moodleform_mod {
             $mform->setType('display', PARAM_INT);
             reset($options);
             $mform->setDefault('display', key($options));
-
         } else {
             $mform->addElement('select', 'display', get_string('displayselect', 'url'), $options);
             $mform->setDefault('display', $config->display);
@@ -110,6 +113,7 @@ class mod_url_mod_form extends moodleform_mod {
             $mform->setDefault('printintro', $config->printintro);
         }
 
+        //-------------------------------------------------------
         if ($config->allowvariables) {
             $mform->addElement('header', 'parameterssection', get_string('parametersheader', 'url'));
             $mform->addElement('static', 'parametersinfo', '', get_string('parametersheader_help', 'url'));
@@ -135,7 +139,10 @@ class mod_url_mod_form extends moodleform_mod {
             }
         }
 
+        //-------------------------------------------------------
         $this->standard_coursemodule_elements();
+
+        //-------------------------------------------------------
         $this->add_action_buttons();
     }
 

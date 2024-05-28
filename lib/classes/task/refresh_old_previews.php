@@ -23,7 +23,7 @@ use core\urlpreview;
  * This task refreshes old urlpreviews in the DB by updating the stored metadata.
  * It rescrapes the url for records that are older than 2 weeks but which have been
  * previewed in the last 2 weeks.
- * 
+ *
  * The delete_unused_previews task is responsible for clearing out old records from the DB.
  *
  * @package    core
