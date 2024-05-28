@@ -36,6 +36,7 @@ class delete_unused_previews extends scheduled_task {
     public function get_name() {
         return get_string('deleteunusedpreviews', 'core_urlpreview');
     }
+
     /**
      * Delete the preview from the DB if it hasn't been used in at least 3 months.
      */

@@ -103,6 +103,7 @@ class unfurl {
         }
         $this->extract_html_metadata($url, $curlresponse);
     }
+
     /**
      * Extract metadata from url.
      * @param string $url The URL from which to extract metadata.
@@ -183,6 +184,7 @@ class unfurl {
             }
         }
     }
+
     /**
      * Render metadata.
      */
@@ -194,6 +196,7 @@ class unfurl {
         // Use the render_from_template method to render Mustache template.
         return $OUTPUT->render_from_template('tool_urlpreview/metadata', $unfurldata);
     }
+
     /**
      * Formats url preview data by passing it to the render_from_template function.
      * @param array $data retrieved data from urlpreview table to be rendered.

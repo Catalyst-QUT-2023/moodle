@@ -37,8 +37,9 @@ class refresh_old_previews extends scheduled_task {
     public function get_name() {
         return get_string('refresholdpreviews', 'core_urlpreview');
     }
+
     /**
-     * Do the job.
+     * The function executed whenever the task is called.
      */
     public function execute() {
         global $DB;

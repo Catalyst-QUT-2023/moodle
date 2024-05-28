@@ -40,6 +40,7 @@ define('RESOURCELIB_DISPLAY_DOWNLOAD', 4);
 define('RESOURCELIB_DISPLAY_OPEN', 5);
 /** Open in "emulated" pop-up without navigation */
 define('RESOURCELIB_DISPLAY_POPUP', 6);
+
 /** Legacy files not needed or new resource */
 define('RESOURCELIB_LEGACYFILES_NO', 0);
 /** Legacy files conversion marked as completed */
