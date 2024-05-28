@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Link to CSV course upload.
+ * Adds the URL metadata preview page under the development section.
  *
  * @package    tool_urlpreview
- * @copyright  2023 Emily Lim <n10882243@qut.edu.au>
+ * @copyright  2024 Team "the Z" https://github.com/Catalyst-QUT-2023
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
