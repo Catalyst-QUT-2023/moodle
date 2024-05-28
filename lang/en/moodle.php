@@ -2338,6 +2338,7 @@ $string['uploadrenamedchars'] = 'File was renamed from {$a->oldname} to {$a->new
 $string['uploadserverlimit'] = 'Uploaded file exceeded the maximum size limit set by the server';
 $string['uploadthisfile'] = 'Upload this file';
 $string['url'] = 'URL';
+$string['urltimeout'] = 'Timeout occurred while fetching URL: ${a}';
 $string['used'] = 'Used';
 $string['usedinnplaces'] = 'Used in {$a} places';
 $string['user'] = 'User';

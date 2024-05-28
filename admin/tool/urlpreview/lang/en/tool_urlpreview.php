@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 $string['content'] = 'Content';
 $string['deleteunusedpreviews'] = 'Delete unused previews';
 $string['linkpreview'] = 'Link Preview';
-$string['loading'] = 'url preview generating \'{$a}\'';
+$string['loading'] = 'Url preview generating \'{$a}\'';
 $string['menuname'] = 'URL Metadata Preview';
 $string['pluginname'] = 'urlpreview';
 $string['preview'] = 'Preview';

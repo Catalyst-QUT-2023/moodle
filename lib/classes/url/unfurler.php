@@ -98,7 +98,7 @@ class unfurl {
 
         $errorno = $curl->get_errno();
         if ($errorno === CURLE_OPERATION_TIMEOUTED) {
-            echo "Timeout occurred while fetching URL: $url";
+            echo get_string('urltimeout', 'moodle', $url);
             return;
         }
         $this->extract_html_metadata($url, $curlresponse);
