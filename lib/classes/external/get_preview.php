@@ -51,6 +51,7 @@ class get_preview extends external_api {
      * @param string $url
      */
     public static function execute($url) {
+        global $DB;
         // Parameter validation.
         ['url' => $url] = self::validate_parameters(
             self::execute_parameters(),
@@ -61,7 +62,7 @@ class get_preview extends external_api {
         $context = \context_system::instance();
         self::validate_context($context);
 
-        global $DB;
+        
 
         // Check if the linted data for this URL is already in the database.
         $sql = "SELECT * FROM {urlpreview} WHERE " . $DB->sql_compare_text('url') . " = ?";
