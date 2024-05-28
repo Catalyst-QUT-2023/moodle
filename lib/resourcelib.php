@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -39,6 +40,7 @@ define('RESOURCELIB_DISPLAY_DOWNLOAD', 4);
 define('RESOURCELIB_DISPLAY_OPEN', 5);
 /** Open in "emulated" pop-up without navigation */
 define('RESOURCELIB_DISPLAY_POPUP', 6);
+
 /** Legacy files not needed or new resource */
 define('RESOURCELIB_LEGACYFILES_NO', 0);
 /** Legacy files conversion marked as completed */
@@ -91,7 +93,7 @@ function resourcelib_try_file_migration($filepath, $cmid, $courseid, $component,
     } while (false);
 
     // copy and keep the same path, name, etc.
-    $file_record = ['contextid' => $context->id, 'component' => $component, 'filearea' => $filearea, 'itemid' => $itemid];
+    $file_record = array('contextid'=>$context->id, 'component'=>$component, 'filearea'=>$filearea, 'itemid'=>$itemid);
     try {
         return $fs->create_file_from_storedfile($file_record, $file);
     } catch (Exception $e) {
@@ -111,17 +113,17 @@ function resourcelib_get_displayoptions(array $enabled, $current=null) {
         $enabled[] = $current;
     }
 
-    $options = [RESOURCELIB_DISPLAY_AUTO     => get_string('resourcedisplayauto'),
-                RESOURCELIB_DISPLAY_EMBED    => get_string('resourcedisplayembed'),
-                RESOURCELIB_DISPLAY_FRAME    => get_string('resourcedisplayframe'),
-                RESOURCELIB_DISPLAY_NEW      => get_string('resourcedisplaynew'),
-                RESOURCELIB_DISPLAY_DOWNLOAD => get_string('resourcedisplaydownload'),
-                RESOURCELIB_DISPLAY_OPEN     => get_string('resourcedisplayopen'),
-                RESOURCELIB_DISPLAY_POPUP    => get_string('resourcedisplaypopup')];
+    $options = array(RESOURCELIB_DISPLAY_AUTO     => get_string('resourcedisplayauto'),
+                     RESOURCELIB_DISPLAY_EMBED    => get_string('resourcedisplayembed'),
+                     RESOURCELIB_DISPLAY_FRAME    => get_string('resourcedisplayframe'),
+                     RESOURCELIB_DISPLAY_NEW      => get_string('resourcedisplaynew'),
+                     RESOURCELIB_DISPLAY_DOWNLOAD => get_string('resourcedisplaydownload'),
+                     RESOURCELIB_DISPLAY_OPEN     => get_string('resourcedisplayopen'),
+                     RESOURCELIB_DISPLAY_POPUP    => get_string('resourcedisplaypopup'));
 
-    $result = [];
+    $result = array();
 
-    foreach ($options as $key => $value) {
+    foreach ($options as $key=>$value) {
         if (in_array($key, $enabled)) {
             $result[$key] = $value;
         }

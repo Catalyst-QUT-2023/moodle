@@ -26,11 +26,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 /** Display full frame */
-define('RESOURCELIB_DISPLAY_FULL', 0);
+define('URLPREVIEW_DISPLAY_FULL', 0);
 /** Display slim frame */
-define('RESOURCELIB_DISPLAY_SLIM', 1);
+define('URLPREVIEW_DISPLAY_SLIM', 1);
 /** Display none */
-define('RESOURCELIB_DISPLAY_NONE', 2);
+define('URLPREVIEW_DISPLAY_NONE', 2);
 
 require_once($CFG->libdir.'/filelib.php');
 
@@ -82,7 +82,7 @@ class unfurl {
 
     /**
      * Unfurler contructor.
-     * @param string $url 
+     * @param string $url
      */
     public function __construct($url) {
 
@@ -103,6 +103,7 @@ class unfurl {
         }
         $this->extract_html_metadata($url, $curlresponse);
     }
+
     /**
      * Extract metadata from url.
      * @param string $url The URL from which to extract metadata.
@@ -183,6 +184,7 @@ class unfurl {
             }
         }
     }
+
     /**
      * Render metadata.
      */
@@ -194,8 +196,10 @@ class unfurl {
         // Use the render_from_template method to render Mustache template.
         return $OUTPUT->render_from_template('tool_urlpreview/metadata', $unfurldata);
     }
+
     /**
-     * Formatting preview data.
+     * Formats url preview data by passing it to the render_from_template function.
+     * @param array $data retrieved data from urlpreview table to be rendered.
      */
     public static function format_preview_data($data) {
         global $OUTPUT;
@@ -225,9 +229,9 @@ class unfurl {
         }
     
         $options = [
-            RESOURCELIB_DISPLAY_FULL => get_string('resourcedisplayfull'),
-            RESOURCELIB_DISPLAY_SLIM => get_string('resourcedisplayslim'),
-            RESOURCELIB_DISPLAY_NONE => get_string('resourcedisplaynone')
+            URLPREVIEW_DISPLAY_FULL => get_string('resourcedisplayfull'),
+            URLPREVIEW_DISPLAY_SLIM => get_string('resourcedisplayslim'),
+            URLPREVIEW_DISPLAY_NONE => get_string('resourcedisplaynone')
         ];
 
         $result = [];

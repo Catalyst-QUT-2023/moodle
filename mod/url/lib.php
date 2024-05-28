@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -118,6 +119,7 @@ function url_add_instance($data, $mform) {
         $displayoptions['printintro']   = (int)!empty($data->printintro);
     }
     $data->displayoptions = serialize($displayoptions);
+
     $data->externalurl = url_fix_submitted_url($data->externalurl);
 
     $data->timemodified = time();
@@ -139,6 +141,7 @@ function url_update_instance($data, $mform) {
     global $CFG, $DB;
 
     require_once($CFG->dirroot.'/mod/url/locallib.php');
+
     $parameters = array();
     for ($i=0; $i < 100; $i++) {
         $parameter = "parameter_$i";
@@ -159,6 +162,7 @@ function url_update_instance($data, $mform) {
         $displayoptions['printintro']   = (int)!empty($data->printintro);
     }
     $data->displayoptions = serialize($displayoptions);
+
     $data->externalurl = url_fix_submitted_url($data->externalurl);
 
     $data->timemodified = time();
@@ -245,7 +249,7 @@ function url_get_coursemodule_info($coursemodule) {
     $unfurler = new unfurl($url->externalurl);
     $urlpreview = $url->urlpreview;
     
-    if ($urlpreview == RESOURCELIB_DISPLAY_FULL) {
+    if ($urlpreview == URLPREVIEW_DISPLAY_FULL) {
         $metadata = [
             'title' => $unfurler->title ?: format_string($url->name),
             'sitename' => $unfurler->sitename,
@@ -254,7 +258,7 @@ function url_get_coursemodule_info($coursemodule) {
             'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,
         ];
         $info->content = $OUTPUT->render_from_template('core/url_preview_card', $metadata);
-    } else if ($urlpreview == RESOURCELIB_DISPLAY_SLIM) {
+    } else if ($urlpreview == URLPREVIEW_DISPLAY_SLIM) {
         $metadata = [
             'title' => $unfurler->title ?: format_string($url->name),
             'sitename' => $unfurler->sitename,
