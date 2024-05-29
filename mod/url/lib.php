@@ -246,38 +246,22 @@ function url_get_coursemodule_info($coursemodule) {
         $info->content = format_module_intro('url', $url, $coursemodule->id, false);
     }
 
+    // Renders the url preview.
     $unfurler = new unfurl($url->externalurl);
     $urlpreview = $url->urlpreview;
-    
+    $metadata = [
+        'title' => $unfurler->title ?: format_string($url->name),
+        'sitename' => $unfurler->sitename,
+        'image' => $unfurler->image,
+        'description' => $unfurler->description,
+        'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,
+    ];
     if ($urlpreview == URLPREVIEW_DISPLAY_FULL) {
-        $metadata = [
-            'title' => $unfurler->title ?: format_string($url->name),
-            'sitename' => $unfurler->sitename,
-            'image' => $unfurler->image,
-            'description' => $unfurler->description,
-            'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,
-        ];
         $info->content = $OUTPUT->render_from_template('core/url_preview_card', $metadata);
     } else if ($urlpreview == URLPREVIEW_DISPLAY_SLIM) {
-        $metadata = [
-            'title' => $unfurler->title ?: format_string($url->name),
-            'sitename' => $unfurler->sitename,
-            'image' => $unfurler->image,
-            'description' => $unfurler->description,
-            'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,
-        ];
-
         $info->content = $OUTPUT->render_from_template('core/url_preview_slim', $metadata);
-    } else {
-        $metadata = [
-            'title' => $unfurler->title ?: format_string($url->name),
-            'sitename' => $unfurler->sitename,
-            'image' => $unfurler->image,
-            'description' => $unfurler->description,
-            'canonicalurl' => $unfurler->canonicalurl ?: $url->externalurl,
-        ];
     }
-    
+
     $info->customdata['display'] = $display;
     // The icon will be filtered from now on because the custom icons have been updated.
     $info->customdata['filtericon'] = true;
