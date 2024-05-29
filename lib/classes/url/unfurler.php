@@ -227,7 +227,7 @@ class unfurl {
         if ($current !== null && is_numeric($current)) {
             $enabled[] = $current;
         }
-    
+
         $options = [
             URLPREVIEW_DISPLAY_FULL => get_string('resourcedisplayfull'),
             URLPREVIEW_DISPLAY_SLIM => get_string('resourcedisplayslim'),
